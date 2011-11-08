@@ -1,0 +1,5 @@
+Packages:
+    python-qt4 acpi
+
+PIP:
+    pip install -r pip-reqs.txt
