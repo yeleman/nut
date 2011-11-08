@@ -1,0 +1,19 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<formset id="malaria-test" title="Malaria Monthly Report" onload="validate()" onvalidate="">
+<form id='u5' title="Children Under Five">
+<script type="text/python"><![CDATA[
+def validate():
+    total_malaria_cases = document.getElementById('total_malaria_cases').getElementsByTagName('input')[0].firstChild.nodeValue
+]]></script>
+<separator id='consultation' title="Consultation" />
+<item id="total_malaria_cases">
+    <label>Total Malaria Cases</label>
+    <input type="posint" onchange="" />
+</item>
+<item id="total_malaria_deaths">
+    <label>Total Malaria Deaths</label>
+    <input type="posint" onchange="" />
+</item>
+<separator/>
+</form>
+</formset>

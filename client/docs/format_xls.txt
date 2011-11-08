@@ -1,0 +1,19 @@
+# Le type de fichier prise en charge est *.xls(excel).
+  Dans ce fichier:
+   La colonne A doit contenir les noms des labels;
+   La colonne B doit contenir les valeurs des données; 
+   la colonne C doit contenir les contraintes.
+# le nom de chaque feuille du classeur est utilisé comme titre de la page.
+# Pas de possibilité de ligne vierge.
+
+# Comme contraintes on a:
+   Number pour les nombres negatifs et positif
+   Text pour tout (caractere, chffres etc ...)
+   Number-positive pour les nombres positifs
+   Number-negative pour les nombres negatifs
+   Bolean pour les vrais ou faux
+   Section pour le nom des sections
+   Interval-temps pour les intervalles de temps (temps1-temps2)
+   Interval-number pour les intervalles de noombres (nombre1-nombre2)
+   
+   
