@@ -1,5 +1,12 @@
 # Django settings for web project.
 
+import os
+import tempfile
+
+ROOT_DIR = os.path.dirname(os.path.abspath(__file__))
+LOGS_DIR = os.path.join(ROOT_DIR, 'logs')
+TEMP_DIR = tempfile.gettempdir()
+
 DEBUG = True
 TEMPLATE_DEBUG = DEBUG
 
@@ -27,11 +34,11 @@ DATABASES = {
 # timezone as the operating system.
 # If running in a Windows environment this must be set to the same as your
 # system time zone.
-TIME_ZONE = 'America/Chicago'
+TIME_ZONE = 'Africa/Bamako'
 
 # Language code for this installation. All choices can be found here:
 # http://www.i18nguy.com/unicode/language-identifiers.html
-LANGUAGE_CODE = 'en-us'
+LANGUAGE_CODE = 'fr-fr'
 
 SITE_ID = 1
 
@@ -93,11 +100,17 @@ TEMPLATE_LOADERS = (
 )
 
 MIDDLEWARE_CLASSES = (
+    'django.middleware.gzip.GZipMiddleware',
     'django.middleware.common.CommonMiddleware',
     'django.contrib.sessions.middleware.SessionMiddleware',
     'django.middleware.csrf.CsrfViewMiddleware',
     'django.contrib.auth.middleware.AuthenticationMiddleware',
     'django.contrib.messages.middleware.MessageMiddleware',
+    'django.middleware.locale.LocaleMiddleware',
+    'babeldjango.middleware.LocaleMiddleware',
+    'bolibana_tools.middleware.Http500Middleware',
+    'bolibana_tools.middleware.Http404Middleware',
+    'bolibana_tools.middleware.Http403Middleware',
 )
 
 ROOT_URLCONF = 'web.urls'
@@ -115,10 +128,18 @@ INSTALLED_APPS = (
     'django.contrib.sites',
     'django.contrib.messages',
     'django.contrib.staticfiles',
-    # Uncomment the next line to enable the admin:
-    # 'django.contrib.admin',
-    # Uncomment the next line to enable admin documentation:
-    # 'django.contrib.admindocs',
+    'django.contrib.admin',
+    'django.contrib.admindocs',
+
+    'django.contrib.humanize',
+    'babeldjango',
+    #'nosms',
+    'bolibana_auth',
+    'bolibana_reporting',
+    'bolibana_tools',
+    'nut',
+    'reversion',
+    'django_extensions',
 )
 
 # A sample logging configuration. The only tangible logging
@@ -143,3 +164,45 @@ LOGGING = {
         },
     }
 }
+
+DEFAULT_LOCALE = 'fr_FR.UTF-8'
+
+EMAIL_HOST = 'localhost'
+EMAIL_PORT = 25
+EMAIL_SENDER = 'root@localhost'
+
+LOGIN_URL = '/login'
+LOGIN_REDIRECT_URL = '/'
+MESSAGE_STORAGE = 'django.contrib.messages.storage.cookie.CookieStorage'
+
+#NOSMS_HANDLER = 'pnlp_sms.palu.nosms_handler'
+#NOSMS_TRANSPORT_HOST = 'localhost'
+#NOSMS_TRANSPORT_PORT = 13013
+#NOSMS_TRANSPORT_USERNAME = None
+#NOSMS_TRANSPORT_PASSWORD = None
+
+HOTLINE_NUMBER = "00000000"
+HOTLINE_EMAIL = "root@localhost"
+
+SUPPORT_CONTACTS = [('unknown', u"HOTLINE", HOTLINE_EMAIL)]
+
+ENABLE_FORTUNE = True
+
+USE_HTTPS = False
+
+TEMPLATE_CONTEXT_PROCESSORS = ("django.contrib.auth.context_processors.auth",
+    "django.core.context_processors.debug",
+    "django.core.context_processors.i18n",
+    "django.core.context_processors.media",
+    "django.core.context_processors.static",
+    "django.contrib.messages.context_processors.messages",
+    "bolibana_tools.context_processors.add_provider",
+    "bolibana_tools.context_processors.add_level")
+
+AUTH_PROFILE_MODULE = 'bolibana_auth.Provider'
+
+# loads custom settings from a separate file
+try:
+    from local_settings import *
+except ImportError:
+    pass

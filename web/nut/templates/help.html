@@ -1,0 +1,51 @@
+{% extends "base.html" %}
+
+{% block title %}Aide{% endblock %}
+{% block pagetitle %}<h1 class="pagetitle">Aide en ligne</h1>{% endblock %}
+{% block content-class %}context help{% endblock %}
+
+{% block jqueryonload %}addJQEventForHelpNavigation();{% endblock %}
+
+{% block content %}
+<p>Cette section vous permettra de trouver des réponses aux questions que vous pouvez vous poser sur l'outil.</p>
+<p>Si vous ne trouvez pas satisfaction dans cette section, <a href="{% url support %}">faîtes nous en part</a> pour que nous améliorions ce contenu.</p>
+
+<h2>Listes des sujets traités</h2>
+<ul class="help">
+<li><a href="#lost_login">J'ai perdu mon identifiant.</a></li>
+<li><a href="#lost_password">J'ai perdu mon mot de passe.</a></li>
+<li><a href="#change_password">Comment changer mon mot de passe ?</a></li>
+<li><a href="#edit_prodile">Comment changer mes informations (nom, e-mail, téléphone) ?</a></li>
+</ul>
+
+<h2>Réponses</h2>
+
+<div><a name="lost_login"></a>
+<h3>J'ai perdu mon identifiant.</h3>
+<p>En cas de perte de votre identifiant, il vous faut contacter l'ANTIM.</p>
+<p>Vous pouvez les joindre via le <a href="{% url support %}">formulaire de contact</a> ou par téléphone.</p></div>
+
+
+<div><a name="lost_password"></a>
+<h3>J'ai perdu mon mot de passe.</h3>
+<p>En cas de perte de votre mot de passe, il vous faut contacter l'ANTIM.</p>
+<p>Vous pouvez les joindre via le <a href="{% url support %}">formulaire de contact</a> ou par téléphone.</p></div>
+
+<div><a name="change_password"></a>
+<h3>Comment changer mon mot de passe ?</h3>
+<p>Vous pouvez changer votre mot de passe depuis <a href="{% url profile %}">votre profil</a> accessible à tout moment en cliquant sur votre nom en haut de l'écran.</p>
+<p>Vous devez être identifié pour changer de mot de passe.</p>
+<p>Si vous n'arrivez pas à vous identifiez, referrez vous à <a href="#lost_login">la section correspondante</a>.</p></div>
+
+<div><a name="edit_prodile"></a>
+<h3>Comment changer mes informations (nom, e-mail, téléphone) ?</h3>
+<p>Depuis <a href="{% url profile %}">votre profil</a> (accessible en cliquant sur votre nom), vous pouvez changer votre informations personnelles:</p>
+<ul>
+<li>Prénom</li>
+<li>Nom</li>
+<li>Adresse e-mail. Celle-ci sera utilisé pour vous envoyer des informations et notifications ainsi que votre mot de passe.</li>
+<li>Numéro de téléphone. Celui-ci sera utilisé pour vous avertir (nouveaux rapports).</li>
+</ul>
+<p>Vous devez être identifié pour modifier ces informations.</p></div>
+
+{% endblock %}

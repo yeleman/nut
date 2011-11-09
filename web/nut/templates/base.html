@@ -1,0 +1,69 @@
+{% load i18n %}<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN"
+ "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en" lang="en">
+<head>
+    <meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
+    <title>NUT | {% block title %}Gao{% endblock %} - Routine Nutrition</title>
+    <link rel="stylesheet" media="screen" type="text/css" href="{% url static 'nut.css' %}" title="NUT" />
+    <link rel="stylesheet" media="print" type="text/css" href="{% url static 'print.css' %}" />
+    <link rel="shortcut icon" href="{% url static 'images/nut_favicon.png' %}" />
+    {% block javascript %}{% endblock %}
+    <meta http-equiv="Content-Language" content="fr-fr" />
+    <meta name="ROBOTS" content="ALL" />
+    <meta name="Copyright" content="ACF, PESINET, ANTIM, YELEMAN" />
+    <meta name="keywords" content="nutrition, gao, mali, antim, sms" />
+    <meta name="description" content="Système d'information de routine sur la nutrition au Nord Mali. Données SMS et Web." />
+</head>
+<body>
+    <div id="page">
+        <div id="header" class="mainbox">
+            <div id="logo"></div>
+            <h1><a href="{% url index %}">NUT</a></h1>
+            <ul id="user-menu">
+            {% if web_provider.is_authenticated %}
+            <li><a href="{% url profile %}" title="{% trans 'Edit your informations' %}">{{ web_provider.get_full_name }}</a></li>
+            <li><a href="{% url logout %}" title="{% trans 'Log out' %}">{% trans "Disconnect" %}</a></li>
+            {% else %}
+            <li><a href="{% url login %}" title="{% trans 'Log in' %}">{% trans "Log in" %}</a></li>
+            {% endif %}
+            <li><a href="{% url help %}" title="{% trans 'View Help Topics' %}">{% trans "Help" %}</a></li>
+            </ul>
+
+            <div id="breadcrumbs">{%block breadcrumbs %}{% endblock %}</div>
+            <div id="menu">{% include "menu.html" with category=category%}</div>
+        </div>
+        {% block submenu %}{% endblock %}
+        <div id="content" class="mainbox {% block page-name %}default{% endblock %} {% block content-class %}{% endblock %}">
+        {% if messages %}
+        <ul id="messages" title="{% trans 'Informative Messages. Click to hide.' %}">
+            {% for message in messages %}
+            <li{% if message.tags %} class="{{ message.tags }}"{% endif %}>{{ message }}</li>
+            {% endfor %}
+        </ul>
+        {% endif %}
+        {% block pagetitle %}{% endblock %}
+        {% block content %}
+        {% endblock %}
+        </div>
+        <div id="footer">
+        <ul>
+            <li><a href="{% url support %}" title="{% trans 'Contact Us' %}">{% trans "Contact" %}</a></li>
+            <li><a href="{% url about %}" title="{% trans 'About NUT' %}">{% trans "About" %}</a></li>
+            <li><a href="{% url media '' %}" title="Documents et téléchargements">Ressources</a></li>
+        </ul>
+        </div>
+        <div id="top-link"><a class="anchor" href="">↑Haut</a></div>
+    </div>
+</body>
+<script type="text/javascript" src="{% url static 'jquery-1.6.2.min.js' %}"></script>
+<script type="text/javascript" src="{% url static 'nut.js' %}"></script>
+{% if category == 'indicator_data' %}<script type="text/javascript" src="{% url static 'highcharts.js' %}"></script>{% endif %}
+<script type="text/javascript">
+$(document).ready(function(){
+    addMessagesClickEvent();
+    addLogoClickEvent('{% url index %}');
+    {% block jqueryonload %}{% endblock %}
+    {% if category != 'indicator_data' %}addJavascript("{% url static 'highcharts.js' %}", 'head');{% endif %}
+});
+</script>
+</html>

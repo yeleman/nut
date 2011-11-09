@@ -1,5 +1,12 @@
 Packages:
-    
+    python-mysqldb
 
 PIP:
     pip install -r pip-reqs.txt
+
+REPO:
+    Please symlink all those in your site-packages
+
+    https://github.com/yeleman/bolibana_auth
+    https://github.com/yeleman/bolibana_reporting
+    https://github.com/yeleman/bolibana_tools

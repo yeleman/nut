@@ -1,0 +1,841 @@
+// main layout
+
+html {
+    background: none;
+}
+
+body {
+    font-family: "Trebuchet MS", sans-serif;
+    background-color: @background;
+    height: 100%;
+}
+
+#page {
+    width: 955px;
+    background-color: @background-content;
+    margin: auto;
+    margin-top: 0;
+    padding: 0;
+
+    //border: 1px solid #2d3339;
+    //box-shadow: 0 3px 6px rgba(0,0,0,0.77);
+    border-top: 0;
+}
+
+#header {
+    position: relative;
+    width: 955px;
+    height: 160px;
+    background-color: @green;
+    background-image: @header_png;
+
+    box-shadow: 0 1px 6px rgba(0,0,0,0.77);
+}
+
+.hidden {
+    display: none;
+}
+
+.visible {
+    display: block;
+}
+
+
+#header h1 {
+    display: none;
+}
+
+accronym {
+    border-bottom: 1px dotted;
+}
+
+#content p {
+    margin-top: .2em;
+    margin-bottom: .2em;
+}
+
+.inlinelist {
+    display: inline;
+    color: @text-background;
+    padding-left: 0.4em;
+    padding-right: 0.4em;
+}
+
+ul#user-menu {
+    background-color: @background;
+    right: 0;
+    top: 0;
+    position: absolute;
+    //max-width: 210px;
+    list-style-type: none;
+    padding-left: 20px;
+    padding-right: 20px;
+    padding-top: 10px;
+    padding-bottom: 15px;
+}
+
+ul#user-menu li {
+    .inlinelist;
+    font-size: 85%;
+}
+
+ul#user-menu li a {
+    color: @text-background;
+}
+
+ul#user-menu li:hover a {
+    color: @green;
+}
+
+#logo {
+    left: 30px;
+    top: 10px;
+    width: 152px;
+    height: 140px;
+    position: absolute;
+    opacity: .5;
+    cursor: pointer;
+}
+
+#menu {
+    background-image: @menu_bg_png;
+    height: 64px;
+    position: absolute;
+    width: 726px;
+    left: 169px;
+    bottom: 1px;
+    padding-left: 60px;
+}
+
+#menu ul {
+    bottom: 0px;
+    padding: 0;
+    position: absolute;
+    height: 27px;
+    //background-color: blue;
+}
+
+#menu ul li {
+    .inlinelist;
+    font-size: 108%;
+    padding: 10px;
+    padding-top: 14px;
+    border-left: 1px solid @text-background;
+}
+
+#menu ul li:first-child {
+    border-left: none;
+}
+
+#menu ul li:hover, #menu ul li.hover {
+    background-image: @menu_selected_png;
+    background-position: center top;
+    background-repeat: no-repeat;
+}
+
+
+#content {
+    position: relative;
+    padding-left: 36px;
+    padding-right: 36px;
+    padding-top: 17px;
+    padding-bottom: 17px;
+    color: @text-content;
+    box-shadow: 0 10px 6px rgba(0,0,0,0.77);
+}
+
+#footer {
+    position: absolute;
+    margin-top: 20px;
+    padding-bottom: 10px;
+}
+
+#footer ul {
+    margin-left: 26px;
+}
+
+#footer ul li {
+    .inlinelist;
+    font-size: 77%;
+    padding-right: 10px;
+    padding-left: 10px;
+    border-left: 1px solid @text-background;
+    text-transform: uppercase;
+    line-height: 0.75em;
+}
+
+#footer ul li:first-child {
+    border-left: none;
+}
+
+h1.pagetitle,
+h2.pagetitle {
+    font-size: 116%;
+    text-transform: uppercase;
+    background-image: @bullet_png;
+    background-position: left center;
+    background-repeat: no-repeat;
+    padding-left: 1em;
+    color: @text-content-title;
+    margin-bottom: 2em;
+}
+
+h2.pagetitle {
+    background: none;
+    margin-top: 1em;
+    margin-bottom: 1em;
+}
+
+#content p, #content h2, #content h3, #content form, 
+#content ul, #content li, #content table.background, 
+#content #context > table, #content #context > button,
+#content #context > div {
+    margin-left: 30px;
+    margin-right: 30px;
+}
+
+#content.fulltext > p:first-child:first-line,
+#content.fulltext > .ad:first-child + p:first-line {
+    text-transform:uppercase;  
+    position:relative;  
+    font-size:0.95em;  
+    letter-spacing:1px;  
+}
+#content.fulltext > p:first-child:first-letter, 
+#content.fulltext > :first-child + p:first-letter {
+    letter-spacing: 0;
+    text-transform: uppercase;
+    font-size: 2.5em;
+    float: left;
+    margin:0.13em 0.2em 0 0;
+    line-height: 0.7;
+}
+
+h2 {
+    font-size: 123.1%;
+    text-transform: uppercase;
+    background-image: @bullet2_png;
+    background-position: left center;
+    background-repeat: no-repeat;
+    padding-left: 1.5em;
+    color: @text-content-title;
+    margin-bottom: 1em;
+    margin-top: 1em;
+}
+
+ul#messages {
+    position: absolute;
+    right: 2em;
+    border-radius: .7em;
+    padding: 1em;
+    background-color: @background-menu; //@green;
+    opacity: .65;
+    color: @text-background;
+    max-width: 30em;
+    cursor: pointer;
+    z-index: 99;
+}
+
+ul#messages li {
+    list-style: square inside;
+}
+
+ul#messages.hidden {
+    display: none;
+}
+
+
+table {
+    border-collapse: collapse;
+    width: 100%;
+    margin-top: 1em;
+    margin-bottom: 1em;
+    color: @text-table;
+}
+
+caption, h3.caption {
+    color: @text-caption;
+    font-size: 108%;
+    margin-bottom: 1em;
+    font-weight: normal;
+}
+
+caption strong, h3.caption strong {
+    color: black;
+}
+
+#content #context > table {
+    width: 823px;
+}
+
+th {
+    background: none repeat scroll 0 0 @green;
+    color: @text-table-head;
+    text-transform: uppercase;
+    padding: 8px;
+}
+
+td, th {
+    border-left: 2px solid @background-content;
+    border-right: 2px solid @background-content;
+}
+
+td {
+    padding: 8px;
+}
+
+tr {
+    border-bottom: solid 6px @border-table-nodata;
+}
+
+tr:nth-child(even) td {
+    background-color: @background-table-even;
+}
+
+tr:nth-child(odd) td {
+    background-color: @background-table-odd;
+}
+
+td a, td a:visited, td a:hover, td a:link {
+    color: @text-content;
+}
+
+#content.context #context {
+    position: relative;
+    background-color: @background-context;
+    padding: 1em 0em 1em 0em;
+}
+
+#content.context th, #content.context td {
+    border-left: 2px solid @background-context;
+    border-right: 2px solid @background-context;
+}
+
+#content.context tr {
+    border-bottom: solid 6px @background-context;
+}
+
+tr.reference th {
+    background-color: darken(@green, 8);
+    //color: darken(@text-table-head, 50);
+}
+
+.click {
+    cursor: pointer;
+}
+
+tr:hover td {
+    background-color: @green;
+    //opacity: .6;
+}
+
+
+em {
+    font-style: italic;
+}
+
+strong {
+    font-weight: bold;
+}
+
+.lower {
+    text-transform: lowercase;
+}
+
+
+
+div.fileinputs input#fakefield {
+	margin-left: 8px;
+	margin-top: 6px;
+    padding-top: 3px;
+    padding-left: 6px;
+    border-radius: 1em;
+    background-color: white;
+    border: 1px solid #b8e4a9;
+    height: 16px;
+    color: #2c3238;
+    text-transform: uppercase;
+    font-size: 77%;
+    width: 28.8em;
+    cursor: pointer;
+}
+
+span.button {
+    background-color: transparent;
+    text-transform: uppercase;
+    padding: 0;
+    padding-right: 2px;
+    margin: 0;
+    border: 0;
+    color: @text-background;
+	z-index: 1;
+    display: none;
+    cursor: pointer;
+}
+
+#send {
+    position: absolute;
+    left: 31.5em;
+    top: 0;
+    background-color: @green;
+    text-transform: uppercase;
+    border: 0;
+    color: @text-background;
+    height: 32px;
+    cursor: pointer;
+    padding-left: 1em;
+    padding-right: 1em;
+    font-size: 77%;
+}
+
+div.fileinputs input:focus {
+	background-color: transparent;
+}
+
+div.fileinputs {
+    background-color: @green;
+	position: relative;
+	height: 32px;
+	width: 24em;
+}
+
+input.file {
+	width: 23em;
+    height: 32px;
+	margin: 0;
+    left: .5em;
+}
+
+input.file.hidden {
+	position: relative;
+	opacity: 0;
+	z-index: 2;
+}
+
+div.fakefile {
+	position: absolute;
+	top: 0px;
+	left: 0px;
+	width: 24em;
+	padding: 0;
+	margin: 0;
+	z-index: 1;
+	height: 32px;
+}
+
+form {
+    padding-top: 1em;
+    padding-bottom: 1em;
+}
+
+strong.bright {
+    color: @green;
+}
+
+#content li {
+    list-style: square inside;
+}
+
+#content a, #content a:link, #content a:hover, #content a:active {
+    color: @green;
+}
+
+h3 {
+    font-size: 108%;
+    color: @text-content;
+    font-weight: bold;
+    margin-bottom: 1em;
+    margin-top: 1em;
+}
+
+sup {vertical-align: super; }
+sub { vertical-align: sub; }
+
+table.background {
+    max-width: 622px;
+    width: auto;
+    font-size: .8em;
+}
+
+#content #sidebar {
+    position: absolute;
+    //float: right;
+    top: 24px;
+    right: 36px;
+    //margin-right: -174px;
+    width: 192px;
+    padding-top: 2em;
+    padding-bottom: 1em;
+    margin-bottom: 2em;
+    background-color: @green;
+}
+
+#sidebar * {
+    color: @text-background;
+    padding-left: 0;
+    margin-left: 0;
+}
+
+#sidebar a {
+    color: white;
+}
+
+#sidebar h2 {
+    font-size: 93%;
+    background: 0;
+    margin-bottom: 2em;
+    margin-top: 0;
+}
+
+#sidebar p, li {
+    font-size: 85%;
+}
+
+#sidebar li {
+    margin-left: 0;
+}
+
+#content.withsidebar {
+    padding-right: 270px;
+}
+
+#content tr:hover td a:active, #content tr:hover td a:link, #content tr:hover td a:visited, #content tr:hover td a {
+    color: @text-background;
+}
+
+html * .center {
+    text-align: center;
+}
+
+html * .left {
+    text-align: left;
+}
+
+html * .right {
+    text-align: right;
+}
+
+html * .justify {
+    text-align: justify;
+}
+
+html * td.nodata {
+    background-color: @background-dark;
+}
+
+tr.spacer, tr.spacer td {
+    background-color: transparent;
+}
+
+html * td.changed {
+    background-color: orange;
+}
+
+html * td.error {
+    background-color: @red;
+}
+
+button.formbutt {
+    background-color: white;
+    color: @text-button;
+    text-transform: uppercase;
+    border-radius: 1.5em;
+    border: 0;
+    padding: 6px 30px 6px 10px;
+    margin: .5em 0 .5em 0;
+    font-size: 85%;
+    cursor: pointer;
+    font-weight: 600;
+    background-image: @button_bubble_png;
+    background-position: 98% 40%;
+    background-repeat: no-repeat;
+    box-shadow: inset -1px -1px #888;
+}
+
+button.formbutt:hover {
+    box-shadow: inset 1px 1px #888;
+}
+
+button.formbutt.important {
+    background-color: @background-dark;
+    color: @text-background;
+    box-shadow: inset -1px -1px #96989a;
+}
+
+button.formbutt.important:hover {
+    box-shadow: inset 1px 1px #96989a;
+}
+
+button.formbutt.default {
+    background-color: darken(@background-context, 10%);
+}
+
+#validate_form {
+    position: absolute;
+    right: 36px;
+}
+
+button.linkbutt {
+    background-color: @background-context;
+    color: @text-button;
+    text-transform: uppercase;
+    border-radius: 1.5em;
+    border: 0;
+    //padding: 6px 30px 6px 10px;
+    padding: 6px;
+    font-size: 85%;
+    cursor: pointer;
+    font-weight: 600;
+    box-shadow: inset -1px -1px #888;
+}
+
+.rightbuttons {
+    width: 823px;
+    text-align:right;
+}
+
+button.download {
+    background-image: @button_bubble_download_png;
+}
+
+
+#submenu {
+    position: relative;
+    padding-left: 36px;
+    padding-right: 36px;
+    padding-top: 6px;
+    color: @text-background;
+    background-color: @background;
+    height: 36px;
+    //box-shadow: 0 1px 6px rgba(0,0,0,0.77);
+}
+
+#submenu label {
+    padding-right: 15px;
+    margin-right: 20px;
+    background-image: @arrow_png;
+    background-position: right 65%;
+    background-repeat: no-repeat;
+}
+
+#submenu a, #submenu select {
+    margin-right: 16px;
+}
+
+#submenu a {
+    text-transform: uppercase;
+    font-weight: bold;
+    color: @green;
+}
+
+select.browser {
+background-color: white;
+    color: @text-button;
+    text-transform: uppercase;
+    border-radius: 1.5em;
+    border: 0;
+    padding: 3px 10px 3px 10px;
+    margin: .5em 0 .5em 0;
+    font-size: 85%;
+    cursor: pointer;
+    font-weight: 600;
+    //background-image: @select_bubble_png;
+    background-position: 98% 40%;
+    background-repeat: no-repeat;
+    box-shadow: inset -1px -1px #888;
+}
+
+#period_nav {
+    width: 100%;
+    height: 36px;
+    background-color: @green;
+    color: white;
+    font-size: 93%;
+    text-transform: uppercase;
+    padding-top: 6px;
+    font-weight: bold;
+}
+
+#period_nav.unvalidated {
+    background-color: @orange;
+}
+
+
+#content .clr {
+	clear:both;
+}
+
+#content.context.withsidebar #sidebar {
+    top: 66px;
+    padding-top: 22px;
+    position: relative;
+    right: 0px;
+    top: 0px;
+    float: right;
+    margin-right: -174px;
+}
+
+#content.context.withsidebar #sidebar ul li a, 
+#content.context.withsidebar #sidebar ul li a:active {
+    color: @text-background;
+}
+
+#content.context.withsidebar #sidebar ul.main > li a, 
+#content.context.withsidebar #sidebar ul.main > li a:active {
+    color: @text-content-title;
+}
+
+#content.context.withsidebar #sidebar {
+    width: 142px;
+}
+
+#content.context.withsidebar {
+    padding-right: 210px;
+}
+
+#content.context.withsidebar #period_nav {
+    //width: 691px;
+    width: 741px;
+}
+
+#content.context.withsidebar #context > table {
+    //width: 580px;
+    width: 640px;
+}
+
+#content.context.withsidebar #sidebar ul ul li:hover a,
+#content.context.withsidebar #sidebar ul ul li.hover a {
+    color: @text-content;
+}
+
+#content.context.withsidebar #sidebar ul > li {
+    list-style: none outside none;
+}
+
+#content.context.withsidebar #sidebar ul li.hover {
+    list-style: @list_selected_dark_png outside none;
+}
+
+#content.context.withsidebar #sidebar ul.main > li:hover,
+#content.context.withsidebar #sidebar ul.main > li.hover {
+    background-color: white;
+}
+
+#content.context.withsidebar #sidebar ul.main > li.hover {
+    text-align: right;
+    padding-right: 1em;
+}
+
+#content.context.withsidebar #sidebar ul {
+    margin-left: 0px;
+    padding-left: 1em;
+}
+
+#content.context.withsidebar #sidebar * {
+    margin-right: 0;
+}
+
+#content.context.withsidebar #sidebar ul > li {
+    padding-top: .1em;
+    padding-bottom: .1em;
+    font-size: 93%;
+}
+
+#content.context.withsidebar #sidebar ul.main {
+    padding-left: 0;
+    text-transform: uppercase;
+}
+
+#content.context.withsidebar #sidebar ul.main > li {
+    margin-top: 20px;
+}
+
+#content.context.withsidebar #sidebar ul.main > li {
+    font-size: 108%;
+}
+
+#content.context.withsidebar #sidebar ul.main > li {
+    list-style: @bullet_png inside none;
+}
+
+#content > ul, #content > ol {
+    font-size: 100%;
+    margin: 1em;
+}
+
+#content ul li, #content ol li {
+    font-size: 100%;
+}
+
+#content ol li {
+    list-style: decimal inside none;
+}
+
+#content ul.help {
+    font-size: 113%;
+}
+
+#content > ul.help li {
+    //list-style: @bullet_png inside none;
+}
+
+#content > ul.help a {
+    font-weight: bold;
+    color: @text-content;
+}
+
+#content.help div {
+    padding-top: .1em;
+    padding-bottom: .5em;
+}
+
+#content div.helpon {
+    background-color: darken(@background-context, 30);
+}
+
+#top-link a:link, #top-link a:visited {
+    background-color: #777770;
+    border: 1px solid #B7B7AE;
+    border-radius: 4px 4px 4px 4px;
+    bottom: 10px;
+    box-shadow: 1px 2px 3px #333333;
+    color: #F3F3ED;
+    display: block;
+    float: left;
+    font-size: 14px;
+    line-height: 1.2;
+    outline: 0 none;
+    padding: 4px 10px;
+    position: fixed;
+    right: 10px;
+    text-align: center;
+    width: 50px;
+}
+
+#content.download table th a { color: white; }
+#content.download hr { display: none; }
+#content.download table img { display: none; }
+#content.download table a, 
+#content.download table a:link, 
+#content.download table a:hover, 
+#content.download table a:active {
+    font-weight: bold;
+    color: @text-content;
+}
+
+.reporting_rate {
+    color: @white;
+    font-weight: bold;
+}
+
+td.success {
+    background-color: @green;
+}
+
+td.warning {
+    background-color: @orange;
+}
+
+input.hidden {
+    display: block;
+}

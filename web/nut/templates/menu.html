@@ -1,0 +1,8 @@
+{% load bolibana %}
+{% if web_provider.is_authenticated %}
+    <ul>
+
+    </ul>
+{% else %}
+{% if fortune %}<ul><li title="[{{ fortune.0 }}] {{ fortune.2 }}">{{ fortune.1 }}</li></ul>{% endif %}
+{% endif %}
