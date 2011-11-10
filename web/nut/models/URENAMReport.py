@@ -21,11 +21,11 @@ class UrenamReport(Report):
         verbose_name_plural = _(u"URENAM Reports")
 
     total_beginning_month_6_59 = models.PositiveIntegerField( \
-                                           _(u"Total at the beginning of the month"))
+                                   _(u"Total at the beginning of the month"))
     m_total_beginning_month_6_59 = models.PositiveIntegerField( \
-                                           _(u"M total at the beginning of the month"))
+                                   _(u"M total at the beginning of the month"))
     f_total_beginning_month_6_59 = models.PositiveIntegerField( \
-                                           _(u"F total at the beginning of the month"))
+                                   _(u"F total at the beginning of the month"))
     p_t_o70_u80_or_imc_u18_6_59 = models.PositiveIntegerField( \
                                            _(u"P/T >= 70% < 80% or IMC < 18"))
     pb_u120mm_or_pb_u210mm_6_59 = models.PositiveIntegerField( \
@@ -37,7 +37,7 @@ class UrenamReport(Report):
     relapse_6_59 = models.PositiveIntegerField( \
                                            _(u"Relapse (postwar)"))
     readimission_6_59 = models.PositiveIntegerField( \
-                                           _(u"Readimission (after Abadon) or medical"))
+                                   _(u"Readimission (after Abadon) or medical"))
     nutritional_reference_admission_6_59 = models.PositiveIntegerField( \
                                            _(u"Nutritional reference"))
     total_admission_6_59  = models.PositiveIntegerField( \
@@ -70,11 +70,11 @@ class UrenamReport(Report):
                                            _(u"F total remaining to month end"))
 
     total_beginning_month_fe_fa = models.PositiveIntegerField( \
-                                           _(u"Total at the beginning of the month"))
+                                   _(u"Total at the beginning of the month"))
     m_total_beginning_month_fe_fa = models.PositiveIntegerField( \
-                                           _(u"M total at the beginning of the month"))
+                                   _(u"M total at the beginning of the month"))
     f_total_beginning_month_fe_fa = models.PositiveIntegerField( \
-                                           _(u"F total at the beginning of the month"))
+                                   _(u"F total at the beginning of the month"))
     p_t_o70_u80_or_imc_u18_fe_fa = models.PositiveIntegerField( \
                                            _(u"P/T >= 70% < 80% or IMC < 18"))
     pb_u120mm_or_pb_u210mm_fe_fa = models.PositiveIntegerField( \
@@ -86,7 +86,7 @@ class UrenamReport(Report):
     relapse_fe_fa = models.PositiveIntegerField( \
                                            _(u"Relapse (postwar)"))
     readimission_fe_fa = models.PositiveIntegerField( \
-                                           _(u"Readimission (after Abadon) or medical"))
+                                   _(u"Readimission (after Abadon) or medical"))
     nutritional_reference_admission_fe_fa = models.PositiveIntegerField( \
                                            _(u"Nutritional reference"))
     total_admission_fe_fa  = models.PositiveIntegerField( \
@@ -113,11 +113,11 @@ class UrenamReport(Report):
                                            _(u"F total remaining to month end"))
 
     total_beginning_month_monitoring_1_2 = models.PositiveIntegerField( \
-                                           _(u"Total at the beginning of the month"))
+                                   _(u"Total at the beginning of the month"))
     m_total_beginning_month_monitoring_1_2 = models.PositiveIntegerField( \
-                                           _(u"M total at the beginning of the month"))
+                                   _(u"M total at the beginning of the month"))
     f_total_beginning_month_monitoring_1_2 = models.PositiveIntegerField( \
-                                           _(u"F total at the beginning of the month"))
+                                   _(u"F total at the beginning of the month"))
     p_t_o70_u80_or_imc_u18_monitoring_1_2 = models.PositiveIntegerField( \
                                            _(u"P/T >= 70% < 80% or IMC < 18"))
     pb_u120mm_or_pb_u210mm_monitoring_1_2 = models.PositiveIntegerField( \
@@ -154,52 +154,5 @@ class UrenamReport(Report):
                                            _(u"M total remaining to month end"))
     f_total_remaining_to_month_end_1_2  = models.PositiveIntegerField( \
                                            _(u"F total remaining to month end"))
-
-    def add_6_59_month_data(self, total_beginning_month_6_59, \
-                                m_total_beginning_month_6_59, \
-                                f_total_beginning_month_6_59, \
-                                p_t_o70_u80_or_imc_u18_6_59, \
-                                pb_u120mm_or_pb_u210mm_6_59, \
-                                other_6_59, \
-                                new_case_6_59, \
-                                relapse_6_59, \
-                                readimission_6_59, \
-                                nutritional_reference_admission_6_59, \
-                                total_admission_6_59, \
-                                m_total_admission_6_59, \
-                                f_total_admission_6_59, \
-                                refers_to_3_or_2_6_59, \
-                                death_6_59, \
-                                drop_6_59, \
-                                non_respondent_6_59, \
-                                medical_transfer_6_59, \
-                                total_output_6_59, \
-                                m_total_output_6_59, \
-                                f_total_output_6_59, \
-                                total_remaining_to_month_end_6_59, \
-                                m_total_remaining_to_month_end_6_59, \
-                                f_total_remaining_to_month_end_6_59):
-        self.total_beginning_month_6_59 = total_beginning_month_6_59
-        self.m_total_beginning_month_6_59 = m_total_beginning_month_6_59
-        self.f_total_beginning_month_6_59 = f_total_beginning_month_6_59
-        self.p_t_o70_u80_or_imc_u18_6_59 = p_t_o70_u80_or_imc_u18_6_59
-        self.pb_u120mm_or_pb_u210mm_6_59 = pb_u120mm_or_pb_u210mm_6_59
-        self.other_6_59 = other_6_59
-        self.new_case_6_59 = new_case_6_59
-        self.relapse_6_59 = relapse_6_59
-        self.nutritional_reference_admission_6_59 = nutritional_reference_admission_6_59
-        self.total_admission_6_59 = total_admission_6_59
-        self.m_total_admission_6_59 = m_total_admission_6_59
-        self.f_total_admission_6_59 = f_total_admission_6_59
-        self.refers_to_3_or_2_6_59 = refers_to_3_or_2_6_59
-        self.death_6_59 = death_6_59
-        self.drop_6_59 = drop_6_59
-        self.non_respondent_6_59 = non_respondent_6_59
-        self.total_output_6_59 = total_output_6_59
-        self.m_total_output_6_59 = m_total_output_6_59
-        self.f_total_output_6_59 = f_total_output_6_59
-        self.total_remaining_to_month_end_6_59 = total_remaining_to_month_end_6_59
-        self.m_total_remaining_to_month_end_6_59 = m_total_remaining_to_month_end_6_59
-        self.f_total_remaining_to_month_end_6_59 = f_total_remaining_to_month_end_6_59
 
 reversion.register(UrenamReport)
