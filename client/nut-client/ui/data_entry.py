@@ -33,3 +33,10 @@ class DataEntryWidget(REDEWidget):
         gridbox.addWidget(self.date, 2, 2)
         vbox.addLayout(gridbox)
         self.setLayout(vbox)
+
+        self.popup()
+
+    def popup(self):
+        mbox = QtGui.QMessageBox.about(self, _(u"Test popup"), \
+                          _(u"This is a test popup\n\n" \
+                            u"Thanks."))
