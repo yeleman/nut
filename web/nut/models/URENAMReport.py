@@ -23,7 +23,7 @@ class URENAMReport(Report):
                                    _(u"F total at the beginning of the month"))
     u59_w_h_o70_u80_or_BMI_u18 = models.PositiveIntegerField( \
                                            _(u"W/H >= 70% < 80% or BMI < 18"))
-    u59_MUAC_u120mor_MUAC_u210mm = models.PositiveIntegerField( \
+    u59_MUAC_u120_mor_MUAC_u210mm = models.PositiveIntegerField( \
                                            _(u"MUAC < 120 mm (ou MUAC < 210 mm)"))
     u59_other = models.PositiveIntegerField( \
                                            _(u"Other"))
@@ -70,7 +70,7 @@ class URENAMReport(Report):
                                    _(u"F total at the beginning of the month"))
     pw_w_h_o70_u80_or_BMI_u18 = models.PositiveIntegerField( \
                                            _(u"P/T >= 70% < 80% or IMC < 18"))
-    pw_MUAC_u120mor_MUAC_u210mmm = models.PositiveIntegerField( \
+    pw_MUAC_u120_mor_MUAC_u210mmm = models.PositiveIntegerField( \
                                            _(u"PB < 120 mm (ou PB < 210 mm)"))
     pw_other = models.PositiveIntegerField( \
                                            _(u"Other"))
@@ -115,7 +115,7 @@ class URENAMReport(Report):
                                    _(u"F total at the beginning of the month"))
     f2_w_h_o70_u80_or_BMI_u18 = models.PositiveIntegerField( \
                                            _(u"P/T >= 70% < 80% or IMC < 18"))
-    f2_MUAC_u120mor_MUAC_u210mm = models.PositiveIntegerField( \
+    f2_MUAC_u120m_or_MUAC_u210mm = models.PositiveIntegerField( \
                                            _(u"PB < 120 mm (ou PB < 210 mm)"))
     f2_other = models.PositiveIntegerField( \
                                            _(u"Other"))
