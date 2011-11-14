@@ -4,155 +4,152 @@
 
 import reversion
 from django.db import models
-from django.db.models.signals import pre_save, post_save
-from django.contrib import admin
-from django.dispatch import receiver
-from django.utils.translation import ugettext_lazy as _, ugettext
+from django.utils.translation import ugettext_lazy as _
 
 from bolibana_reporting.models import Report
 
-import inspect
-
-class UrenamReport(Report):
+class URENAMReport(Report):
     """ """
     class Meta:
         app_label = 'nut'
         verbose_name = _(u"URENAM Report")
         verbose_name_plural = _(u"URENAM Reports")
 
-    total_beginning_month_6_59 = models.PositiveIntegerField( \
+    u59_total_beginning_month = models.PositiveIntegerField( \
                                    _(u"Total at the beginning of the month"))
-    m_total_beginning_month_6_59 = models.PositiveIntegerField( \
+    u59_total_beginning_month_m = models.PositiveIntegerField( \
                                    _(u"M total at the beginning of the month"))
-    f_total_beginning_month_6_59 = models.PositiveIntegerField( \
+    u59_total_beginning_month_f = models.PositiveIntegerField( \
                                    _(u"F total at the beginning of the month"))
-    p_t_o70_u80_or_imc_u18_6_59 = models.PositiveIntegerField( \
-                                           _(u"P/T >= 70% < 80% or IMC < 18"))
-    pb_u120mm_or_pb_u210mm_6_59 = models.PositiveIntegerField( \
-                                           _(u"PB < 120 mm (ou PB < 210 mm)"))
-    other_6_59 = models.PositiveIntegerField( \
+    u59_w_h_o70_u80_or_BMI_u18 = models.PositiveIntegerField( \
+                                           _(u"W/H >= 70% < 80% or BMI < 18"))
+    u59_MUAC_u120mor_MUAC_u210mm = models.PositiveIntegerField( \
+                                           _(u"MUAC < 120 mm (ou MUAC < 210 mm)"))
+    u59_other = models.PositiveIntegerField( \
                                            _(u"Other"))
-    new_case_6_59 = models.PositiveIntegerField( \
+    u59_new_case = models.PositiveIntegerField( \
                                            _(u"New case"))
-    relapse_6_59 = models.PositiveIntegerField( \
+    u59_relapse = models.PositiveIntegerField( \
                                            _(u"Relapse (postwar)"))
-    readimission_6_59 = models.PositiveIntegerField( \
+    u59_readimission = models.PositiveIntegerField( \
                                    _(u"Readimission (after Abadon) or medical"))
-    nutritional_reference_admission_6_59 = models.PositiveIntegerField( \
+    u59_nutritional_reference_admission = models.PositiveIntegerField( \
                                            _(u"Nutritional reference"))
-    total_admission_6_59  = models.PositiveIntegerField( \
+    u59_total_admission  = models.PositiveIntegerField( \
                                            _(u"Total admission"))
-    m_total_admission_6_59  = models.PositiveIntegerField( \
+    u59_total_admission  = models.PositiveIntegerField( \
                                            _(u"M total admission"))
-    f_total_admission_6_59  = models.PositiveIntegerField( \
+    u59_total_admission  = models.PositiveIntegerField( \
                                        _(u"F total admission"))
-    refers_to_3_or_2_6_59  = models.PositiveIntegerField( \
+    u59_refers_to_3_or_2  = models.PositiveIntegerField( \
                                            _(u"Referes 3 ou 2"))
-    death_6_59  = models.PositiveIntegerField( \
+    u59_death  = models.PositiveIntegerField( \
                                            _(u"Death"))
-    drop_6_59  = models.PositiveIntegerField( \
+    u59_drop  = models.PositiveIntegerField( \
                                            _(u"Drop"))
-    non_respondent_6_59  = models.PositiveIntegerField( \
+    u59_non_respondent  = models.PositiveIntegerField( \
                                            _(u"Cured"))
-    medical_transfer_6_59  = models.PositiveIntegerField( \
+    u59_medical_transfer  = models.PositiveIntegerField( \
                                            _(u"Medical transfer output"))
-    total_output_6_59  = models.PositiveIntegerField( \
+    u59_total_output = models.PositiveIntegerField( \
                                            _(u"Total output"))
-    m_total_output_6_59  = models.PositiveIntegerField( \
+    u59_total_output_m  = models.PositiveIntegerField( \
                                            _(u"M total output"))
-    f_total_output_6_59  = models.PositiveIntegerField( \
+    u59_total_output_f  = models.PositiveIntegerField( \
                                            _(u"Ftotal output"))
-    total_remaining_to_month_end_6_59  = models.PositiveIntegerField( \
+    u59_total_remaining_to_month_end = models.PositiveIntegerField( \
                                            _(u"Total remaining to month end"))
-    m_total_remaining_to_month_end_6_59  = models.PositiveIntegerField( \
+    u59_total_remaining_to_month_end_m  = models.PositiveIntegerField( \
                                            _(u"M total remaining to month end"))
-    f_total_remaining_to_month_end_6_59  = models.PositiveIntegerField( \
+    u59_total_remaining_to_month_end_f  = models.PositiveIntegerField( \
                                            _(u"F total remaining to month end"))
 
-    total_beginning_month_fe_fa = models.PositiveIntegerField( \
+    pw_total_beginning_month = models.PositiveIntegerField( \
                                    _(u"Total at the beginning of the month"))
-    m_total_beginning_month_fe_fa = models.PositiveIntegerField( \
-                                   _(u"M total at the beginning of the month"))
-    f_total_beginning_month_fe_fa = models.PositiveIntegerField( \
+    pw_total_beginning_month = models.PositiveIntegerField( \
                                    _(u"F total at the beginning of the month"))
-    p_t_o70_u80_or_imc_u18_fe_fa = models.PositiveIntegerField( \
+    pw_w_h_o70_u80_or_BMI_u18 = models.PositiveIntegerField( \
                                            _(u"P/T >= 70% < 80% or IMC < 18"))
-    pb_u120mm_or_pb_u210mm_fe_fa = models.PositiveIntegerField( \
+    pw_MUAC_u120mor_MUAC_u210mmm = models.PositiveIntegerField( \
                                            _(u"PB < 120 mm (ou PB < 210 mm)"))
-    other_fe_fa = models.PositiveIntegerField( \
+    pw_other = models.PositiveIntegerField( \
                                            _(u"Other"))
-    new_case_fe_fa = models.PositiveIntegerField( \
+    pw_new_case = models.PositiveIntegerField( \
                                            _(u"New case"))
-    relapse_fe_fa = models.PositiveIntegerField( \
+    pw_relapse = models.PositiveIntegerField( \
                                            _(u"Relapse (postwar)"))
-    readimission_fe_fa = models.PositiveIntegerField( \
+    pw_readimission = models.PositiveIntegerField( \
                                    _(u"Readimission (after Abadon) or medical"))
-    nutritional_reference_admission_fe_fa = models.PositiveIntegerField( \
+    pw_nutritional_reference_admission = models.PositiveIntegerField( \
                                            _(u"Nutritional reference"))
-    total_admission_fe_fa  = models.PositiveIntegerField( \
+    pw_total_admission  = models.PositiveIntegerField( \
                                            _(u"Total admission "))
-    f_total_admission_fe_fa  = models.PositiveIntegerField( \
+    pw_total_admission  = models.PositiveIntegerField( \
                                            _(u"F total admission "))
-    refers_to_3_or_2_fe_fa  = models.PositiveIntegerField( \
-                                           _(u"Referes 3 ou 2"))
-    death_fe_fa  = models.PositiveIntegerField( \
-                                           _(u"Death"))
-    drop_fe_fa  = models.PositiveIntegerField( \
-                                           _(u"Drop"))
-    non_ respondent_fe_fa  = models.PositiveIntegerField( \
+    pw_cured  = models.PositiveIntegerField( \
                                            _(u"Cured"))
-    medical_transfer_fe_fa  = models.PositiveIntegerField( \
+    pw_refers_to_3_or_2  = models.PositiveIntegerField( \
+                                           _(u"Referes 3 ou 2"))
+    pw_death  = models.PositiveIntegerField( \
+                                           _(u"Death"))
+    pw_drop  = models.PositiveIntegerField( \
+                                           _(u"Drop"))
+    pw_non_respondent  = models.PositiveIntegerField( \
+                                           _(u"Cured"))
+    pw_medical_transfer  = models.PositiveIntegerField( \
                                            _(u"Medical transfer output"))
-    total_output_fe_fa  = models.PositiveIntegerField( \
+    pw_total_output  = models.PositiveIntegerField( \
                                            _(u"Total output"))
-    f_total_output_fe_fa  = models.PositiveIntegerField( \
+    pw_total_output  = models.PositiveIntegerField( \
                                            _(u"Ftotal output"))
-    total_remaining_to_month_end_fe_fa  = models.PositiveIntegerField( \
+    pw_total_remaining_to_month_end  = models.PositiveIntegerField( \
                                            _(u"Total remaining to month end"))
-    f_total_remaining_to_month_end_fe_fa  = models.PositiveIntegerField( \
+    pw_total_remaining_to_month_end  = models.PositiveIntegerField( \
                                            _(u"F total remaining to month end"))
 
-    total_beginning_month_monitoring_1_2 = models.PositiveIntegerField( \
+    f2_total_beginning_month = models.PositiveIntegerField( \
                                    _(u"Total at the beginning of the month"))
-    m_total_beginning_month_monitoring_1_2 = models.PositiveIntegerField( \
+    f2_total_beginning_month_m = models.PositiveIntegerField( \
                                    _(u"M total at the beginning of the month"))
-    f_total_beginning_month_monitoring_1_2 = models.PositiveIntegerField( \
+    f2_total_beginning_month_f = models.PositiveIntegerField( \
                                    _(u"F total at the beginning of the month"))
-    p_t_o70_u80_or_imc_u18_monitoring_1_2 = models.PositiveIntegerField( \
+    f2_w_h_o70_u80_or_BMI_u18 = models.PositiveIntegerField( \
                                            _(u"P/T >= 70% < 80% or IMC < 18"))
-    pb_u120mm_or_pb_u210mm_monitoring_1_2 = models.PositiveIntegerField( \
+    f2_MUAC_u120mor_MUAC_u210mm = models.PositiveIntegerField( \
                                            _(u"PB < 120 mm (ou PB < 210 mm)"))
-    other_monitoring_1_2 = models.PositiveIntegerField( \
+    f2_other = models.PositiveIntegerField( \
                                            _(u"Other"))
-    nutritional_reference_admission_monitoring_1_2 = models.PositiveIntegerField( \
+    f2_nutritional_reference_admission = models.PositiveIntegerField( \
                                            _(u"Nutritional reference"))
-    total_admission_monitoring_1_2  = models.PositiveIntegerField( \
+    f2_total_admission = models.PositiveIntegerField( \
                                            _(u"Total admission "))
-    m_total_admission_monitoring_1_2  = models.PositiveIntegerField( \
+    f2_total_admission_m = models.PositiveIntegerField( \
                                            _(u"M total admission "))
-    f_total_admission_monitoring_1_2  = models.PositiveIntegerField( \
+    f2_total_admission_f = models.PositiveIntegerField( \
                                            _(u"F total admission "))
-    refers_to_3_or_2_1_2  = models.PositiveIntegerField( \
-                                           _(u"Referes 3 ou 2"))
-    death_1_2  = models.PositiveIntegerField( \
-                                           _(u"Death"))
-    drop_1_2  = models.PositiveIntegerField( \
-                                           _(u"Drop"))
-    non_ respondent_1_2  = models.PositiveIntegerField( \
+    f2_cured = models.PositiveIntegerField( \
                                            _(u"Cured"))
-    medical_transfer_1_2  = models.PositiveIntegerField( \
+    f2_refers_to_3_or_2 = models.PositiveIntegerField( \
+                                           _(u"Referes 3 ou 2"))
+    f2_death = models.PositiveIntegerField( \
+                                           _(u"Death"))
+    f2_drop = models.PositiveIntegerField( \
+                                           _(u"Drop"))
+    f2_non_respondent = models.PositiveIntegerField( \
+                                           _(u"Cured"))
+    f2_medical_transfer = models.PositiveIntegerField( \
                                            _(u"Medical transfer output"))
-    total_output_1_2  = models.PositiveIntegerField( \
+    f2_total_output = models.PositiveIntegerField( \
                                            _(u"Total output"))
-    m_total_output_1_2  = models.PositiveIntegerField( \
+    f2_total_output_m = models.PositiveIntegerField( \
                                            _(u"M total output"))
-    f_total_output_1_2  = models.PositiveIntegerField( \
+    f2_total_output_f = models.PositiveIntegerField( \
                                            _(u"Ftotal output"))
-    total_remaining_to_month_end_1_2  = models.PositiveIntegerField( \
+    f2_total_remaining_to_month_end = models.PositiveIntegerField( \
                                            _(u"Total remaining to month end"))
-    m_total_remaining_to_month_end_1_2  = models.PositiveIntegerField( \
+    f2_total_remaining_to_month_end_m = models.PositiveIntegerField( \
                                            _(u"M total remaining to month end"))
-    f_total_remaining_to_month_end_1_2  = models.PositiveIntegerField( \
+    f2_total_remaining_to_month_end_f = models.PositiveIntegerField( \
                                            _(u"F total remaining to month end"))
 
-reversion.register(UrenamReport)
+reversion.register(URENAMReport)
