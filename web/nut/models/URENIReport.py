@@ -19,13 +19,13 @@ class URENIReport(Report):
     # < 6 mois
     u6_total_beginning_month = models.PositiveIntegerField( \
                        _(u"Total at the beginning of the month"))
-    u6_m_total_beginning_month = models.PositiveIntegerField( \
+    u6_total_beginning_month_m = models.PositiveIntegerField( \
                        _(u"M total at the beginning of the month"))
-    u6_w_total_beginning_month = models.PositiveIntegerField( \
+    u6_total_beginning_month_f = models.PositiveIntegerField( \
                        _(u"F total at the beginning of the month"))
-    u6_p_t_u70_or_imc_u16 = models.PositiveIntegerField( \
+    u6_w_h_o70_u80_or_BMI_u16 = models.PositiveIntegerField( \
                        _(u"P/T < 70% ou IMC < 16"))
-    u6_pb_u11cm_or_pb_u18cm = models.PositiveIntegerField( \
+    u6_MUAC_u11cm_or_MUAC_u18cm = models.PositiveIntegerField( \
                        _(u"PB < 11cm (ou PB < 18cm"))
     u6_edemas = models.PositiveIntegerField( \
                        _(u"Edemas"))
@@ -41,9 +41,9 @@ class URENIReport(Report):
                        _(u"Transfer nutritional"))
     u6_total_admission  = models.PositiveIntegerField( \
                        _(u"Total admission"))
-    u6_m_total_admission  = models.PositiveIntegerField( \
+    u6_total_admission_m  = models.PositiveIntegerField( \
                        _(u"M total admission"))
-    u6_w_total_admission  = models.PositiveIntegerField( \
+    u6_total_admission_f  = models.PositiveIntegerField( \
                        _(u"F total admission"))
     u6_cured  = models.PositiveIntegerField( \
                        _(u"cured"))
@@ -59,79 +59,79 @@ class URENIReport(Report):
                        _(u"Nutritional transfer output"))
     u6_total_output  = models.PositiveIntegerField( \
                        _(u"Total output"))
-    u6_m_total_output  = models.PositiveIntegerField( \
+    u6_total_output_m  = models.PositiveIntegerField( \
                        _(u"M total output"))
-    u6_w_total_output  = models.PositiveIntegerField( \
+    u6_total_output_f  = models.PositiveIntegerField( \
                        _(u"Ftotal output"))
     u6_total_remaining_to_month_end  = models.PositiveIntegerField( \
                        _(u"Total remaining to month end"))
-    u6_m_total_remaining_to_month_end  = models.PositiveIntegerField( \
+    u6_total_remaining_to_month_end_m  = models.PositiveIntegerField( \
                        _(u"M total remaining to month end"))
-    u6_w_total_remaining_to_month_end  = models.PositiveIntegerField( \
+    u6_total_remaining_to_month_end_f  = models.PositiveIntegerField( \
                        _(u"F total remaining to month end"))
     # 6-59 mois
-    total_beginning_month_6_59 = models.PositiveIntegerField( \
+    u59_total_beginning_month = models.PositiveIntegerField( \
                     _(u"Total at the beginning of the month"))
-    m_total_beginning_month_6_59 = models.PositiveIntegerField( \
+    u59_m_total_beginning_month = models.PositiveIntegerField( \
                        _(u"M total at the beginning of the month"))
-    w_total_beginning_month_6_59 = models.PositiveIntegerField( \
+    u59_total_beginning_month = models.PositiveIntegerField( \
                        _(u"F total at the beginning of the month"))
-    p_t_u70_or_imc_u16_6_59 = models.PositiveIntegerField( \
+    u59_w_h_o70_u80_or_BMI_u16 = models.PositiveIntegerField( \
                        _(u"P/T < 70% ou IMC < 16"))
-    pb_u11cm_or_pb_u18cm_6_59 = models.PositiveIntegerField( \
+    u59_MUAC_u11cm_or_MUAC_u18cm = models.PositiveIntegerField( \
                        _(u"PB < 11cm (ou PB < 18cm"))
-    edemas_6_59 = models.PositiveIntegerField( \
+    u59_edemas = models.PositiveIntegerField( \
                        _(u"Edemas"))
-    other_6_59 = models.PositiveIntegerField( \
+    u59_other = models.PositiveIntegerField( \
                        _(u"Other"))
-    new_case_6_59 = models.PositiveIntegerField( \
+    u59_new_case = models.PositiveIntegerField( \
                        _(u"New case"))
-    relapse_6_59 = models.PositiveIntegerField( \
+    u59_relapse = models.PositiveIntegerField( \
                        _(u"Relapse (postwar)"))
-    readimission_6_59 = models.PositiveIntegerField( \
+    u59_readimission = models.PositiveIntegerField( \
                        _(u"Readimission (after Abadon) or medical"))
-    transfer_nutritional_admission_6_59 = models.PositiveIntegerField( \
+    u59_transfer_nutritional_admission = models.PositiveIntegerField( \
                        _(u"Transfer nutritional"))
-    total_admission_6_59  = models.PositiveIntegerField( \
+    u59_total_admission  = models.PositiveIntegerField( \
                        _(u"Total admission"))
-    m_total_admission_6_59  = models.PositiveIntegerField( \
+    u59_total_admission_m  = models.PositiveIntegerField( \
                        _(u"M total admission"))
-    w_total_admission_6_59  = models.PositiveIntegerField( \
+    u59_total_admission_f  = models.PositiveIntegerField( \
                        _(u"F total admission"))
-    cured_6_59  = models.PositiveIntegerField( \
+    u59_cured = models.PositiveIntegerField( \
                        _(u"cured"))
-    death_6_59  = models.PositiveIntegerField( \
+    u59_death = models.PositiveIntegerField( \
                        _(u"Death"))
-    drop_6_59  = models.PositiveIntegerField( \
+    u59_drop = models.PositiveIntegerField( \
                        _(u"Drop"))
-    not_responding_6_59  = models.PositiveIntegerField( \
+    u59_not_responding = models.PositiveIntegerField( \
                        _(u"Cured"))
-    medical_transfer_6_59  = models.PositiveIntegerField( \
+    u59_medical_transfer = models.PositiveIntegerField( \
                        _(u"Medical transfer output"))
-    nutritional_transfer_output_6_59  = models.PositiveIntegerField( \
+    u59_nutritional_transfer_output  = models.PositiveIntegerField( \
                        _(u"Nutritional transfer output"))
-    total_output_6_59  = models.PositiveIntegerField( \
+    u59_total_output = models.PositiveIntegerField( \
                        _(u"Total output"))
-    m_total_output_6_59  = models.PositiveIntegerField( \
+    u59_total_output_m = models.PositiveIntegerField( \
                        _(u"M total output"))
-    w_total_output_6_59  = models.PositiveIntegerField( \
+    u59_total_output_f = models.PositiveIntegerField( \
                        _(u"Ftotal output"))
-    total_remaining_to_month_end_6_59  = models.PositiveIntegerField( \
+    u59_total_remaining_to_month_end  = models.PositiveIntegerField( \
                        _(u"Total remaining to month end"))
-    m_total_remaining_to_month_end_6_59  = models.PositiveIntegerField( \
+    u59_total_remaining_to_month_end_m  = models.PositiveIntegerField( \
                        _(u"M total remaining to month end"))
-    w_total_remaining_to_month_end_6_59  = models.PositiveIntegerField( \
+    u59_total_remaining_to_month_end_f  = models.PositiveIntegerField( \
                        _(u"F total remaining to month end"))
     # > 59 mois
     o59_total_beginning_month = models.PositiveIntegerField( \
                        _(u"Total at the beginning of the month"))
-    o59_m_total_beginning_month = models.PositiveIntegerField( \
+    o59_total_beginning_month_m = models.PositiveIntegerField( \
                        _(u"M total at the beginning of the month"))
-    o59_w_total_beginning_month = models.PositiveIntegerField( \
+    o59_total_beginning_month_f = models.PositiveIntegerField( \
                        _(u"F total at the beginning of the month"))
-    o59_p_t_u70_or_imc_u16 = models.PositiveIntegerField( \
+    o59_w_h_o70_u80_or_BMI_u16 = models.PositiveIntegerField( \
                        _(u"P/T < 70% ou IMC < 16"))
-    o59_pb_u11cm_or_pb_u18cm = models.PositiveIntegerField( \
+    o59_MUAC_u11cm_or_MUAC_u18cm = models.PositiveIntegerField( \
                        _(u"PB < 11cm (ou PB < 18cm"))
     o59_edemas = models.PositiveIntegerField( \
                        _(u"Edemas"))
@@ -147,9 +147,9 @@ class URENIReport(Report):
                        _(u"Transfer nutritional"))
     o59_total_admission  = models.PositiveIntegerField( \
                        _(u"Total admission"))
-    o59_m_total_admission  = models.PositiveIntegerField( \
+    o59_total_admission_m  = models.PositiveIntegerField( \
                        _(u"M total admission"))
-    o59_w_total_admission  = models.PositiveIntegerField( \
+    o59_total_admission_f  = models.PositiveIntegerField( \
                        _(u"F total admission"))
     o59_cured  = models.PositiveIntegerField( \
                        _(u"cured"))
@@ -165,13 +165,15 @@ class URENIReport(Report):
                        _(u"Nutritional transfer output"))
     o59_total_output  = models.PositiveIntegerField( \
                        _(u"Total output"))
-    o59_m_total_output  = models.PositiveIntegerField( \
+    o59_total_output_m  = models.PositiveIntegerField( \
                        _(u"M total output"))
-    o59_w_total_output  = models.PositiveIntegerField( \
+    o59_total_output_f  = models.PositiveIntegerField( \
                        _(u"Ftotal output"))
     o59_total_remaining_to_month_end  = models.PositiveIntegerField( \
                        _(u"Total remaining to month end"))
-    o59_m_total_remaining_to_month_end  = models.PositiveIntegerField( \
+    o59_total_remaining_to_month_end_m  = models.PositiveIntegerField( \
                        _(u"M total remaining to month end"))
-    o59_w_total_remaining_to_month_end  = models.PositiveIntegerField( \
+    o59_total_remaining_to_month_end_f  = models.PositiveIntegerField( \
                        _(u"F total remaining to month end"))
+
+reversion.register(URENIReport)
