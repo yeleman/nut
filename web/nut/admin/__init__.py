@@ -6,11 +6,15 @@ from django.contrib import admin
 from django.contrib.auth.admin import UserAdmin
 from django.contrib.auth.models import User
 
-from bolibana_reporting.models import Entity, EntityType, Period
-from bolibana_reporting.admin import EntityAdmin, EntityTypeAdmin, PeriodAdmin
-from bolibana_auth.models import Role, Permission, Access, Provider
-from bolibana_auth.admin import (RoleAdmin, PermissionAdmin, \
+from bolibana.models import Entity, EntityType, Period
+from bolibana.admin import EntityAdmin, EntityTypeAdmin, PeriodAdmin
+from bolibana.models import Role, Permission, Access, Provider
+from bolibana.admin import (RoleAdmin, PermissionAdmin, \
                                  AccessAdmin, ProviderAdmin)
+from nut.models import PECNASReport, PECNAMReport, PECNIReport
+from nut.admin.PECNASReport import PECNASReportAdmin
+from nut.admin.PECNAMReport import PECNAMReportAdmin
+from nut.admin.PECNIReport import PECNIReportAdmin
 
 
 class ProviderUserStacked(admin.StackedInline):
@@ -25,6 +29,10 @@ class CustomUserAdmin(UserAdmin):
 # Adds a provider section to the django User Admin
 admin.site.unregister(User)
 admin.site.register(User, CustomUserAdmin)
+
+admin.site.register(PECNIReport, PECNIReportAdmin)
+admin.site.register(PECNASReport, PECNASReportAdmin)
+admin.site.register(PECNAMReport, PECNAMReportAdmin)
 
 admin.site.register(Period, PeriodAdmin)
 admin.site.register(Entity, EntityAdmin)

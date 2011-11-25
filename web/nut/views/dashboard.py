@@ -9,8 +9,8 @@ from django.shortcuts import render, RequestContext, redirect
 from django.utils.translation import ugettext as _, ugettext_lazy
 from django.conf import settings
 
-from bolibana_tools.decorators import provider_required
-from bolibana_tools.utils import send_email
+from bolibana.web.decorators import provider_required
+from bolibana.tools.utils import send_email
 
 
 def contact_choices(contacts):
@@ -35,7 +35,7 @@ class ContactForm(forms.Form):
     recipient = forms.ChoiceField(required=False, \
                                   label=ugettext_lazy(u"Recipient"), \
                           choices=contact_choices(settings.SUPPORT_CONTACTS), \
-                                  help_text=_(u"Choose PNLP for operational " \
+                                  help_text=_(u"Choose DNS for operational " \
                                               u"requests and ANTIM for " \
                                               u"technical ones."))
 

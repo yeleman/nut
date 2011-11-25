@@ -1,0 +1,59 @@
+
+PREFIXES:
+    u6_
+    u59_
+    o59_
+    fu1_
+    pw_
+    fu12_
+
+FIELDS:
+    total_beginning
+    total_beginning_m
+    total_beginning_f
+    hw_b7080_bmi_u18
+    muac_u120
+    hw_u70_bmi_u16
+    muac_u11_muac_u18
+    oedema
+    other
+    other_hiv   # HIV
+    other_tb    # tuberculosis
+    other_lwb   # low weight at birth
+
+    new_case
+    relapse
+    returned
+    nut_transfered_in
+    nut_referred_in
+    total_admitted
+    total_admitted_m
+    total_admitted_f
+
+    healed
+    referred_out
+    deceased
+    aborted
+    non_respondant
+    medic_transfered_out
+    nut_transfered_out
+    total_out
+    total_out_m
+    total_out_f
+
+    total_end
+    total_end_m
+    total_end_f
+
+STATUSES:
+
+    CREATED
+    AUTO_VALIDATED
+    VALIDATED
+    MODIFIED_BY_SUP
+    MODIFIED_BY_INF
+    
+
+    
+    
+
