@@ -113,7 +113,7 @@ MIDDLEWARE_CLASSES = (
     'bolibana.web.middleware.Http403Middleware',
 )
 
-ROOT_URLCONF = 'web.urls'
+ROOT_URLCONF = 'ylmnut.urls'
 
 TEMPLATE_DIRS = (
     # Put strings here, like "/home/html/django_templates" or "C:/www/django/templates".

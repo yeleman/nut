@@ -7,6 +7,6 @@ PIP:
 REPO:
     Please symlink all those in your site-packages
 
-    https://github.com/yeleman/bolibana_auth
-    https://github.com/yeleman/bolibana_reporting
-    https://github.com/yeleman/bolibana_tools
+    https://github.com/yeleman/bolibana
+
+    Also symlink nut/web as ylmnut
