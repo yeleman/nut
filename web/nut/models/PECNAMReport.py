@@ -113,7 +113,7 @@ class PECNAMReport(NUTReport, Report):
                                                    _(u"Total female departed"))
     pw_total_end_f = models.PositiveIntegerField( \
                                             _(u"Total frmale at end of month"))
-    
+
     # Follow_up (1) and (2)
     # pregnant women or feed_breasting women
     fu12_total_beginning_m = models.PositiveIntegerField( \
@@ -162,6 +162,7 @@ class PECNAMReport(NUTReport, Report):
     sources = models.ManyToManyField('PECNAMReport', \
                                      verbose_name=_(u"Sources"), \
                                      blank=True, null=True)
+
     # HELPERS
     def male_female_sum(self, field):
         """ sum of male + female for a field """
@@ -332,7 +333,7 @@ class PECNAMReport(NUTReport, Report):
     @property
     def all_returned(self):
         return self.all_for_field(inspect.stack()[0][3][4:])
-  
+
     @property
     def all_nut_transfered_in(self):
         return self.all_for_field(inspect.stack()[0][3][4:])

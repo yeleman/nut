@@ -180,6 +180,7 @@ class PECNIReport(NUTReport, Report):
     sources = models.ManyToManyField('PECNIReport', \
                                      verbose_name=_(u"Sources"), \
                                      blank=True, null=True)
+
     # HELPERS
     def male_female_sum(self, field):
         """ sum of male + female for a field """
@@ -301,7 +302,7 @@ class PECNIReport(NUTReport, Report):
     @property
     def all_returned(self):
         return self.all_for_field(inspect.stack()[0][3][4:])
-  
+
     @property
     def all_nut_transfered_in(self):
         return self.all_for_field(inspect.stack()[0][3][4:])
@@ -373,4 +374,3 @@ class PECNIReport(NUTReport, Report):
     @property
     def all_total_end_f(self):
         return self.all_for_field(inspect.stack()[0][3][4:])
-

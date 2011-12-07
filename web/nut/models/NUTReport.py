@@ -194,7 +194,7 @@ class NUTReport(object):
     @property
     def all_returned(self):
         return self.all_for_field(inspect.stack()[0][3][4:])
-  
+
     @property
     def all_nut_transfered_in(self):
         return self.all_for_field(inspect.stack()[0][3][4:])
@@ -281,6 +281,6 @@ def pre_save_report(sender, instance, **kwargs):
 def post_save_report(sender, instance, **kwargs):
     """ generates the receipt """
     if instance.receipt == 'NO_RECEIPT':
-        instance.receipt = generate_receipt(instance, fix='P', 
+        instance.receipt = generate_receipt(instance, fix='P',
                                             add_random=True)
         instance.save()

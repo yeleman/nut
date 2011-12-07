@@ -86,7 +86,8 @@ urlpatterns = patterns('',
      url(r'^about/$', direct_to_template, \
          {'template': 'about.html'}, name='about'),
 
-     url(r'^addressbook/$', bviews.addressbook.addressbook, name='addressbook'),
+     url(r'^addressbook/$',
+         bviews.addressbook.addressbook, name='addressbook'),
 
     # development only
     url(r'^static/admin/(?P<path>.*)$',

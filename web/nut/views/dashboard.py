@@ -109,6 +109,7 @@ class DateForm(forms.Form):
     import datetime
     date = forms.DateField(initial=datetime.date.today)
 
+
 def change_date(request):
 
     context = {}
@@ -117,7 +118,9 @@ def change_date(request):
         form = DateForm(request.POST)
         if form.is_valid():
             import subprocess
-            subprocess.call(['sudo', 'date', form.cleaned_data.get('date').strftime('%m%d1200%Y')])
+            subprocess.call(['sudo', 'date',
+                             form.cleaned_data.get('date') \
+                                              .strftime('%m%d1200%Y')])
             context.update({'success': True})
         else:
             pass

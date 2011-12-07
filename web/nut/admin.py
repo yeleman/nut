@@ -12,7 +12,9 @@ from bolibana.admin import EntityAdmin, EntityTypeAdmin, PeriodAdmin
 from bolibana.models import Role, Permission, Access, Provider
 from bolibana.admin import (RoleAdmin, PermissionAdmin, \
                                  AccessAdmin, ProviderAdmin)
-from nut.models import PECNASReport, PECNAMReport, PECNIReport
+from nut.models import (PECNASReport, PECNAMReport, PECNIReport,
+                        NUTInput, InputConsumptionReport, ConsumptionReport,
+                        InputOrderReport, OrderReport)
 
 
 class ProviderUserStacked(admin.StackedInline):
@@ -37,6 +39,33 @@ admin.site.register(Access, AccessAdmin)
 admin.site.register(Permission, PermissionAdmin)
 
 
+class InputAdmin(admin.ModelAdmin):
+    list_display = ('__unicode__', 'slug', 'name')
+
+
+class InputConsumptionReportAdmin(admin.ModelAdmin):
+    list_display = ('__unicode__', 'cons_report', 'nut_input',
+                    'initial', 'left')
+    list_filter = ('nut_input',)
+
+
+class InputOrderReportAdmin(admin.ModelAdmin):
+    list_display = ('__unicode__', 'order_report', 'nut_input', 'quantity')
+    list_filter = ('nut_input',)
+
+
+class ConsumptionReportAdmin(admin.ModelAdmin):
+    list_display = ('__unicode__', 'period', 'entity',
+                    'nut_type', 'receipt', '_status')
+    list_filter = ('period', 'type', '_status', 'nut_type')
+
+admin.site.register(NUTInput, InputAdmin)
+admin.site.register(InputConsumptionReport, InputConsumptionReportAdmin)
+admin.site.register(ConsumptionReport, ConsumptionReportAdmin)
+admin.site.register(OrderReport, ConsumptionReportAdmin)
+admin.site.register(InputOrderReport, InputOrderReportAdmin)
+
+
 class PECNIReportAdmin(admin.ModelAdmin):
     list_display = ('__unicode__', 'period', 'entity', 'receipt', '_status')
     list_filter = ('period', 'type', '_status')
@@ -50,7 +79,8 @@ class PECNIReportAdmin(admin.ModelAdmin):
                       'sources')
        }),
        (_(u"6-59 months"), {
-                        'fields': (('u6_total_beginning_m', 'u6_total_beginning_f'),
+                        'fields': (('u6_total_beginning_m',
+                        'u6_total_beginning_f'),
                         'u6_hw_u70_bmi_u16',
                         'u6_muac_u11_muac_u18',
                         'u6_oedema',
@@ -60,7 +90,9 @@ class PECNIReportAdmin(admin.ModelAdmin):
                         'u6_returned',
                         'u6_nut_transfered_in',
                         ('u6_admitted_m', 'u6_admitted_f'),
-                        ('u6_healed', 'u6_deceased', 'u6_aborted', 'u6_non_respondant', 'u6_medic_transfered_out', 'u6_nut_transfered_out'),
+                        ('u6_healed', 'u6_deceased', 'u6_aborted',
+                        'u6_non_respondant', 'u6_medic_transfered_out',
+                        'u6_nut_transfered_out'),
                         ('u6_total_out_m', 'u6_total_out_f'),
                         ('u6_total_end_m', 'u6_total_end_f'))
        }),
@@ -75,7 +107,9 @@ class PECNIReportAdmin(admin.ModelAdmin):
                         'u59_returned',
                         'u59_nut_transfered_in',
                         ('u59_admitted_m', 'u59_admitted_f'),
-                        ('u59_healed', 'u59_deceased', 'u59_aborted', 'u59_non_respondant', 'u59_medic_transfered_out', 'u59_nut_transfered_out'),
+                        ('u59_healed', 'u59_deceased', 'u59_aborted',
+                        'u59_non_respondant', 'u59_medic_transfered_out',
+                        'u59_nut_transfered_out'),
                         ('u59_total_out_m', 'u59_total_out_f'),
                         ('u59_total_end_m', 'u59_total_end_f'))
        }),
@@ -90,7 +124,9 @@ class PECNIReportAdmin(admin.ModelAdmin):
                         'o59_returned',
                         'o59_nut_transfered_in',
                         ('o59_admitted_m', 'o59_admitted_f'),
-                        ('o59_healed', 'o59_deceased', 'o59_aborted', 'o59_non_respondant', 'o59_medic_transfered_out', 'o59_nut_transfered_out'),
+                        ('o59_healed', 'o59_deceased', 'o59_aborted',
+                        'o59_non_respondant', 'o59_medic_transfered_out',
+                        'o59_nut_transfered_out'),
                         ('o59_total_out_m', 'o59_total_out_f'),
                         ('o59_total_end_m', 'o59_total_end_f'))
        }),
@@ -102,6 +138,7 @@ class PECNIReportAdmin(admin.ModelAdmin):
         return self.readonly_fields
 
 admin.site.register(PECNIReport, PECNIReportAdmin)
+
 
 class PECNAMReportAdmin(admin.ModelAdmin):
     list_display = ('__unicode__', 'period', 'entity', 'receipt', '_status')
@@ -125,7 +162,9 @@ class PECNAMReportAdmin(admin.ModelAdmin):
                         'u59_returned',
                         'u59_nut_referred_in',
                         ('u59_admitted_m', 'u59_admitted_f'),
-                        ('u59_healed', 'u59_referred_out', 'u59_deceased', 'u59_aborted', 'u59_non_respondant', 'u59_medic_transfered_out'),
+                        ('u59_healed', 'u59_referred_out', 'u59_deceased',
+                        'u59_aborted', 'u59_non_respondant',
+                        'u59_medic_transfered_out'),
                         ('u59_total_out_m', 'u59_total_out_f'),
                         ('u59_total_end_m', 'u59_total_end_f'))
        }),
@@ -139,7 +178,9 @@ class PECNAMReportAdmin(admin.ModelAdmin):
                         'pw_returned',
                         'pw_nut_referred_in',
                         'pw_admitted_f',
-                        ('pw_healed', 'pw_referred_out', 'pw_deceased', 'pw_aborted', 'pw_non_respondant', 'pw_medic_transfered_out'),
+                        ('pw_healed', 'pw_referred_out', 'pw_deceased',
+                        'pw_aborted', 'pw_non_respondant',
+                        'pw_medic_transfered_out'),
                         'pw_total_out_f',
                         'pw_total_end_f')
        }),
@@ -150,7 +191,9 @@ class PECNAMReportAdmin(admin.ModelAdmin):
                         ('fu12_other_hiv', 'fu12_other_tb', 'fu12_other_lwb'),
                         'fu12_nut_referred_in',
                         ('fu12_admitted_m', 'fu12_admitted_f'),
-                        ('fu12_healed', 'fu12_referred_out', 'fu12_deceased', 'fu12_aborted', 'fu12_non_respondant', 'fu12_medic_transfered_out'),
+                        ('fu12_healed', 'fu12_referred_out', 'fu12_deceased',
+                        'fu12_aborted', 'fu12_non_respondant',
+                        'fu12_medic_transfered_out'),
                         ('fu12_total_out_m', 'fu12_total_out_f'),
                         ('fu12_total_end_m', 'fu12_total_end_f'))
        }),
@@ -162,6 +205,7 @@ class PECNAMReportAdmin(admin.ModelAdmin):
         return self.readonly_fields
 
 admin.site.register(PECNAMReport, PECNAMReportAdmin)
+
 
 class PECNASReportAdmin(admin.ModelAdmin):
     list_display = ('__unicode__', 'period', 'entity', 'receipt', '_status')
@@ -187,7 +231,9 @@ class PECNASReportAdmin(admin.ModelAdmin):
                         'u59_nut_transfered_in',
                         'u59_nut_referred_in',
                         ('u59_admitted_m', 'u59_admitted_f'),
-                        ('u59_healed', 'u59_referred_out', 'u59_deceased', 'u59_aborted', 'u59_non_respondant', 'u59_medic_transfered_out', 'u59_nut_transfered_out'),
+                        ('u59_healed', 'u59_referred_out', 'u59_deceased',
+                        'u59_aborted', 'u59_non_respondant',
+                        'u59_medic_transfered_out', 'u59_nut_transfered_out'),
                         ('u59_total_out_m', 'u59_total_out_f'),
                         ('u59_total_end_m', 'u59_total_end_f'))
        }),
@@ -203,7 +249,9 @@ class PECNASReportAdmin(admin.ModelAdmin):
                         'o59_nut_transfered_in',
                         'o59_nut_referred_in',
                         ('o59_admitted_m', 'o59_admitted_f'),
-                        ('o59_healed', 'o59_referred_out', 'o59_deceased', 'o59_aborted', 'o59_non_respondant', 'o59_medic_transfered_out', 'o59_nut_transfered_out'),
+                        ('o59_healed', 'o59_referred_out', 'o59_deceased',
+                        'o59_aborted', 'o59_non_respondant',
+                        'o59_medic_transfered_out', 'o59_nut_transfered_out'),
                         ('o59_total_out_m', 'o59_total_out_f'),
                         ('o59_total_end_m', 'o59_total_end_f'))
        }),
@@ -219,7 +267,9 @@ class PECNASReportAdmin(admin.ModelAdmin):
                         'fu1_nut_transfered_in',
                         'fu1_nut_referred_in',
                         ('fu1_admitted_m', 'fu1_admitted_f'),
-                        ('fu1_healed', 'fu1_referred_out', 'fu1_deceased', 'fu1_aborted', 'fu1_non_respondant', 'fu1_medic_transfered_out', 'fu1_nut_transfered_out'),
+                        ('fu1_healed', 'fu1_referred_out', 'fu1_deceased',
+                        'fu1_aborted', 'fu1_non_respondant',
+                        'fu1_medic_transfered_out', 'fu1_nut_transfered_out'),
                         ('fu1_total_out_m', 'fu1_total_out_f'),
                         ('fu1_total_end_m', 'fu1_total_end_f'))
        }),

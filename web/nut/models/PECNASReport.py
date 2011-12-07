@@ -194,4 +194,3 @@ class PECNASReport(NUTReport, Report):
     sources = models.ManyToManyField('PECNASReport', \
                                      verbose_name=_(u"Sources"), \
                                      blank=True, null=True)
-

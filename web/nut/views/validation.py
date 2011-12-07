@@ -27,6 +27,7 @@ from pnlp_core.validators import MalariaReportValidator
 from pnlp_core.data import provider_can_or_403
 """
 
+
 @provider_permission('can_validate_report')
 def validation_list(request):
     context = {'category': 'validation'}
@@ -115,7 +116,7 @@ def report_validation(request, report_receipt):
                     new_report.save()
                     reversion.set_user(web_provider.user)
                     #new_report.save()
-                
+
                 context.update({'saved': True, 'report': new_report})
         else:
             # django form validation errors
