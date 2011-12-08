@@ -10,7 +10,7 @@ from NUTReport import NUTReport, pre_save_report, post_save_report
 from bolibana.models import EntityType, Entity, Report, MonthPeriod
 
 
-class PECNAMReport(NUTReport, Report):
+class PECMAMReport(NUTReport, Report):
 
     """ PEC Report URENAM """
 
@@ -71,7 +71,7 @@ class PECNAMReport(NUTReport, Report):
     u59_total_end_m = models.PositiveIntegerField( \
                                               _(u"Total male at end of month"))
     u59_total_end_f = models.PositiveIntegerField( \
-                                            _(u"Total frmale at end of month"))
+                                            _(u"Total female at end of month"))
 
     # pregnant women or feed_breasting women
     pw_total_beginning_f = models.PositiveIntegerField( \
@@ -112,7 +112,7 @@ class PECNAMReport(NUTReport, Report):
     pw_total_out_f = models.PositiveIntegerField( \
                                                    _(u"Total female departed"))
     pw_total_end_f = models.PositiveIntegerField( \
-                                            _(u"Total frmale at end of month"))
+                                            _(u"Total female at end of month"))
 
     # Follow_up (1) and (2)
     # pregnant women or feed_breasting women
@@ -156,255 +156,101 @@ class PECNAMReport(NUTReport, Report):
     fu12_total_end_m = models.PositiveIntegerField( \
                                               _(u"Total male at end of month"))
     fu12_total_end_f = models.PositiveIntegerField( \
-                                            _(u"Total frmale at end of month"))
+                                            _(u"Total female at end of month"))
 
     # Aggregation
-    sources = models.ManyToManyField('PECNAMReport', \
+    sources = models.ManyToManyField('PECMAMReport', \
                                      verbose_name=_(u"Sources"), \
                                      blank=True, null=True)
 
-    # HELPERS
-    def male_female_sum(self, field):
-        """ sum of male + female for a field """
-        return getattr(self, '%s_m' % field) + getattr(self, '%s_f' % field)
-
-    def all_for_field(self, field):
-        """ returns sum of all ages for a field """
-        sum_ = 0
-        for cat, cat_name in CATEGORIES:
-            sum_ += getattr(self, '%s_%s' % (cat, field))
-        return sum_
-
-    # MALE/FEMALE TOTALS
+    # MISSING FIELDS FOR GENERAL TOTALS
     @property
-    def u59_total_beginning(self):
-        return self.male_female_sum(inspect.stack()[0][3])
+    def pw_total_beginning_m(self):
+        return 0
 
     @property
-    def u59_admitted(self):
-        return self.male_female_sum(inspect.stack()[0][3])
+    def u59_hw_u70_bmi_u16(self):
+        return 0
 
     @property
-    def u59_total_out(self):
-        return self.male_female_sum(inspect.stack()[0][3])
+    def pw_hw_u70_bmi_u16(self):
+        return 0
 
     @property
-    def u59_total_end(self):
-        return self.male_female_sum(inspect.stack()[0][3])
+    def fu12_hw_u70_bmi_u16(self):
+        return 0
 
     @property
-    def pw_total_beginning(self):
-        return self.male_female_sum(inspect.stack()[0][3])
+    def u59_muac_u11_muac_u18(self):
+        return 0
 
     @property
-    def pw_admitted(self):
-        return self.male_female_sum(inspect.stack()[0][3])
+    def pw_muac_u11_muac_u18(self):
+        return 0
 
     @property
-    def pw_total_out(self):
-        return self.male_female_sum(inspect.stack()[0][3])
+    def fu12_muac_u11_muac_u18(self):
+        return 0
 
     @property
-    def pw_total_end(self):
-        return self.male_female_sum(inspect.stack()[0][3])
+    def u59_oedema(self):
+        return 0
 
     @property
-    def fu12_total_beginning(self):
-        return self.male_female_sum(inspect.stack()[0][3])
+    def pw_oedema(self):
+        return 0
 
     @property
-    def fu12_admitted(self):
-        return self.male_female_sum(inspect.stack()[0][3])
+    def fu12_oedema(self):
+        return 0
 
     @property
-    def fu12_total_out(self):
-        return self.male_female_sum(inspect.stack()[0][3])
+    def fu12_new_case(self):
+        return 0
 
     @property
-    def fu12_total_end(self):
-        return self.male_female_sum(inspect.stack()[0][3])
-
-    # MALE/FEMALE TOTALS
-    @property
-    def u6_total_beginning(self):
-        return self.male_female_sum(inspect.stack()[0][3])
+    def fu12_relapse(self):
+        return 0
 
     @property
-    def u6_admitted(self):
-        return self.male_female_sum(inspect.stack()[0][3])
+    def fu12_returned(self):
+        return 0
 
     @property
-    def u6_total_out(self):
-        return self.male_female_sum(inspect.stack()[0][3])
+    def u59_nut_transfered_in(self):
+        return 0
 
     @property
-    def u6_total_end(self):
-        return self.male_female_sum(inspect.stack()[0][3])
+    def pw_nut_transfered_in(self):
+        return 0
 
     @property
-    def u59_total_beginning(self):
-        return self.male_female_sum(inspect.stack()[0][3])
+    def fu12_nut_transfered_in(self):
+        return 0
 
     @property
-    def u59_admitted(self):
-        return self.male_female_sum(inspect.stack()[0][3])
+    def pw_total_admitted_m(self):
+        return 0
 
     @property
-    def u59_total_out(self):
-        return self.male_female_sum(inspect.stack()[0][3])
+    def u59_nut_transfered_out(self):
+        return 0
 
     @property
-    def u59_total_end(self):
-        return self.male_female_sum(inspect.stack()[0][3])
+    def pw_nut_transfered_out(self):
+        return 0
 
     @property
-    def o59_total_beginning(self):
-        return self.male_female_sum(inspect.stack()[0][3])
+    def fu12_nut_transfered_out(self):
+        return 0
 
     @property
-    def o59_admitted(self):
-        return self.male_female_sum(inspect.stack()[0][3])
+    def pw_total_out_m(self):
+        return 0
 
     @property
-    def o59_total_out(self):
-        return self.male_female_sum(inspect.stack()[0][3])
+    def pw_total_end_m(self):
+        return 0
 
-    @property
-    def o59_total_end(self):
-        return self.male_female_sum(inspect.stack()[0][3])
-
-    # ALL AGE TOTALS
-    @property
-    def all_total_beginning(self):
-        return self.all_for_field(inspect.stack()[0][3][4:])
-
-    @property
-    def all_total_beginning_m(self):
-        return self.all_for_field(inspect.stack()[0][3][4:])
-
-    @property
-    def all_total_beginning_f(self):
-        return self.all_for_field(inspect.stack()[0][3][4:])
-
-    @property
-    def all_hw_b7080_bmi_u18(self):
-        return self.all_for_field(inspect.stack()[0][3][4:])
-
-    @property
-    def all_muac_u120(self):
-        return self.all_for_field(inspect.stack()[0][3][4:])
-
-    @property
-    def all_hw_u70_bmi_u16(self):
-        return self.all_for_field(inspect.stack()[0][3][4:])
-
-    @property
-    def all_muac_u11_muac_u18(self):
-        return self.all_for_field(inspect.stack()[0][3][4:])
-
-    @property
-    def all_oedema(self):
-        return self.all_for_field(inspect.stack()[0][3][4:])
-
-    @property
-    def all_other(self):
-        return self.all_for_field(inspect.stack()[0][3][4:])
-
-    @property
-    def all_other_hiv(self):
-        return self.all_for_field(inspect.stack()[0][3][4:])
-
-    @property
-    def all_other_tb(self):
-        return self.all_for_field(inspect.stack()[0][3][4:])
-
-    @property
-    def all_other_lwb(self):
-        return self.all_for_field(inspect.stack()[0][3][4:])
-
-    @property
-    def all_new_case(self):
-        return self.all_for_field(inspect.stack()[0][3][4:])
-
-    @property
-    def all_relapse(self):
-        return self.all_for_field(inspect.stack()[0][3][4:])
-
-    @property
-    def all_returned(self):
-        return self.all_for_field(inspect.stack()[0][3][4:])
-
-    @property
-    def all_nut_transfered_in(self):
-        return self.all_for_field(inspect.stack()[0][3][4:])
-
-    @property
-    def all_nut_referred_in(self):
-        return self.all_for_field(inspect.stack()[0][3][4:])
-
-    @property
-    def all_total_admitted(self):
-        return self.all_for_field(inspect.stack()[0][3][4:])
-
-    @property
-    def all_total_admitted_m(self):
-        return self.all_for_field(inspect.stack()[0][3][4:])
-
-    @property
-    def all_total_admitted_f(self):
-        return self.all_for_field(inspect.stack()[0][3][4:])
-
-    @property
-    def all_healed(self):
-        return self.all_for_field(inspect.stack()[0][3][4:])
-
-    @property
-    def all_referred_out(self):
-        return self.all_for_field(inspect.stack()[0][3][4:])
-
-    @property
-    def all_deceased(self):
-        return self.all_for_field(inspect.stack()[0][3][4:])
-
-    @property
-    def all_aborted(self):
-        return self.all_for_field(inspect.stack()[0][3][4:])
-
-    @property
-    def all_non_respondant(self):
-        return self.all_for_field(inspect.stack()[0][3][4:])
-
-    @property
-    def all_medic_transfered_out(self):
-        return self.all_for_field(inspect.stack()[0][3][4:])
-
-    @property
-    def all_nut_transfered_out(self):
-        return self.all_for_field(inspect.stack()[0][3][4:])
-
-    @property
-    def all_total_out(self):
-        return self.all_for_field(inspect.stack()[0][3][4:])
-
-    @property
-    def all_total_out_m(self):
-        return self.all_for_field(inspect.stack()[0][3][4:])
-
-    @property
-    def all_total_out_f(self):
-        return self.all_for_field(inspect.stack()[0][3][4:])
-
-    @property
-    def all_total_end(self):
-        return self.all_for_field(inspect.stack()[0][3][4:])
-
-    @property
-    def all_total_end_m(self):
-        return self.all_for_field(inspect.stack()[0][3][4:])
-
-    @property
-    def all_total_end_f(self):
-        return self.all_for_field(inspect.stack()[0][3][4:])
-
-pre_save.connect(pre_save_report, sender=PECNAMReport)
-post_save.connect(post_save_report, sender=PECNAMReport)
+pre_save.connect(pre_save_report, sender=PECMAMReport)
+post_save.connect(post_save_report, sender=PECMAMReport)

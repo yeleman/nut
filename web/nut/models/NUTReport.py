@@ -38,55 +38,6 @@ class NUTReport(object):
 
     # MALE/FEMALE TOTALS
     @property
-    def u59_total_beginning(self):
-        return self.male_female_sum(inspect.stack()[0][3])
-
-    @property
-    def u59_admitted(self):
-        return self.male_female_sum(inspect.stack()[0][3])
-
-    @property
-    def u59_total_out(self):
-        return self.male_female_sum(inspect.stack()[0][3])
-
-    @property
-    def u59_total_end(self):
-        return self.male_female_sum(inspect.stack()[0][3])
-
-    @property
-    def o59_total_beginning(self):
-        return self.male_female_sum(inspect.stack()[0][3])
-
-    @property
-    def o59_admitted(self):
-        return self.male_female_sum(inspect.stack()[0][3])
-
-    @property
-    def o59_total_out(self):
-        return self.male_female_sum(inspect.stack()[0][3])
-
-    @property
-    def o59_total_end(self):
-        return self.male_female_sum(inspect.stack()[0][3])
-
-    @property
-    def fu1_total_beginning(self):
-        return self.male_female_sum(inspect.stack()[0][3])
-
-    @property
-    def fu1_admitted(self):
-        return self.male_female_sum(inspect.stack()[0][3])
-
-    @property
-    def fu1_total_out(self):
-        return self.male_female_sum(inspect.stack()[0][3])
-
-    @property
-    def fu1_total_end(self):
-        return self.male_female_sum(inspect.stack()[0][3])
-
-    # MALE/FEMALE TOTALS
-    @property
     def u6_total_beginning(self):
         return self.male_female_sum(inspect.stack()[0][3])
 

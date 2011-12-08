@@ -11,7 +11,7 @@ from NUTReport import NUTReport
 from bolibana.models import EntityType, Entity, Report, MonthPeriod
 
 
-class PECNASReport(NUTReport, Report):
+class PECSAMReport(NUTReport, Report):
 
     """ PEC Report URENAS """
 
@@ -191,6 +191,34 @@ class PECNASReport(NUTReport, Report):
                                             _(u"Total frmale at end of month"))
 
     # Aggregation
-    sources = models.ManyToManyField('PECNASReport', \
+    sources = models.ManyToManyField('PECSAMReport', \
                                      verbose_name=_(u"Sources"), \
                                      blank=True, null=True)
+
+    # MISSING FIELDS FOR GENERAL TOTALS
+    @property
+    def u59_hw_b7080_bmi_u18(self):
+        return 0
+
+    @property
+    def o59_hw_b7080_bmi_u18(self):
+        return 0
+
+    @property
+    def fu1_hw_b7080_bmi_u18(self):
+        return 0
+
+    @property
+    def u59_muac_u120(self):
+        return 0
+
+    @property
+    def o59_muac_u120(self):
+        return 0
+
+    @property
+    def fu1_muac_u120(self):
+        return 0
+
+pre_save.connect(pre_save_report, sender=PECSAMPReport)
+post_save.connect(post_save_report, sender=PECSAMPReport)
