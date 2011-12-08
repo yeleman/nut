@@ -4,8 +4,9 @@
 
 from django.db import models
 from django.utils.translation import ugettext_lazy as _, ugettext
+from django.db.models.signals import pre_save, post_save
 
-from NUTReport import NUTReport
+from NUTReport import NUTReport, pre_save_report, post_save_report
 from bolibana.models import EntityType, Entity, Report, MonthPeriod
 
 
@@ -230,5 +231,5 @@ class PECSAMPReport(NUTReport, Report):
     def o59_referred_out(self):
         return 0
 
-pre_save.connect(pre_save_report, sender=PECSAMReport)
-post_save.connect(post_save_report, sender=PECSAMReport)
+pre_save.connect(pre_save_report, sender=PECSAMPReport)
+post_save.connect(post_save_report, sender=PECSAMPReport)

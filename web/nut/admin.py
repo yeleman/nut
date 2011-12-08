@@ -12,7 +12,7 @@ from bolibana.admin import EntityAdmin, EntityTypeAdmin, PeriodAdmin
 from bolibana.models import Role, Permission, Access, Provider
 from bolibana.admin import (RoleAdmin, PermissionAdmin, \
                                  AccessAdmin, ProviderAdmin)
-from nut.models import (PECNASReport, PECNAMReport, PECNIReport,
+from nut.models import (PECSAMReport, PECMAMReport, PECSAMPReport,
                         NUTInput, InputConsumptionReport, ConsumptionReport,
                         InputOrderReport, OrderReport, NUTEntity)
 
@@ -67,7 +67,7 @@ admin.site.register(OrderReport, ConsumptionReportAdmin)
 admin.site.register(InputOrderReport, InputOrderReportAdmin)
 
 
-class PECNIReportAdmin(admin.ModelAdmin):
+class PECSAMPReportAdmin(admin.ModelAdmin):
     list_display = ('__unicode__', 'period', 'entity', 'receipt', '_status')
     list_filter = ('period', 'type', '_status')
 
@@ -138,10 +138,10 @@ class PECNIReportAdmin(admin.ModelAdmin):
             return ('receipt',) + self.readonly_fields
         return self.readonly_fields
 
-admin.site.register(PECNIReport, PECNIReportAdmin)
+admin.site.register(PECSAMPReport, PECSAMPReportAdmin)
 
 
-class PECNAMReportAdmin(admin.ModelAdmin):
+class PECMAMReportAdmin(admin.ModelAdmin):
     list_display = ('__unicode__', 'period', 'entity', 'receipt', '_status')
     list_filter = ('period', 'type', '_status')
 
@@ -205,10 +205,10 @@ class PECNAMReportAdmin(admin.ModelAdmin):
             return ('receipt',) + self.readonly_fields
         return self.readonly_fields
 
-admin.site.register(PECNAMReport, PECNAMReportAdmin)
+admin.site.register(PECMAMReport, PECMAMReportAdmin)
 
 
-class PECNASReportAdmin(admin.ModelAdmin):
+class PECSAMReportAdmin(admin.ModelAdmin):
     list_display = ('__unicode__', 'period', 'entity', 'receipt', '_status')
     list_filter = ('period', 'type', '_status')
 
@@ -281,4 +281,4 @@ class PECNASReportAdmin(admin.ModelAdmin):
             return ('receipt',) + self.readonly_fields
         return self.readonly_fields
 
-admin.site.register(PECNASReport, PECNASReportAdmin)
+admin.site.register(PECSAMReport, PECSAMReportAdmin)

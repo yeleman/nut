@@ -32,7 +32,7 @@ class NUTReport(object):
         """ returns sum of all ages for a field """
         sum_ = 0
         for cat, cat_name in self.CATEGORIES:
-            if hasattr('%s_%s' % (cat, field)):
+            if hasattr(self, '%s_%s' % (cat, field)):
                 sum_ += getattr(self, '%s_%s' % (cat, field))
         return sum_
 
