@@ -19,6 +19,54 @@ class NUTReport(object):
 
     """ NUT Meta Report """
 
+    @property
+    def mperiod(self):
+        """ casted period to MonthPeriod """
+        mp = self.period
+        mp.__class__ = MonthPeriod
+        return mp
+
+    @classmethod
+    def start(cls, period, entity, author, \
+               type=Report.TYPE_SOURCE, *args, **kwargs):
+        """ creates a report object with meta data only. Object not saved """
+        report = cls(period=period, entity=entity, created_by=author, \
+                     modified_by=author, _status=cls.STATUS_CREATED, \
+                     type=type)
+        for arg, value in kwargs.items():
+            try:
+                setattr(report, arg, value)
+            except AttributeError:
+                pass
+
+        return report
+
+    def to_dict(self):
+        d = {}
+        for field in self._meta.get_all_field_names():
+            try:
+                if not field.split('_')[0] in ('u5', 'o5', 'pw', 'stockout'):
+                    continue
+            except:
+                continue
+            d[field] = getattr(self, field)
+        return d
+
+    def get(self, slug):
+        """ [data browser] returns data for a slug variable """
+        return getattr(self, slug)
+
+    def field_name(self, slug):
+        """ [data browser] returns name of field for a slug variable """
+        return self._meta.get_field(slug).verbose_name
+
+    def validate(self):
+        """ runs MalariaReportValidator """
+        #validator = MalariaReportValidator(self)
+        #validator.validate()
+        #return validator.errors
+        return []
+
     # HELPERS
     def male_female_sum(self, field):
         """ sum of male + female for a field """

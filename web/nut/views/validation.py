@@ -10,13 +10,13 @@ from django.contrib.auth.decorators import login_required
 from django.shortcuts import render, redirect, get_object_or_404
 
 from bolibana.web.decorators import provider_required, provider_permission
-from ylmnut.data import (current_period, current_reporting_period,
+"""from ylmnut.data import (current_period, current_reporting_period,
                          provider_entity, time_cscom_over, time_district_over,
                          time_region_over, time_can_validate,
                          get_not_received_reports, get_reports_to_validate,
                          get_validated_reports)
 from bolibana.tools.utils import provider_can_or_403
-
+"""
 
 @provider_permission('can_validate_report')
 def validation_list(request):
@@ -30,6 +30,10 @@ def validation_list(request):
     # check permission or raise 403
     # should never raise as already checked by decorator
     provider_can_or_403('can_validate_report', web_provider, entity)
+
+    # complete
+    # report received
+    # not_received
 
     not_sent = [(ent, contact_for(ent)) \
                 for ent in get_not_received_reports(entity, period)]

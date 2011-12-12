@@ -128,7 +128,7 @@ INSTALLED_APPS = (
     'django.contrib.admin',
     'django.contrib.humanize',
     'babeldjango',
-    #'nosms',
+    'nosms',
     'bolibana',
     'nut',
     'reversion',
@@ -200,7 +200,8 @@ LOGIN_URL = '/login'
 LOGIN_REDIRECT_URL = '/'
 MESSAGE_STORAGE = 'django.contrib.messages.storage.cookie.CookieStorage'
 
-#NOSMS_HANDLER = 'pnlp_sms.palu.nosms_handler'
+NOSMS_TRANSPORT = 'smsd'
+NOSMS_HANDLER = 'nutsms.nosms_handler'
 #NOSMS_TRANSPORT_HOST = 'localhost'
 #NOSMS_TRANSPORT_PORT = 13013
 #NOSMS_TRANSPORT_USERNAME = None
