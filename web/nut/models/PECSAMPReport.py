@@ -70,10 +70,6 @@ class PECSAMPReport(NUTReport, Report):
                                                      _(u"Total male departed"))
     u6_total_out_f = models.PositiveIntegerField( \
                                                    _(u"Total female departed"))
-    u6_total_end_m = models.PositiveIntegerField( \
-                                              _(u"Total male at end of month"))
-    u6_total_end_f = models.PositiveIntegerField( \
-                                            _(u"Total frmale at end of month"))
 
     # Between 6 months and 59 months
     u59_total_beginning_m = models.PositiveIntegerField( \
@@ -121,10 +117,6 @@ class PECSAMPReport(NUTReport, Report):
                                                      _(u"Total male departed"))
     u59_total_out_f = models.PositiveIntegerField( \
                                                    _(u"Total female departed"))
-    u59_total_end_m = models.PositiveIntegerField( \
-                                              _(u"Total male at end of month"))
-    u59_total_end_f = models.PositiveIntegerField( \
-                                            _(u"Total frmale at end of month"))
 
     # over 59 months
     o59_total_beginning_m = models.PositiveIntegerField( \
@@ -172,15 +164,115 @@ class PECSAMPReport(NUTReport, Report):
                                                      _(u"Total male departed"))
     o59_total_out_f = models.PositiveIntegerField( \
                                                    _(u"Total female departed"))
-    o59_total_end_m = models.PositiveIntegerField( \
-                                              _(u"Total male at end of month"))
-    o59_total_end_f = models.PositiveIntegerField( \
-                                            _(u"Total frmale at end of month"))
 
     # Aggregation
     sources = models.ManyToManyField('PECSAMPReport', \
                                      verbose_name=_(u"Sources"), \
                                      blank=True, null=True)
+
+    def add_u6_data(self, u6_total_beginning_m,
+                    u6_total_beginning_f, u6_hw_u70_bmi_u16,
+                    u6_muac_u11_muac_u18, u6_oedema,
+                    u6_other_hiv, u6_other_tb, u6_other_lwb,
+                    u6_new_case, u6_relapse,
+                    u6_returned, u6_nut_transfered_in,
+                    u6_admitted_m, u6_admitted_f,
+                    u6_healed, u6_deceased,
+                    u6_aborted, u6_non_respondant,
+                    u6_medic_transfered_out, u6_nut_transfered_out,
+                    u6_total_out_m, u6_total_out_f):
+        self.u6_total_beginning_m = u6_total_beginning_m
+        self.u6_total_beginning_f = u6_total_beginning_f
+        self.u6_hw_u70_bmi_u16 = u6_hw_u70_bmi_u16
+        self.u6_muac_u11_muac_u18 = u6_muac_u11_muac_u18
+        self.u6_oedema = u6_oedema
+        self.u6_other_hiv = u6_other_hiv
+        self.u6_other_tb = u6_other_tb
+        self.u6_other_lwb = u6_other_lwb
+        self.u6_new_case = u6_new_case
+        self.u6_relapse = u6_relapse
+        self.u6_returned = u6_returned
+        self.u6_nut_transfered_in = u6_nut_transfered_in
+        self.u6_admitted_m = u6_admitted_m
+        self.u6_admitted_f = u6_admitted_f
+        self.u6_healed = u6_healed
+        self.u6_deceased = u6_deceased
+        self.u6_aborted = u6_aborted
+        self.u6_non_respondant = u6_non_respondant
+        self.u6_medic_transfered_out = u6_medic_transfered_out
+        self.u6_nut_transfered_out = u6_nut_transfered_out
+        self.u6_total_out_m = u6_total_out_m
+        self.u6_total_out_f = u6_total_out_f
+
+    def add_u59_data(self, u59_total_beginning_m,
+                    u59_total_beginning_f,
+                    u59_hw_u70_bmi_u16, u59_muac_u11_muac_u18,
+                    u59_oedema, u59_other_hiv, u59_other_tb,
+                    u59_other_lwb, u59_new_case,
+                    u59_relapse, u59_returned,
+                    u59_nut_transfered_in, u59_admitted_m,
+                    u59_admitted_f, u59_healed,
+                    u59_deceased, u59_aborted,
+                    u59_non_respondant, u59_medic_transfered_out,
+                    u59_nut_transfered_out, u59_total_out_m,
+                    u59_total_out_f):
+        self.u59_total_beginning_m = u59_total_beginning_m
+        self.u59_total_beginning_f = u59_total_beginning_f
+        self.u59_hw_u70_bmi_u16 = u59_hw_u70_bmi_u16
+        self.u59_muac_u11_muac_u18 = u59_muac_u11_muac_u18
+        self.u59_oedema = u59_oedema
+        self.u59_other_hiv = u59_other_hiv
+        self.u59_other_tb = u59_other_tb
+        self.u59_other_lwb = u59_other_lwb
+        self.u59_new_case = u59_new_case
+        self.u59_relapse = u59_relapse
+        self.u59_returned = u59_returned
+        self.u59_nut_transfered_in = u59_nut_transfered_in
+        self.u59_admitted_m = u59_admitted_m
+        self.u59_admitted_f = u59_admitted_f
+        self.u59_healed = u59_healed
+        self.u59_deceased = u59_deceased
+        self.u59_aborted = u59_aborted
+        self.u59_non_respondant = u59_non_respondant
+        self.u59_medic_transfered_out = u59_medic_transfered_out
+        self.u59_nut_transfered_out = u59_nut_transfered_out
+        self.u59_total_out_m = u59_total_out_m
+        self.u59_total_out_f = u59_total_out_f
+
+    def add_o59_data(self, o59_total_beginning_m,
+                    o59_total_beginning_f,
+                    o59_hw_u70_bmi_u16, o59_muac_u11_muac_u18,
+                    o59_oedema, o59_other_hiv,
+                    o59_other_tb, o59_other_lwb, o59_new_case,
+                    o59_relapse, o59_returned,
+                    o59_nut_transfered_in, 
+                    o59_admitted_m, o59_admitted_f,
+                    o59_healed, o59_deceased,
+                    o59_aborted, o59_non_respondant,
+                    o59_medic_transfered_out, o59_nut_transfered_out,
+                    o59_total_out_m, o59_total_out_f):
+        self.o59_total_beginning_m = o59_total_beginning_m
+        self.o59_total_beginning_f = o59_total_beginning_f
+        self.o59_hw_u70_bmi_u16 = o59_hw_u70_bmi_u16
+        self.o59_muac_u11_muac_u18 = o59_muac_u11_muac_u18
+        self.o59_oedema = o59_oedema
+        self.o59_other_hiv = o59_other_hiv
+        self.o59_other_tb = o59_other_tb
+        self.o59_other_lwb = o59_other_lwb
+        self.o59_new_case = o59_new_case
+        self.o59_relapse = o59_relapse
+        self.o59_returned = o59_returned
+        self.o59_nut_transfered_in = o59_nut_transfered_in
+        self.o59_admitted_m = o59_admitted_m
+        self.o59_admitted_f = o59_admitted_f
+        self.o59_healed = o59_healed
+        self.o59_deceased = o59_deceased
+        self.o59_aborted = o59_aborted
+        self.o59_non_respondant = o59_non_respondant
+        self.o59_medic_transfered_out = o59_medic_transfered_out
+        self.o59_nut_transfered_out = o59_nut_transfered_out
+        self.o59_total_out_m = o59_total_out_m
+        self.o59_total_out_f = o59_total_out_f
 
     # MISSING FIELDS FOR GENERAL TOTALS
     @property

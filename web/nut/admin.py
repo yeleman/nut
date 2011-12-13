@@ -2,6 +2,8 @@
 # encoding=utf-8
 # maintainer: rgaudin
 
+import reversion
+
 from django.contrib import admin
 from django.contrib.auth.admin import UserAdmin
 from django.contrib.auth.models import User
@@ -94,8 +96,7 @@ class PECSAMPReportAdmin(admin.ModelAdmin):
                         ('u6_healed', 'u6_deceased', 'u6_aborted',
                         'u6_non_respondant', 'u6_medic_transfered_out',
                         'u6_nut_transfered_out'),
-                        ('u6_total_out_m', 'u6_total_out_f'),
-                        ('u6_total_end_m', 'u6_total_end_f'))
+                        ('u6_total_out_m', 'u6_total_out_f'))
        }),
        (_(u">59 months"), {
             'fields': (('u59_total_beginning_m', 'u59_total_beginning_f'),
@@ -111,8 +112,7 @@ class PECSAMPReportAdmin(admin.ModelAdmin):
                         ('u59_healed', 'u59_deceased', 'u59_aborted',
                         'u59_non_respondant', 'u59_medic_transfered_out',
                         'u59_nut_transfered_out'),
-                        ('u59_total_out_m', 'u59_total_out_f'),
-                        ('u59_total_end_m', 'u59_total_end_f'))
+                        ('u59_total_out_m', 'u59_total_out_f'))
        }),
        (_(u"Follow-up URENI 1"), {
             'fields': (('o59_total_beginning_m', 'o59_total_beginning_f'),
@@ -128,8 +128,7 @@ class PECSAMPReportAdmin(admin.ModelAdmin):
                         ('o59_healed', 'o59_deceased', 'o59_aborted',
                         'o59_non_respondant', 'o59_medic_transfered_out',
                         'o59_nut_transfered_out'),
-                        ('o59_total_out_m', 'o59_total_out_f'),
-                        ('o59_total_end_m', 'o59_total_end_f'))
+                        ('o59_total_out_m', 'o59_total_out_f'))
        }),
    )
 
@@ -141,7 +140,7 @@ class PECSAMPReportAdmin(admin.ModelAdmin):
 admin.site.register(PECSAMPReport, PECSAMPReportAdmin)
 
 
-class PECMAMReportAdmin(admin.ModelAdmin):
+class PECMAMReportAdmin(reversion.VersionAdmin):
     list_display = ('__unicode__', 'period', 'entity', 'receipt', '_status')
     list_filter = ('period', 'type', '_status')
 
@@ -166,8 +165,7 @@ class PECMAMReportAdmin(admin.ModelAdmin):
                         ('u59_healed', 'u59_referred_out', 'u59_deceased',
                         'u59_aborted', 'u59_non_respondant',
                         'u59_medic_transfered_out'),
-                        ('u59_total_out_m', 'u59_total_out_f'),
-                        ('u59_total_end_m', 'u59_total_end_f'))
+                        ('u59_total_out_m', 'u59_total_out_f'))
        }),
        (_(u"Pregnant/Breast-feeding Women"), {
             'fields': ('pw_total_beginning_f',
@@ -182,8 +180,7 @@ class PECMAMReportAdmin(admin.ModelAdmin):
                         ('pw_healed', 'pw_referred_out', 'pw_deceased',
                         'pw_aborted', 'pw_non_respondant',
                         'pw_medic_transfered_out'),
-                        'pw_total_out_f',
-                        'pw_total_end_f')
+                        'pw_total_out_f')
        }),
        (_(u"Follow-up URENI/URENAS"), {
             'fields': (('fu12_total_beginning_m', 'fu12_total_beginning_f'),
@@ -195,8 +192,7 @@ class PECMAMReportAdmin(admin.ModelAdmin):
                         ('fu12_healed', 'fu12_referred_out', 'fu12_deceased',
                         'fu12_aborted', 'fu12_non_respondant',
                         'fu12_medic_transfered_out'),
-                        ('fu12_total_out_m', 'fu12_total_out_f'),
-                        ('fu12_total_end_m', 'fu12_total_end_f'))
+                        ('fu12_total_out_m', 'fu12_total_out_f'))
        }),
    )
 
@@ -235,8 +231,7 @@ class PECSAMReportAdmin(admin.ModelAdmin):
                         ('u59_healed', 'u59_referred_out', 'u59_deceased',
                         'u59_aborted', 'u59_non_respondant',
                         'u59_medic_transfered_out', 'u59_nut_transfered_out'),
-                        ('u59_total_out_m', 'u59_total_out_f'),
-                        ('u59_total_end_m', 'u59_total_end_f'))
+                        ('u59_total_out_m', 'u59_total_out_f'))
        }),
        (_(u">59 months"), {
             'fields': (('o59_total_beginning_m', 'o59_total_beginning_f'),
@@ -253,8 +248,7 @@ class PECSAMReportAdmin(admin.ModelAdmin):
                         ('o59_healed', 'o59_referred_out', 'o59_deceased',
                         'o59_aborted', 'o59_non_respondant',
                         'o59_medic_transfered_out', 'o59_nut_transfered_out'),
-                        ('o59_total_out_m', 'o59_total_out_f'),
-                        ('o59_total_end_m', 'o59_total_end_f'))
+                        ('o59_total_out_m', 'o59_total_out_f'))
        }),
        (_(u"Follow-up URENI 1"), {
             'fields': (('fu1_total_beginning_m', 'fu1_total_beginning_f'),
@@ -271,8 +265,7 @@ class PECSAMReportAdmin(admin.ModelAdmin):
                         ('fu1_healed', 'fu1_referred_out', 'fu1_deceased',
                         'fu1_aborted', 'fu1_non_respondant',
                         'fu1_medic_transfered_out', 'fu1_nut_transfered_out'),
-                        ('fu1_total_out_m', 'fu1_total_out_f'),
-                        ('fu1_total_end_m', 'fu1_total_end_f'))
+                        ('fu1_total_out_m', 'fu1_total_out_f'))
        }),
    )
 

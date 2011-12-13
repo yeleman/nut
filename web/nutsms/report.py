@@ -9,14 +9,15 @@ import locale
 import reversion
 from django.utils.translation import ugettext as _
 from django.conf import settings
+from django.db import transaction
 
 from bolibana.models import Report, Provider, Entity, MonthPeriod
 from bolibana.tools.utils import provider_can
-from nut.models import NUTEntity, PECMAMReport
+from nut.models import NUTEntity, PECMAMReport, PECSAMReport, PECSAMPReport
 from ylmnut.data import current_reporting_period, contact_for
 from nutrsc.errors import REPORT_ERRORS
 from nutrsc.tools import generate_user_hash
-from nutrsc.data import PECMAMDataHolder
+from nutrsc.data import PECMAMDataHolder, PECSAMDataHolder, PECSAMPDataHolder
 from nutrsc.validators import PECReportValidator
 
 logger = logging.getLogger(__name__)
@@ -60,6 +61,7 @@ def nut_report(message, args, sub_cmd, **kwargs):
     GA1/gao-343-VO5 """
 
     def resp_error(code, msg):
+        # make sure we cancel whatever addition
         message.respond(u"nut report error %(code)s|%(msg)s" \
                         % {'code': code, 'msg': msg})
         return True
@@ -99,6 +101,28 @@ def nut_report(message, args, sub_cmd, **kwargs):
                 if cap in section.keys():
                     return False
         return True
+
+    @transaction.commit_on_success
+    @reversion.create_revision()
+    def save_reports(reports, receipts):
+        reversion.set_user(reports.values()[0].created_by.user)
+        reversion.set_comment("SMS transmitted report")
+        for repid, report in reports.items():
+            try:
+                report.save()
+                receipts[repid] = report.receipt
+            except Exception as e:
+                logger.error(u"Unable to save report to DB. " \
+                             u"Message: %s | Exp: %r" \
+                             % (message.text, e))
+                return False
+        return True
+
+    def class_for(cap):
+        return eval('PEC%sReport' % cap.upper())
+
+    def holder_for(cap):
+        return eval('PEC%sDataHolder' % cap.upper())
 
     # check that all parts made it together
     if not args.strip().endswith('-eom-'):
@@ -155,19 +179,42 @@ def nut_report(message, args, sub_cmd, **kwargs):
     if not period == current_reporting_period():
         return resp_error('BAD_PERIOD', REPORT_ERRORS['BAD_PERIOD'])
 
-    # extract PEC section
+    # report receipts holder for confirm message
+    report_receipts = {}
+    # reports holder for delayed database commit
+    reports = {}
+
+
+    """
+        reports = {
+            'P':
+                {'MAM': [pr],
+                'SAM': [pr]},
+            'C':
+                {'MAM': [icr, icr, icr, cr],
+                 'SAM': [icr, cr]}
+            'O':
+                {'MAM': [ior, ior, ior, or],
+                 'SAM': [ior, or]}
+            } """
+
+    #####################
+    # PEC section
+    #####################
     pec = sub_sections_from_section(pec_sec)
 
     # check that capabilities correspond to entity
     if not check_capabilities(pec, entity):
         return resp_error('BAD_CAP', REPORT_ERRORS['BAD_CAP'])
 
+    ########## CHECK AGES
+
     # create Data Holder
-    pec_holder = {}  
+    pec_holder = {}
 
     # loop on capabilities
     for capid, cap in pec.items():
-        pec_cap = PECMAMDataHolder()
+        pec_cap = holder_for(capid)()
 
         for ageid, age in cap.items():
 
@@ -194,9 +241,13 @@ def nut_report(message, args, sub_cmd, **kwargs):
         pec_holder[capid] = pec_cap
 
     # Create Validator then Report then store #recipt ID for each CAP
-    report_receipts = {}
+    #report_receipts = {}
+    #reports = {}
     for capid, data_browser in pec_holder.items():
-    
+
+        # class of the report to create
+        ClassReport = class_for(capid)
+        
         # feed data holder with guessable data
         try:
             hc = entity.slug
@@ -219,12 +270,14 @@ def nut_report(message, args, sub_cmd, **kwargs):
             return resp_error('PEC_%s' % capid.upper(),
                               error_start + e.__str__())
         except:
-            raise
+            pass
         errors = validator.errors
-        import pprint
-        pprint.pprint(errors.all())
+
         # UNIQUENESS
-        #?????????????????????????
+        if ClassReport.objects.filter(period=period,
+                                      entity=entity,
+                                      type=Report.TYPE_SOURCE).count() > 0:
+            return resp_error('UNIQ', REPORT_ERRORS['UNIQ'])
 
         # return first error to user
         if errors.count() > 0:
@@ -236,35 +289,99 @@ def nut_report(message, args, sub_cmd, **kwargs):
             period = MonthPeriod.find_create_from( \
                                                 year=data_browser.get('year'), \
                                                 month=data_browser.get('month'))
-            report = PECMAMReport.start(period, entity, provider, \
+            report = ClassReport.start(period, entity, provider, \
                                          type=Report.TYPE_SOURCE)
 
-            report.add_u59_data(*data_browser.data_for_cat('u59'))
-            report.add_pw_data(*data_browser.data_for_cat('pw'))
-            report.add_fu12_data(*data_browser.data_for_cat('fu12'))
-            
-            with reversion.create_revision():
-                report.save()
-                reversion.set_user(provider.user)
+            report.add_all_data(data_browser)
 
         except Exception as e:
-            raise
+            #raise
             logger.error(u"Unable to save report to DB. Message: %s | Exp: %r" \
                          % (message.text, e))
             return resp_error('SRV', REPORT_ERRORS['SRV'])
 
-        report_receipts[capid] = report.receipt
+        reports[capid] = report
 
+    #####################
+    # CONS section
+    #####################
+    cons = sub_sections_from_section(cons_sec)
+
+    # check that capabilities correspond to entity
+    if not check_capabilities(cons, entity):
+        return resp_error('BAD_CAP', REPORT_ERRORS['BAD_CAP'])
+
+
+    # create Data Holder
+    cons_holder = {}
+
+    # loop on capabilities
+    for capid, cap in cons.items():
+        cons_cap = holder_for(capid)()
+
+        for inputid, inputstr in cap.items():
+
+            # match field names with values
+            try:
+                age_data = dict(zip(pec_cap.fields_for(ageid), age.split()))
+            except ValueError:
+                # failure to split means we proabably lack a data or more
+                # we can't process it.
+                return resp_error('BAD_FORM_PEC', REPORT_ERRORS['BAD_FORM_PEC'])
+
+            # convert form-data to int or bool respectively
+            try:
+                for key, value in age_data.items():
+                    # all PEC data are integer
+                    pec_cap.set(key, int(value))
+            except:
+                raise
+                # failure to convert means non-numeric
+                # value which we can't process.
+                return resp_error('BAD_FORM_PEC', REPORT_ERRORS['BAD_FORM_PEC'])
+
+        # store Data Holder in main variable
+        pec_holder[capid] = pec_cap
+
+    
+
+    #####################
+    # ORDER section
+    #####################
+    order = sub_sections_from_section(order_sec)
+
+    # check that capabilities correspond to entity
+    if not check_capabilities(order, entity):
+        return resp_error('BAD_CAP', REPORT_ERRORS['BAD_CAP'])
+    
+
+    #####################
+    # DB COMMIT
+    #####################
+    
+    # create the reports in DB
+    if not save_reports(reports, report_receipts):
+        return resp_error('SRV', REPORT_ERRORS['SRV'])
+
+
+    #####################
+    # CONFIRM RESPONSE
+    #####################
     """nut report ok #P$MAM GA1/gao-343-VO5$SAM GA1/gao-343-VO5#C$MAM
     GA1/gao-343-VO5$SAM GA1/gao-343-VO5#O$MAM GA1/gao-343-VO5$SAM
     GA1/gao-343-VO5"""
     pec_receipts = ""
     for capid, rec in report_receipts.items():
-        pec_receipts += "&%(capid)s %(rec)s" % {'capid': capid, 'rec': rec}
+        pec_receipts += "&%(capid)s %(rec)s" % {'capid': capid.upper(),
+                                                'rec': rec.upper()}
     confirm = u"nut report ok #P%(pecr)s" % {'pecr': pec_receipts}
 
     message.respond(confirm)
     return True
+
+    #####################
+    # TRIGGER ALERT
+    #####################
     """
     try:
         to = contact_for(report.entity.parent).phone_number

@@ -35,3 +35,4 @@ def contact_for(entity, recursive=True):
     if entity.parent and recursive:
         return contact_for(entity.parent)
     return None
+

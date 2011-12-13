@@ -2,6 +2,7 @@
 # encoding=utf_8
 # maintainer: rgaudin
 
+import reversion
 from django.db import models
 from django.utils.translation import ugettext_lazy as _, ugettext
 from django.db.models.signals import pre_save, post_save
@@ -330,6 +331,8 @@ class PECMAMReport(NUTReport, Report):
     @property
     def pw_total_end_m(self):
         return 0
+
+reversion.register(PECMAMReport)
 
 pre_save.connect(pre_save_report, sender=PECMAMReport)
 post_save.connect(post_save_report, sender=PECMAMReport)

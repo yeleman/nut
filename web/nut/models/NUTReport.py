@@ -13,11 +13,51 @@ from django.utils.translation import ugettext_lazy as _, ugettext
 
 from bolibana.models import EntityType, Entity, Report, MonthPeriod
 from bolibana.tools.utils import generate_receipt
+from nutrsc.constants import *
 
 
 class NUTReport(object):
 
     """ NUT Meta Report """
+
+    @property
+    def dirty_fields(self, only_data=True):
+        """ List of fields which have changed since previous revision """
+        # no dirty fields if validated
+        if self._status >= self.STATUS_VALIDATED:
+            return []
+
+        versions = reversion.get_for_object(self)
+        
+        # no dirty fields if only one rev.
+        if len(versions) <= 1:
+            return []
+        
+        last, previous = versions[0:2]
+
+        diff = []
+
+        fields = self._meta.get_all_field_names()
+        if only_data:
+            # only data fields
+            # ie. the ones starting by the age prefix
+            fields = [x for x in fields if x[0:3] \
+                     in ([('%s_' % k)[0:3] for k in POPULATIONS.keys()])]
+        for field in fields:
+            if last.field_dict[field] != previous.field_dict[field]:
+                diff.append(field)
+        return diff
+
+    def previous_value(self, field):
+        """ Value of a field in previous revision """
+        versions = reversion.get_for_object(self)
+
+        # return current value if no previous one
+        if len(versions) <= 1:
+            return getattr(field)
+
+        # return value form previous [1] version
+        return version[1].field_dict[field]
 
     @property
     def mperiod(self):
@@ -76,6 +116,16 @@ class NUTReport(object):
             if hasattr(self, '%s_f' % field) else 0
         return male + female
 
+    def other_sum(self, field):
+        """ sum of all other field for an age """
+        hiv = getattr(self, '%s_hiv' % field) \
+            if hasattr(self, '%s_hiv' % field) else 0
+        tb = getattr(self, '%s_tb' % field) \
+            if hasattr(self, '%s_tb' % field) else 0
+        lwb = getattr(self, '%s_lwb' % field) \
+            if hasattr(self, '%s_lwb' % field) else 0
+        return sum([hiv, tb, lwb])
+
     def all_for_field(self, field):
         """ returns sum of all ages for a field """
         sum_ = 0
@@ -83,6 +133,93 @@ class NUTReport(object):
             if hasattr(self, '%s_%s' % (cat, field)):
                 sum_ += getattr(self, '%s_%s' % (cat, field))
         return sum_
+
+    def total_end_for(self, age, sex):
+        """ calculates remaining people for an age and sex """
+        initial = getattr(self, '%s_total_beginning_%s' % (age, sex))
+        admitted = getattr(self, '%s_total_admitted_%s' % (age, sex))
+        out = getattr(self, '%s_total_out_%s' % (age, sex))
+        return (initial + admitted) - out
+
+    def add_all_data(self, data_browser):
+        """ Add all data to report from data browser by calling sub meth. """
+        for catid, catname in self.CATEGORIES:
+            getattr(self, 'add_%s_data' \
+                          % catid)(*data_browser.data_for_cat(catid))
+
+    # REMAINING
+    @property
+    def u6_total_end_f(self):
+        return self.total_end_for('u6', 'f')
+
+    @property
+    def u6_total_end_m(self):
+        return self.total_end_for('u6', 'm')
+
+    @property
+    def u59_total_end_f(self):
+        return self.total_end_for('u59', 'f')
+
+    @property
+    def u59_total_end_m(self):
+        return self.total_end_for('u59', 'm')
+
+    @property
+    def o59_total_end_f(self):
+        return self.total_end_for('o59', 'f')
+
+    @property
+    def o59_total_end_m(self):
+        return self.total_end_for('o59', 'm')
+
+    @property
+    def fu1_total_end_f(self):
+        return self.total_end_for('fu1', 'f')
+
+    @property
+    def fu1_total_end_m(self):
+        return self.total_end_for('fu1', 'm')
+
+    @property
+    def pw_total_end_f(self):
+        return self.total_end_for('pw', 'f')
+
+    @property
+    def pw_total_end_m(self):
+        return self.total_end_for('pw', 'm')
+
+    @property
+    def fu12_total_end_f(self):
+        return self.total_end_for('fu12', 'f')
+
+    @property
+    def fu12_total_end_m(self):
+        return self.total_end_for('fu12', 'm')
+
+    # OTHERS
+    @property
+    def u6_other(self):
+        return self.other_sum(inspect.stack()[0][3])
+
+    @property
+    def u59_other(self):
+        return self.other_sum(inspect.stack()[0][3])
+
+    @property
+    def o59_other(self):
+        return self.other_sum(inspect.stack()[0][3])
+
+    @property
+    def fu1_other(self):
+        return self.other_sum(inspect.stack()[0][3])
+
+    @property
+    def pw_other(self):
+        return self.other_sum(inspect.stack()[0][3])
+
+    @property
+    def fu12_other(self):
+        return self.other_sum(inspect.stack()[0][3])
 
     # MALE/FEMALE TOTALS
     @property
