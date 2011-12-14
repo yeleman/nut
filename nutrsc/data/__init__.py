@@ -53,5 +53,5 @@ class CONSDataHolder(DataHolder):
 
 from PECMAM import PECMAMDataHolder
 from PECSAM import PECSAMDataHolder
-from PECSAMP import PECSAMDataHolder
+from PECSAMP import PECSAMPDataHolder
 

@@ -13,12 +13,13 @@ from django.db import transaction
 
 from bolibana.models import Report, Provider, Entity, MonthPeriod
 from bolibana.tools.utils import provider_can
-from nut.models import NUTEntity, PECMAMReport, PECSAMReport, PECSAMPReport
 from ylmnut.data import current_reporting_period, contact_for
 from nutrsc.errors import REPORT_ERRORS
 from nutrsc.tools import generate_user_hash
-from nutrsc.data import PECMAMDataHolder, PECSAMDataHolder, PECSAMPDataHolder
-from nutrsc.validators import PECReportValidator
+from pec_report import pec_sub_report
+from cons_report import cons_sub_report
+from order_report import order_sub_report
+from nut.models import NUTEntity
 
 logger = logging.getLogger(__name__)
 locale.setlocale(locale.LC_ALL, settings.DEFAULT_LOCALE)
@@ -68,6 +69,7 @@ def nut_report(message, args, sub_cmd, **kwargs):
 
     def provider_entity(provider):
         """ Entity a Provider is attached to """
+        print(provider.first_access().target.id)
         try:
             return NUTEntity.objects.get(id=provider.first_access().target.id)
         except:
@@ -102,27 +104,37 @@ def nut_report(message, args, sub_cmd, **kwargs):
                     return False
         return True
 
-    @transaction.commit_on_success
     @reversion.create_revision()
-    def save_reports(reports, receipts):
-        reversion.set_user(reports.values()[0].created_by.user)
+    @transaction.commit_manually
+    def save_reports(reports, receipts, user=None):
+        reversion.set_user(user)
         reversion.set_comment("SMS transmitted report")
-        for repid, report in reports.items():
-            try:
-                report.save()
-                receipts[repid] = report.receipt
-            except Exception as e:
-                logger.error(u"Unable to save report to DB. " \
-                             u"Message: %s | Exp: %r" \
-                             % (message.text, e))
-                return False
+        for secid, section in reports.items():
+        
+            # create key for report type (P,C,O)
+            if not receipts.has_key(secid):
+                receipts[secid] = {}
+                
+            for catid, reports in section.items():
+            
+                # create key for category (MAM,SAM,SAMP)
+                if not receipts[secid].has_key(catid):
+                    receipts[secid][catid] = []
+                    
+                for report in reports:
+                    try:
+                        report.save()
+                        # store receipt if exist.
+                        if hasattr(report, 'receipt'):
+                            receipts[secid][catid].append(report.receipt)
+                    except Exception as e:
+                        logger.error(u"Unable to save report to DB. " \
+                                     u"Message: %s | Exp: %r" \
+                                     % (message.text, e))
+                        transaction.rollback()
+                        return False
+        transaction.commit()
         return True
-
-    def class_for(cap):
-        return eval('PEC%sReport' % cap.upper())
-
-    def holder_for(cap):
-        return eval('PEC%sDataHolder' % cap.upper())
 
     # check that all parts made it together
     if not args.strip().endswith('-eom-'):
@@ -184,204 +196,79 @@ def nut_report(message, args, sub_cmd, **kwargs):
     # reports holder for delayed database commit
     reports = {}
 
+    # global infos
+    infos = {'entity': entity,
+             'eentity': eentity,
+             'provider': provider,
+             'month': month,
+             'year': year,
+             'period': period,
+             'username': username,
+             'password': password}
 
     """
-        reports = {
-            'P':
-                {'MAM': [pr],
-                'SAM': [pr]},
-            'C':
-                {'MAM': [icr, icr, icr, cr],
-                 'SAM': [icr, cr]}
-            'O':
-                {'MAM': [ior, ior, ior, or],
-                 'SAM': [ior, or]}
-            } """
+    reports = {
+        'P':
+            {'MAM': [pr],
+            'SAM': [pr]},
+        'C':
+            {'MAM': [icr, icr, icr, cr],
+             'SAM': [icr, cr]}
+        'O':
+            {'MAM': [ior, ior, ior, or],
+             'SAM': [ior, or]}
+        } """
 
-    #####################
-    # PEC section
-    #####################
-    pec = sub_sections_from_section(pec_sec)
+    # SECTIONS
+    for sid, section in {'P': 'pec', 'C': 'cons', 'O': 'order'}.items():
 
-    # check that capabilities correspond to entity
-    if not check_capabilities(pec, entity):
-        return resp_error('BAD_CAP', REPORT_ERRORS['BAD_CAP'])
+        # extract/split sub sections info from string
+        sec = sub_sections_from_section(eval('%s_sec' % section))
 
-    ########## CHECK AGES
+        # check that capabilities correspond to entity
+        if not check_capabilities(sec, entity):
+            return resp_error('BAD_CAP', REPORT_ERRORS['BAD_CAP'])
 
-    # create Data Holder
-    pec_holder = {}
+        # call sub-report section handler
+        sec_succ, sec_data = eval('%s_sub_report' % section)(message,
+                                                             sec, infos)
+        # cancel if sub report failed.
+        if not sec_succ:
+            return resp_error(sec_data[0], sec_data[1])
 
-    # loop on capabilities
-    for capid, cap in pec.items():
-        pec_cap = holder_for(capid)()
+        # add sub-report to list of reports
+        reports [sid] = sec_data
 
-        for ageid, age in cap.items():
-
-            # match field names with values
-            try:
-                age_data = dict(zip(pec_cap.fields_for(ageid), age.split()))
-            except ValueError:
-                # failure to split means we proabably lack a data or more
-                # we can't process it.
-                return resp_error('BAD_FORM_PEC', REPORT_ERRORS['BAD_FORM_PEC'])
-
-            # convert form-data to int or bool respectively
-            try:
-                for key, value in age_data.items():
-                    # all PEC data are integer
-                    pec_cap.set(key, int(value))
-            except:
-                raise
-                # failure to convert means non-numeric
-                # value which we can't process.
-                return resp_error('BAD_FORM_PEC', REPORT_ERRORS['BAD_FORM_PEC'])
-
-        # store Data Holder in main variable
-        pec_holder[capid] = pec_cap
-
-    # Create Validator then Report then store #recipt ID for each CAP
-    #report_receipts = {}
-    #reports = {}
-    for capid, data_browser in pec_holder.items():
-
-        # class of the report to create
-        ClassReport = class_for(capid)
-        
-        # feed data holder with guessable data
-        try:
-            hc = entity.slug
-        except:
-            hc = None
-        data_browser.set('hc', hc)
-        data_browser.set('month', month)
-        data_browser.set('year', year)
-
-        # create validator and fire
-        validator = PECReportValidator(data_browser)
-        validator.errors.reset()
-
-        # common start of error message
-        error_start = u"Impossible d'enregistrer le rapport. "
-
-        try:
-            validator.validate()
-        except AttributeError as e:
-            return resp_error('PEC_%s' % capid.upper(),
-                              error_start + e.__str__())
-        except:
-            pass
-        errors = validator.errors
-
-        # UNIQUENESS
-        if ClassReport.objects.filter(period=period,
-                                      entity=entity,
-                                      type=Report.TYPE_SOURCE).count() > 0:
-            return resp_error('UNIQ', REPORT_ERRORS['UNIQ'])
-
-        # return first error to user
-        if errors.count() > 0:
-            return resp_error('PEC_%s' % capid.upper(),
-                              error_start + errors.all()[0])
-
-        # create the report
-        try:
-            period = MonthPeriod.find_create_from( \
-                                                year=data_browser.get('year'), \
-                                                month=data_browser.get('month'))
-            report = ClassReport.start(period, entity, provider, \
-                                         type=Report.TYPE_SOURCE)
-
-            report.add_all_data(data_browser)
-
-        except Exception as e:
-            #raise
-            logger.error(u"Unable to save report to DB. Message: %s | Exp: %r" \
-                         % (message.text, e))
-            return resp_error('SRV', REPORT_ERRORS['SRV'])
-
-        reports[capid] = report
-
-    #####################
-    # CONS section
-    #####################
-    cons = sub_sections_from_section(cons_sec)
-
-    # check that capabilities correspond to entity
-    if not check_capabilities(cons, entity):
-        return resp_error('BAD_CAP', REPORT_ERRORS['BAD_CAP'])
-
-
-    # create Data Holder
-    cons_holder = {}
-
-    # loop on capabilities
-    for capid, cap in cons.items():
-        cons_cap = holder_for(capid)()
-
-        for inputid, inputstr in cap.items():
-
-            # match field names with values
-            try:
-                age_data = dict(zip(pec_cap.fields_for(ageid), age.split()))
-            except ValueError:
-                # failure to split means we proabably lack a data or more
-                # we can't process it.
-                return resp_error('BAD_FORM_PEC', REPORT_ERRORS['BAD_FORM_PEC'])
-
-            # convert form-data to int or bool respectively
-            try:
-                for key, value in age_data.items():
-                    # all PEC data are integer
-                    pec_cap.set(key, int(value))
-            except:
-                raise
-                # failure to convert means non-numeric
-                # value which we can't process.
-                return resp_error('BAD_FORM_PEC', REPORT_ERRORS['BAD_FORM_PEC'])
-
-        # store Data Holder in main variable
-        pec_holder[capid] = pec_cap
-
+    import pprint
+    pprint.pprint(reports)
     
-
-    #####################
-    # ORDER section
-    #####################
-    order = sub_sections_from_section(order_sec)
-
-    # check that capabilities correspond to entity
-    if not check_capabilities(order, entity):
-        return resp_error('BAD_CAP', REPORT_ERRORS['BAD_CAP'])
-    
-
-    #####################
-    # DB COMMIT
-    #####################
+    ## DB COMMIT
     
     # create the reports in DB
-    if not save_reports(reports, report_receipts):
+    # save receipts number
+    if not save_reports(reports, report_receipts, user=provider.user):
         return resp_error('SRV', REPORT_ERRORS['SRV'])
 
 
-    #####################
-    # CONFIRM RESPONSE
-    #####################
-    """nut report ok #P$MAM GA1/gao-343-VO5$SAM GA1/gao-343-VO5#C$MAM
-    GA1/gao-343-VO5$SAM GA1/gao-343-VO5#O$MAM GA1/gao-343-VO5$SAM
-    GA1/gao-343-VO5"""
-    pec_receipts = ""
-    for capid, rec in report_receipts.items():
-        pec_receipts += "&%(capid)s %(rec)s" % {'capid': capid.upper(),
-                                                'rec': rec.upper()}
-    confirm = u"nut report ok #P%(pecr)s" % {'pecr': pec_receipts}
+    pprint.pprint(report_receipts)
+
+    ## CONFIRM RESPONSE
+    
+    # list of section/sub section formatted receipts
+    recstr = ""
+    for secid, section in report_receipts.items():
+        recstr += "#%s" % secid.upper()
+        for catid, receipts in section.items():
+            recstr += "&%s " % catid.upper()
+            recstr += " ".join(receipts)
+
+    confirm = "nut report ok %s" % recstr
 
     message.respond(confirm)
     return True
 
-    #####################
-    # TRIGGER ALERT
-    #####################
+    ## TRIGGER ALERT
+    
     """
     try:
         to = contact_for(report.entity.parent).phone_number
