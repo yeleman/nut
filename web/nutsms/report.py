@@ -122,7 +122,12 @@ def nut_report(message, args, sub_cmd, **kwargs):
                     receipts[secid][catid] = []
                     
                 for report in reports:
+                    logger.info("%s > %s > %s" % (secid, catid, report.__class__))
                     try:
+                        # HACK: write foreign key id if needed
+                        if hasattr(report, 'cons_report_id'):
+                            report.cons_report_id = report.cons_report.id
+                        
                         report.save()
                         # store receipt if exist.
                         if hasattr(report, 'receipt'):
@@ -222,6 +227,8 @@ def nut_report(message, args, sub_cmd, **kwargs):
     # SECTIONS
     for sid, section in {'P': 'pec', 'C': 'cons', 'O': 'order'}.items():
 
+        logger.info("Processing %s" % section)
+
         # extract/split sub sections info from string
         sec = sub_sections_from_section(eval('%s_sec' % section))
 
@@ -234,21 +241,25 @@ def nut_report(message, args, sub_cmd, **kwargs):
                                                              sec, infos)
         # cancel if sub report failed.
         if not sec_succ:
+            logger.warning(u"   FAILED.")
             return resp_error(sec_data[0], sec_data[1])
 
         # add sub-report to list of reports
         reports [sid] = sec_data
+        logger.info("---- Ended %s" % section)
 
     import pprint
-    pprint.pprint(reports)
+    #pprint.pprint(reports)
     
     ## DB COMMIT
     
     # create the reports in DB
     # save receipts number
+    logger.info("Saving reports")
     if not save_reports(reports, report_receipts, user=provider.user):
+        logger.warning("Unable to save reports")
         return resp_error('SRV', REPORT_ERRORS['SRV'])
-
+    logger.info("Reports savec")
 
     pprint.pprint(report_receipts)
 

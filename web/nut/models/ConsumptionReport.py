@@ -54,6 +54,13 @@ class ConsumptionReport(Report):
     sam = SAMManager()
     samp = SAMPManager()
 
+    def __unicode__(self):
+        cap = self.nut_type.upper()
+        return ugettext(u"%(entity)s/%(cap)s/%(period)s") \
+                        % {'entity': self.entity, \
+                           'period': self.period,
+                           'cap': cap}
+
     def is_complete(self):
         print('is_complete %s' % self)
         for code in CONSUMPTION_TABLE[self.nut_type][self.version]:

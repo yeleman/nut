@@ -20,6 +20,19 @@ class NUTReport(object):
 
     """ NUT Meta Report """
 
+    def cap_from_class(self):
+        for cap in ('mam', 'samp', 'sam'):
+            if cap in str(self.__class__).lower():
+                return cap.upper()
+            
+
+    def __unicode__(self):
+        cap = self.cap_from_class()
+        return ugettext(u"%(entity)s/%(cap)s/%(period)s") \
+                        % {'entity': self.entity, \
+                           'period': self.period,
+                           'cap': cap}
+
     @property
     def dirty_fields(self, only_data=True):
         """ List of fields which have changed since previous revision """

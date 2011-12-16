@@ -20,4 +20,4 @@ def order_sub_report(message, pec, infos):
     def resp_error(code, msg):
         return (False, (code, msg))
 
-    return (True, {'mam': 'oreg', 'sam': 'orig'})
+    return (True, {'mam': [], 'sam': []})
