@@ -69,7 +69,6 @@ def nut_report(message, args, sub_cmd, **kwargs):
 
     def provider_entity(provider):
         """ Entity a Provider is attached to """
-        print(provider.first_access().target.id)
         try:
             return NUTEntity.objects.get(id=provider.first_access().target.id)
         except:
@@ -127,7 +126,10 @@ def nut_report(message, args, sub_cmd, **kwargs):
                         # HACK: write foreign key id if needed
                         if hasattr(report, 'cons_report_id'):
                             report.cons_report_id = report.cons_report.id
-                        
+
+                        if hasattr(report, 'order_report_id'):
+                            report.order_report_id = report.order_report.id
+
                         report.save()
                         # store receipt if exist.
                         if hasattr(report, 'receipt'):
@@ -144,6 +146,8 @@ def nut_report(message, args, sub_cmd, **kwargs):
     # check that all parts made it together
     if not args.strip().endswith('-eom-'):
         return resp_error('BAD_FORM', REPORT_ERRORS['BAD_FORM'])
+    else:
+        args = args.strip()[:-5].strip()
 
     # split up sections
     try:
@@ -247,9 +251,6 @@ def nut_report(message, args, sub_cmd, **kwargs):
         # add sub-report to list of reports
         reports [sid] = sec_data
         logger.info("---- Ended %s" % section)
-
-    import pprint
-    #pprint.pprint(reports)
     
     ## DB COMMIT
     
@@ -259,9 +260,7 @@ def nut_report(message, args, sub_cmd, **kwargs):
     if not save_reports(reports, report_receipts, user=provider.user):
         logger.warning("Unable to save reports")
         return resp_error('SRV', REPORT_ERRORS['SRV'])
-    logger.info("Reports savec")
-
-    pprint.pprint(report_receipts)
+    logger.info("Reports saved")
 
     ## CONFIRM RESPONSE
     

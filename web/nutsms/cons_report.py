@@ -118,7 +118,7 @@ def cons_sub_report(message, cons, infos):
 
         # return first error to user
         if errors.count() > 0:
-            return resp_error('PEC_%s' % capid.upper(),
+            return resp_error('CONS_%s' % capid.upper(),
                               error_start + errors.all()[0])
 
         reports[capid] = []
@@ -152,7 +152,5 @@ def cons_sub_report(message, cons, infos):
             logger.error(u"Unable to save report to DB. Message: %s | Exp: %r" \
                          % (message.text, e))
             return resp_error('SRV', REPORT_ERRORS['SRV'])
-
-        
 
     return (True, reports)

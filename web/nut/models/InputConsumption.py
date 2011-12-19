@@ -25,7 +25,7 @@ class InputConsumptionReport(models.Model):
                               related_name='nutinput_reports',
                               verbose_name=_(u"Inputs"))
     initial = models.PositiveIntegerField(verbose_name=_(u"Initial Stock"))
-    received = models.PositiveIntegerField(verbose_name=_(u"Quantity " \
+    received = models.PositiveIntegerField(verbose_name=_(u"Quantity" \
                                                           u"Received"))
     used = models.PositiveIntegerField(verbose_name=_(u"Quantity used"))
     lost = models.PositiveIntegerField(verbose_name=_(u"Quantity lost"))
