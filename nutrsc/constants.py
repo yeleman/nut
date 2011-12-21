@@ -21,3 +21,10 @@ POPULATIONS = {
 SEXES = {
     'm': _(u"Male"),
     'f': _(u"Female")}
+
+
+def ntype(code):
+    return {
+        'mam': MODERATE,
+        'sam': SEVERE,
+        'samp': SEVERE_COMP}[code]

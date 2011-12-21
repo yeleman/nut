@@ -99,3 +99,32 @@ class PECReportValidator(DataValidator):
                                    'out': out,
                                    'sex': sname})
                 
+
+class CONSReportValidator(DataValidator):
+
+    def validate(self):
+
+        for inpid in self.get('inputs')():
+            try:
+                rep = self.get('input_%s' % inpid)
+            except:
+                self.errors.add(u"Consumption data missing for %s" \
+                                % inpid.upper())
+                continue
+
+            if not rep.valid():
+                self.errors.add(u"Consumption values for %s is incoherent." \
+                                % inpid.upper())
+            
+
+class ORDERReportValidator(DataValidator):
+
+    def validate(self):
+
+        for inpid in self.get('inputs')():
+            try:
+                rep = self.get('input_%s' % inpid)
+            except:
+                self.errors.add(u"Consumption data missing for %s" \
+                                % inpid.upper())
+                continue

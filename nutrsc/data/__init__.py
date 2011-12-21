@@ -36,20 +36,66 @@ class DataHolder(object):
             data.append(self.get(field))
         return data
 
-class CONSDataHolder(DataHolder):
 
+class CONSInputDataHolder(DataHolder):
+
+    input_code = ''
     initial = 0
     received = 0
     consumed = 0
     lost = 0
-    version = DEFAULT_VERSION
 
-    def inputs(self, cat):
+    def fields(self):
+        return ['initial', 'received', 'consumed', 'lost']
+
+    @property
+    def got(self):
+        return (initial + received)
+
+    @property
+    def used(self):
+        return (consomed + lost)
+
+    @property
+    def left(self):
+        return self.got() - self.used()
+
+    @property
+    def valid(self):
+        return self.used <= self.left
+
+
+class CONSDataHolder(DataHolder):
+
+    version = DEFAULT_VERSION
+    cap = ''
+
+    def inputs(self):
         h = {'mam': MODERATE,
              'sam': SEVERE,
              'samp': SEVERE_COMP}
-        return CONSUMPTION_TABLE[h[cat]][self.version]
+        return CONSUMPTION_TABLE[h[self.cap]][self.version]
 
+
+class CONSMAMDataHolder(CONSDataHolder):
+    cap = 'mam'
+
+
+class CONSSAMDataHolder(CONSDataHolder):
+    cap = 'sam'
+
+
+class CONSSAMPDataHolder(CONSDataHolder):
+    cap = 'samp'
+
+
+class ORDERInputDataHolder(DataHolder):
+
+    input_code = ''
+    quantity = 0
+
+    def fields(self):
+        return ['quantity']
 
 from PECMAM import PECMAMDataHolder
 from PECSAM import PECSAMDataHolder
