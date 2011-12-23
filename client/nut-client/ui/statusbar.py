@@ -8,7 +8,7 @@ import time
 from datetime import datetime
 from acpi import ACPIBatteryStatus
 
-class REDEStatusBar(QtGui.QStatusBar):
+class NUTStatusBar(QtGui.QStatusBar):
 
     def __init__(self, parent):
 

@@ -4,18 +4,18 @@
 
 from PyQt4 import QtGui
 
-from common import REDEWidget, PageTitle
+from common import NUTWidget, PageTitle
 
 
-class HelpWidget(REDEWidget):
+class HelpWidget(NUTWidget):
 
-    def __init__(self, parent=0, *args, **kwargs):
+    def __init__(NUT, parent=0, *args, **kwargs):
 
-        super(HelpWidget, self).__init__(parent=parent, *args, **kwargs)
+        super(HelpWidget, NUT).__init__(parent=parent, *args, **kwargs)
 
         vbox = QtGui.QVBoxLayout()
         # Le titre
-        self.title = PageTitle(_(u"Help"))
-        vbox.addWidget(self.title)
+        NUT.title = PageTitle(_(u"Help"))
+        vbox.addWidget(NUT.title)
 
-        self.setLayout(vbox)
+        NUT.setLayout(vbox)

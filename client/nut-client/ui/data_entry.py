@@ -4,11 +4,11 @@
 
 from PyQt4 import QtGui, QtCore
 
-from common import REDEWidget, PageTitle, PageIntro, FormLabel,\
+from common import NUTWidget, PageTitle, PageIntro, FormLabel,\
                                     DateEdit, IntLineEdit, FloatLineEdit
 
 
-class DataEntryWidget(REDEWidget):
+class DataEntryWidget(NUTWidget):
 
     def __init__(self, parent=0, *args, **kwargs):
         super(DataEntryWidget, self).__init__(parent=parent, *args, **kwargs)

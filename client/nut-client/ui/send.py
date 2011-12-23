@@ -5,10 +5,10 @@
 from PyQt4 import QtGui
 from PyQt4.QtCore import Qt
 
-from common import REDEWidget, PageTitle, PageIntro, FormLabel
+from common import NUTWidget, PageTitle, PageIntro, FormLabel
 
 
-class SendWidget(REDEWidget):
+class SendWidget(NUTWidget):
 
     def __init__(self, parent=0, *args, **kwargs):
 

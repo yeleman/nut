@@ -7,15 +7,19 @@ import sys
 from PyQt4 import QtGui, QtCore
 
 from dashboard import DashboardWidget
+from login import LoginWidget
 from menu import *
-from statusbar import REDEStatusBar
+from statusbar import NUTStatusBar
 
 class MainWindow(QtGui.QMainWindow):
     def __init__(self):
         QtGui.QMainWindow.__init__(self)
 
+        # store User in session
+        self.user = None
+
         self.resize(900, 650)
-        self.setWindowTitle(_(u"Remote Excel Data Entry"))
+        self.setWindowTitle(_(u"NUT Client"))
         self.setWindowIcon(QtGui.QIcon('images/icon32.png'))
 
         QtGui.QShortcut(QtGui.QKeySequence(QtCore.QCoreApplication.translate('', "Ctrl+q")), self, self.close)
@@ -24,10 +28,10 @@ class MainWindow(QtGui.QMainWindow):
         self.menu.build()
         self.addToolBar(self.menu)
 
-        self.statusbar = REDEStatusBar(self)
+        self.statusbar = NUTStatusBar(self)
         self.setStatusBar(self.statusbar)
 
-        self.change_context(DashboardWidget)
+        self.change_context(LoginWidget)
 
     def change_context(self, context_widget, *args, **kwargs):
 

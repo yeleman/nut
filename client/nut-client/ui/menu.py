@@ -11,13 +11,16 @@ from data_entry import DataEntryWidget
 from preferences import PreferencesWidget
 
 
-class REDEMenu(QtGui.QToolBar):
+class NUTMenu(QtGui.QToolBar):
 
     def __init__(self, parent):
 
         QtGui.QToolBar.__init__(self, parent)
 
         self.parent = parent
+
+        self.setMovable(False)
+        self.setToolButtonStyle(0)
 
         self._items = []
 
@@ -34,6 +37,7 @@ class REDEMenu(QtGui.QToolBar):
         for item in self.items():
             icon = QtGui.QIcon(QtGui.QPixmap("images/f%d.png" % item.shortcut))
             btn = ToolBarButton(self)
+            btn.setToolButtonStyle(2)
             btn.setDefaultAction(QtGui.QAction(icon, item.name, self))
             btn.setTarget(item.action)
             self.addWidget(btn)
@@ -61,24 +65,24 @@ class ToolBarButton(QtGui.QToolButton):
             self._target.__call__()
 
 
-class MainMenu(REDEMenu):
+class MainMenu(NUTMenu):
 
     def __init__(self, parent):
-        REDEMenu.__init__(self, parent)
+        NUTMenu.__init__(self, parent)
 
     def ident(self):
         return 'main'
 
     def items(self):
         return [
-            REDEMenuItem(1, _(u"Help"), self.help),
-            REDEMenuItem(2, _(u"Next"), self.next),
-            REDEMenuItem(3, _(u"Previous"), self.previous),
-            REDEMenuItem(4, _(u"Data Entry"), self.data_entry),
-            REDEMenuItem(5, _(u"SIM Management"), self.sim_mgmt),
-            REDEMenuItem(6, _(u"Send"), self.send),
-            REDEMenuItem(7, _(u"Preferences"), self.preferences),
-            REDEMenuItem(12, _(u"Quit"), self.quit),
+            NUTMenuItem(1, _(u"Help"), self.help),
+            NUTMenuItem(2, _(u"Next"), self.next),
+            NUTMenuItem(3, _(u"Previous"), self.previous),
+            NUTMenuItem(4, _(u"Data Entry"), self.data_entry),
+            NUTMenuItem(5, _(u"SIM Management"), self.sim_mgmt),
+            NUTMenuItem(6, _(u"Send"), self.send),
+            NUTMenuItem(7, _(u"Preferences"), self.preferences),
+            NUTMenuItem(12, _(u"Quit"), self.quit),
         ]
 
     def help(self):
@@ -115,7 +119,7 @@ class MainMenu(REDEMenu):
         pass
 
 
-class REDEMenuItem:
+class NUTMenuItem:
 
     def __init__(self, shortcut, name, action, *action_args):
         self.name = name

@@ -4,12 +4,10 @@
 
 from PyQt4 import QtGui, QtCore
 
-from common import REDEWidget, PageTitle, FormLabel, IntLineEdit
+from common import NUTWidget, PageTitle, FormLabel, IntLineEdit
 
 
-class SIM_managementWidget(REDEWidget):
-    """Pöur la recharge de la carte SIM
-    """
+class SIM_managementWidget(NUTWidget):
 
     def __init__(self, parent=0, *args, **kwargs):
 

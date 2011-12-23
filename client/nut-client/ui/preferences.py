@@ -4,10 +4,10 @@
 
 from PyQt4 import QtGui
 
-from common import REDEWidget, PageTitle, PageIntro
+from common import NUTWidget, PageTitle, PageIntro
 
 
-class PreferencesWidget(REDEWidget):
+class PreferencesWidget(NUTWidget):
 
     def __init__(self, parent=0, *args, **kwargs):
         super(PreferencesWidget, self).__init__(parent=parent, *args, **kwargs)

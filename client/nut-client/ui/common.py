@@ -8,11 +8,13 @@ from PyQt4.QtCore import Qt
 MAIN_WIDGET_SIZE = 900
 
 
-class REDEWidget(QtGui.QWidget):
+class NUTWidget(QtGui.QWidget):
 
     def __init__(self, parent=0, *args, **kwargs):
 
         QtGui.QWidget.__init__(self, parent=parent, *args, **kwargs)
+
+        self.parent = parent
 
         self.setMaximumWidth(MAIN_WIDGET_SIZE)
 
@@ -56,6 +58,17 @@ class FormLabel(QtGui.QLabel):
         self.setFont(font)
         self.setAlignment(Qt.AlignLeft)
 
+class ErrorLabel(QtGui.QLabel):
+
+    def __init__(self, text, parent=None):
+        QtGui.QLabel.__init__(self, text, parent)
+        font = QtGui.QFont()
+        self.setFont(font)
+        red = QtGui.QColor(QtCore.Qt.red)
+        palette = QtGui.QPalette()
+        palette.setColor(QtGui.QPalette.WindowText, red)
+        self.setPalette(palette)
+        self.setAlignment(Qt.AlignLeft)
 
 class IntLineEdit(QtGui.QLineEdit):
     """Accepter que des nombre positive """
