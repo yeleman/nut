@@ -6,7 +6,7 @@ from PyQt4 import QtGui
 
 from common import NUTWidget, PageTitle, PageIntro, FormLabel, ErrorLabel
 from nutclient.exceptions import *
-from utils import offline_login
+from nutclient.utils import offline_login
 from dashboard import DashboardWidget
 
 

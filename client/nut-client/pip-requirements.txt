@@ -1,2 +1,4 @@
 peewee
-#dreampie
+nosmsd
+pyzmq-static
+
