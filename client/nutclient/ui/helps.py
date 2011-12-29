@@ -9,6 +9,8 @@ from common import NUTWidget, PageTitle
 
 class HelpWidget(NUTWidget):
 
+    title = u"Help"
+
     def __init__(NUT, parent=0, *args, **kwargs):
 
         super(HelpWidget, NUT).__init__(parent=parent, *args, **kwargs)

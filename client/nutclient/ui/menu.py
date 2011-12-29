@@ -4,6 +4,7 @@
 
 from PyQt4 import QtGui, QtCore, Qt
 
+from dashboard import DashboardWidget
 from send import SendWidget
 from helps import HelpWidget
 from sim_management import SIM_managementWidget
@@ -55,6 +56,7 @@ class ToolBarButton(QtGui.QToolButton):
         QtGui.QToolButton.__init__(self, parent)
         self.setToolButtonStyle(2)
         self._target = None
+        self.setFocusPolicy(QtCore.Qt.NoFocus)
 
     def setTarget(self, func):
         self._target = func
@@ -75,18 +77,22 @@ class MainMenu(NUTMenu):
 
     def items(self):
         return [
-            NUTMenuItem(1, _(u"Help"), self.help),
-            NUTMenuItem(2, _(u"Next"), self.next),
-            NUTMenuItem(3, _(u"Previous"), self.previous),
-            NUTMenuItem(4, _(u"Data Entry"), self.data_entry),
-            NUTMenuItem(5, _(u"SIM Management"), self.sim_mgmt),
-            NUTMenuItem(6, _(u"Send"), self.send),
-            NUTMenuItem(7, _(u"Preferences"), self.preferences),
+            NUTMenuItem(1, _(u"Dashboard"), self.dashboard),
+            NUTMenuItem(2, _(u"Archives"), self.help),
+            NUTMenuItem(3, _(u"Data Entry"), self.data_entry),
+            #NUTMenuItem(5, _(u"Previous"), self.previous),
+            #NUTMenuItem(6, _(u"Next"), self.next),
+            NUTMenuItem(8, _(u"SIM Mgmt"), self.sim_mgmt),
+            NUTMenuItem(9, _(u"Options"), self.preferences),
+            #NUTMenuItem(10, _(u"Send"), self.send),
+            NUTMenuItem(11, _(u"Help"), self.help),
             NUTMenuItem(12, _(u"Quit"), self.quit),
         ]
 
+    def dashboard(self):
+        self.parent.change_context(DashboardWidget)
+
     def help(self):
-        print "help"
         self.parent.change_context(HelpWidget)
 
     def next(self):
@@ -96,18 +102,12 @@ class MainMenu(NUTMenu):
         print "previous"
 
     def data_entry(self):
-        print "data entry"
-        self.parent.setWindowTitle(_(u"Data Entry"))
         self.parent.change_context(DataEntryWidget)
 
     def sim_mgmt(self):
-        print "sim"
-        self.parent.setWindowTitle(_(u"SIM Management"))
         self.parent.change_context(SIM_managementWidget)
 
     def preferences(self):
-        print "pref"
-        self.parent.setWindowTitle(_(u"Preferences"))
         self.parent.change_context(PreferencesWidget)
 
     def send(self):

@@ -62,6 +62,9 @@ class MainWindow(QtGui.QMainWindow):
         # events queue
         self._events = Queue.Queue(0)
 
+        # modal dialog holder
+        self.dialog = None
+
         # store User in session
         self.user = None
 
@@ -87,6 +90,11 @@ class MainWindow(QtGui.QMainWindow):
 
     def change_context(self, context_widget, *args, **kwargs):
 
+        # check permissions
+        if context_widget.require_logged_user() and not self.is_logged():
+            self.change_context(LoginWidget)
+            return
+
         # instanciate context
         self.view_widget = context_widget(parent=self, *args, **kwargs)
 
@@ -94,17 +102,44 @@ class MainWindow(QtGui.QMainWindow):
         self.setCentralWidget(self.view_widget)
         self.view_widget.setFocus()
 
-    def change_context_id(self, context_id, *args, **kwargs):
+    """def change_context_id(self, context_id, *args, **kwargs):
         contexts = {'help': {'widget': DashboardWidget, 'menu': None}}
-        self.change_context(contexts[context_id]['widget'], args, kwargs)
+        self.change_context(contexts[context_id]['widget'], args, kwargs)"""
 
     def open_dialog(self, dialog, modal=False, *args, **kwargs):
-        d = dialog(parent=self, *args, **kwargs)
-        d.setModal(modal)
-        d.exec_()
+        self.dialog = dialog(parent=self, *args, **kwargs)
+        self.dialog.setModal(modal)
+        self.dialog.exec_()
+        self.dialog = None
 
     def process_event(self, event):
-        rep = QtGui.QMessageBox.question(self, u"Incoming SMS", event.detail)
+        # discard if event expired
+        if not event.alive:
+            return
+
+        # send event to modal dialog if exist
+        if self.dialog:
+            self.dialog.process_event(event)
+
+        # has event been discarded?
+        if not event.alive:
+            return
+
+        # send event to current widget
+        self.view_widget.process_event(event)
+
+        # has event been discarded?
+        if not event.alive:
+            return
+
+        # nobody handled event. Use default notification
+        self.default_event_handler(event)
+        event.discard()
+
+    def default_event_handler(self, event):
+        #rep = QtGui.QMessageBox.question(self, u"Incoming SMS", event.detail)
+        self.statusbar.showMessage(event.verbose())
+        event.discard()
 
     def add_event(self, event):
         # add event to queue and launch a timer
@@ -126,3 +161,5 @@ class MainWindow(QtGui.QMainWindow):
         self.thread.stop()
         event.accept()
 
+    def is_logged(self):
+        return self.user and self.user.active

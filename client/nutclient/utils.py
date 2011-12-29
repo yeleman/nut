@@ -5,6 +5,8 @@ from database import *
 from nutrsc.tools import generate_user_hash
 from nutclient.exceptions import *
 
+from nosmsd.utils import send_sms
+
 def must_login():
     """ whether user *must* login again
 
@@ -42,3 +44,9 @@ def offline_login(username, password):
         user = None
 
     return user
+
+
+def remote_login_request(username, password):
+
+    send_smd(u"nut login %(user)s %(pass)s" % {'user': username,
+                                               'password': password})

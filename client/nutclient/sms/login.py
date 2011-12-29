@@ -40,6 +40,7 @@ def nut_logged_in(message, args, sub_cmd, **kwargs):
     user.pwhash = pwhash
     user.hc_code = hc_code
     user.hc_name = hc_name
+    user.active = True
 
     for cap in caps:
         prop = 'hc_is%s' % cap.lower()

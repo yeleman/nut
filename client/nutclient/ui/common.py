@@ -10,6 +10,8 @@ MAIN_WIDGET_SIZE = 900
 
 class NUTWidget(QtGui.QWidget):
 
+    title = "?"
+
     def __init__(self, parent=0, *args, **kwargs):
 
         QtGui.QWidget.__init__(self, parent=parent, *args, **kwargs)
@@ -18,7 +20,16 @@ class NUTWidget(QtGui.QWidget):
 
         self.setMaximumWidth(MAIN_WIDGET_SIZE)
 
+        self.parent.setWindowTitle(self.title)
+
     def refresh(self):
+        pass
+
+    @classmethod
+    def require_logged_user(self):
+        return True
+
+    def process_event(self, event):
         pass
 
     def change_main_context(self, context_widget, *args, **kwargs):
@@ -28,6 +39,19 @@ class NUTWidget(QtGui.QWidget):
     def open_dialog(self, dialog, modal=False, *args, **kwargs):
         return self.parentWidget().open_dialog(dialog, \
                                                modal=modal, *args, **kwargs)
+
+
+class EnterDoesTab(QtGui.QWidget):
+
+    def keyReleaseEvent(self, event):
+        super(EnterDoesTab, self).keyReleaseEvent(event)
+        if event.key() == QtCore.Qt.Key_Return:
+            self.focusNextChild()
+
+
+class EnterTabbedLineEdit(QtGui.QLineEdit, EnterDoesTab):
+    pass
+
 
 class PageTitle(QtGui.QLabel):
     """ Formatage du titre de page """

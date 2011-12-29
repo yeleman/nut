@@ -2,15 +2,17 @@
 # encoding=utf-8
 # maintainer: rgaudin
 
-from PyQt4 import QtGui
+from PyQt4 import QtGui, QtCore
 
-from common import NUTWidget, PageTitle, PageIntro, FormLabel, ErrorLabel
+from common import NUTWidget, PageTitle, PageIntro, FormLabel, ErrorLabel, EnterTabbedLineEdit
 from nutclient.exceptions import *
 from nutclient.utils import offline_login
 from dashboard import DashboardWidget
 
 
 class LoginWidget(NUTWidget):
+
+    title = u"Please log-in"
 
     def __init__(self, parent=0, *args, **kwargs):
 
@@ -32,13 +34,13 @@ class LoginWidget(NUTWidget):
         vbox.addWidget(self.intro)
 
         # username field
-        self.username_field = QtGui.QLineEdit()
+        self.username_field = EnterTabbedLineEdit()
         self.username_label = FormLabel(u"&Identifiant")
         self.username_label.setBuddy(self.username_field)
         self.username_error = ErrorLabel(u"")
 
         # password field
-        self.password_field = QtGui.QLineEdit()
+        self.password_field = EnterTabbedLineEdit()
         self.password_field.setEchoMode(QtGui.QLineEdit.PasswordEchoOnEdit)
         self.password_label = FormLabel(u"Mot de &passe")
         self.password_label.setBuddy(self.password_field)
@@ -71,6 +73,10 @@ class LoginWidget(NUTWidget):
 
         # set focus to username field
         self.setFocusProxy(self.username_field)
+
+    @classmethod
+    def require_logged_user(self):
+        return False
 
     def is_complete(self):
         """ form has been completly filled or not. Sets error messages """
@@ -123,7 +129,9 @@ class LoginWidget(NUTWidget):
                 return
             else:
                 # trigger online_login
-                dialog = self.open_dialog(RemoteLogin)
+                dialog = self.open_dialog(RemoteLogin,
+                                          username=username,
+                                          password=password)
                 return
 
         if not user:
@@ -136,11 +144,32 @@ class LoginWidget(NUTWidget):
         # go to dashboard
         self.change_main_context(DashboardWidget)
 
+    def process_event(self, event):
+        if event.type == event.LOGIN_SUCCESS \
+           or event.type == event.LOGIN_FAILED:
+            box = QtGui.QMessageBox.information(self,
+                                                _(u"Successfully logged-in"),
+                    _(u"Congratulations!\nThe server positively recognized " \
+                      u"you and sent your Health Center informations.\nFrom " \
+                      u"now, you will be able to log-in instantly with that " \
+                      u"username."))
+            event.discard()
+            self.do_login()
+
 
 class RemoteLogin(QtGui.QDialog, NUTWidget):
 
     def __init__(self, parent=0, *args, **kwargs):
         QtGui.QWidget.__init__(self, parent, *args, **kwargs)
+
+        self.username = None
+        self.password = None
+
+        if kwargs.has_key('username'):
+            self.username = kwargs['username']
+
+        if kwargs.has_key('password'):
+            self.password = kwargs['password']
 
         self.setWindowTitle(_(u"Remote Login"))
 
@@ -155,7 +184,6 @@ class RemoteLogin(QtGui.QDialog, NUTWidget):
                                  u"password properly before starting."))
 
         vbox = QtGui.QVBoxLayout()
-        #gridbox = QtGui.QGridLayout()
 
         # page title
         vbox.addWidget(self.title)
@@ -198,3 +226,11 @@ class RemoteLogin(QtGui.QDialog, NUTWidget):
         self.progress_bar.setVisible(True)
         self.progress_label.setVisible(True)
         self.continue_button.setVisible(False)
+        remote_login_request(self.username, self.password)
+
+    def process_event(self, event):
+        # login success/failure close pending dialog
+        # keep event alive so that parent will process
+        if event.type == event.LOGIN_SUCCESS \
+           or event.type == event.LOGIN_FAILED:
+            self.close()
