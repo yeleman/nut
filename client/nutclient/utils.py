@@ -7,28 +7,9 @@ from nutclient.exceptions import *
 
 from nosmsd.utils import send_sms
 
-def must_login():
-    """ whether user *must* login again
-
-    cases include:
-        - never logged in
-        - is not logged in right now (main window has no user attached)
-        - logged-in but user is not active """
-
-    # Test if session holds a valid user
-    
-
-    # Test if we have a user in the DB.
-    if User.select().count() == 0:
-        return True
-
-    # test if there exist 
-    if User.filter(active=True).count() == 0:
-        return True
-
 
 def offline_login(username, password):
-
+    """ test a username/password couple locally for access """
     username = username.strip()
     password = password.strip()
 
@@ -47,6 +28,6 @@ def offline_login(username, password):
 
 
 def remote_login_request(username, password):
-
+    """ sends formatted SMS to server to request login """
     send_smd(u"nut login %(user)s %(pass)s" % {'user': username,
                                                'password': password})

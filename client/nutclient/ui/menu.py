@@ -5,6 +5,7 @@
 from PyQt4 import QtGui, QtCore, Qt
 
 from dashboard import DashboardWidget
+from report import ReportWidget
 from send import SendWidget
 from helps import HelpWidget
 from sim_management import SIM_managementWidget
@@ -93,7 +94,7 @@ class MainMenu(NUTMenu):
         self.parent.change_context(DashboardWidget)
 
     def help(self):
-        self.parent.change_context(HelpWidget)
+        self.parent.change_context(HelpWidget, topic=self.parent.view_widget.__class__.__name__.lower().replace('widget', ''))
 
     def next(self):
         print "next"
@@ -102,7 +103,7 @@ class MainMenu(NUTMenu):
         print "previous"
 
     def data_entry(self):
-        self.parent.change_context(DataEntryWidget)
+        self.parent.change_context(ReportWidget)
 
     def sim_mgmt(self):
         self.parent.change_context(SIM_managementWidget)

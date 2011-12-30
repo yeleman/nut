@@ -1,9 +1,10 @@
 #!/usr/bin/env python
 # encoding=utf-8
 
+from datetime import datetime
+
 import peewee
 
-#dbh = peewee.MySQLDatabase('my_database', user='code')
 dbh = peewee.SqliteDatabase('/home/reg/src/nut/client/client.db')
 
 
@@ -53,6 +54,43 @@ class User(BaseModel):
 
     def verb_caps(self):
         return "+".join([_(cap.upper()) for cap in self.caps()])
+
+class ReportHistory(BaseModel):
+
+    report = peewee.ForeignKeyField(Report, related_name='exchanges')
+
+    previous_status = peewee.CharField()
+    # store a Pickle serialized version of changed fields
+    # with previous values
+    modified_fields = peewee.CharField()
+
+class Report(BaseModel):
+
+    STATUS_DRAFT = 0
+    STATUS_COMPLETE = 1
+    STATUS_SENT = 2
+    STATUS_REMOTE_MODIFIED = 3
+    STATUS_LOCAL_MODIFIED = 4
+    
+    created_by = peewee.ForeignKeyField(User)
+    created_on = peewee.DateTimeField()
+    modified_on = peewee.DateTimeField()
+    month = peewee.IntegerField(null=True)
+    year = peewee.IntegerField(null=True)
+    status = peewee.IntegerField()
+
+    def __unicode__(self):
+        if not self.year and not self.month:
+            return u"Created on %s" % created_on.strftime('%c')
+        elif not self.year:
+            d = datetime.now()
+            d.month = self.month
+            return u"%s ??" % d.strftime('%m')
+        elif not self.month:
+            return u"?? %d" % self.year
+        else:
+            d = datetime.datetime(self.year, self.month, 1)
+            return u"%s" % d.strftime('%m %Y')
         
 
 def setup():

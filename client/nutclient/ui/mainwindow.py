@@ -9,6 +9,7 @@ import Queue
 from PyQt4 import QtGui, QtCore
 
 from dashboard import DashboardWidget
+from common import NUTWidget
 from login import LoginWidget
 from menu import *
 from statusbar import NUTStatusBar
@@ -56,8 +57,11 @@ class ZmqServer(threading.Thread):
         self.is_running = False
 
 class MainWindow(QtGui.QMainWindow):
-    def __init__(self):
+    def __init__(self, app):
         QtGui.QMainWindow.__init__(self)
+
+        # QApplication
+        self.app = app
 
         # events queue
         self._events = Queue.Queue(0)
@@ -81,6 +85,8 @@ class MainWindow(QtGui.QMainWindow):
         self.statusbar = NUTStatusBar(self)
         self.setStatusBar(self.statusbar)
 
+        self.view_widget = NUTWidget(self)
+
         self.change_context(LoginWidget)
 
         self.thread = ZmqServer(self)
@@ -95,12 +101,19 @@ class MainWindow(QtGui.QMainWindow):
             self.change_context(LoginWidget)
             return
 
+        # remove focus from previous page
+        self.view_widget.clearFocus()
+
         # instanciate context
         self.view_widget = context_widget(parent=self, *args, **kwargs)
 
         # attach context to window
         self.setCentralWidget(self.view_widget)
-        self.view_widget.setFocus()
+
+        # set focus to default widget on target
+        focus = self.view_widget.default_focus()
+        if focus:
+            focus.setFocus()
 
     """def change_context_id(self, context_id, *args, **kwargs):
         contexts = {'help': {'widget': DashboardWidget, 'menu': None}}

@@ -21,7 +21,7 @@ def main():
     gettext.install('nut', localedir='locale', unicode=True)
 
     app = QtGui.QApplication(sys.argv)
-    window = MainWindow()
+    window = MainWindow(app)
     setattr(NUTWindow, 'window', window)
     window.show()
     #window.showMaximized()

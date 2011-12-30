@@ -40,6 +40,12 @@ class NUTWidget(QtGui.QWidget):
         return self.parentWidget().open_dialog(dialog, \
                                                modal=modal, *args, **kwargs)
 
+    def default_focus(self):
+        """ widget which should receive focus on NUTWidget display
+
+            Called from MainWindows as FocusProxy is buggy. """
+        return None
+
 
 class EnterDoesTab(QtGui.QWidget):
 
@@ -117,3 +123,27 @@ class DateEdit(QtGui.QDateEdit):
         QtGui.QDateEdit.__init__(self, parent)
         self.setDisplayFormat("MMMM yyyy")
         self.setDateRange(QtCore.QDate(1999, 1, 1), QtCore.QDate(2100, 1, 1))
+
+class ReportTable(QtGui.QTableWidget, NUTWidget):
+
+    def __init__(self, parent, report=None, *args, **kwargs):
+
+        QtGui.QTableWidget.__init__(self, parent=parent, *args, **kwargs)
+
+        self.setAlternatingRowColors(True)
+        
+        self.setShowGrid(True)
+        self.setWordWrap(True)
+
+        self.horizontalHeader().setVisible(True)
+        self.horizontalHeader().setDefaultSectionSize(78)
+        self.horizontalHeader().setHighlightSections(True)
+        self.horizontalHeader().setFont(QtGui.QFont("Courier New", 10))
+
+        self.verticalHeader().setVisible(True)
+        self.verticalHeader().setDefaultSectionSize(30)
+        self.verticalHeader().setHighlightSections(True)
+        self.verticalHeader().setFont(QtGui.QFont("Courier New", 10))
+
+        self.setSelectionMode(QtGui.QAbstractItemView.SingleSelection)
+        #self.setFont(QtGui.QFont("Courier New", 10))

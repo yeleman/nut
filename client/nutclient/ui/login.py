@@ -74,6 +74,10 @@ class LoginWidget(NUTWidget):
         # set focus to username field
         self.setFocusProxy(self.username_field)
 
+    def default_focus(self):
+        # direct focus to username field
+        return self.username_field
+
     @classmethod
     def require_logged_user(self):
         return False
