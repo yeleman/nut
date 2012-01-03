@@ -6,7 +6,7 @@ from PyQt4 import QtGui, QtCore
 
 from common import NUTWidget, PageTitle, PageIntro, FormLabel, ErrorLabel, EnterTabbedLineEdit
 from nutclient.exceptions import *
-from nutclient.utils import offline_login
+from nutclient.utils import offline_login, remote_login_request
 from dashboard import DashboardWidget
 
 
@@ -164,7 +164,7 @@ class LoginWidget(NUTWidget):
 class RemoteLogin(QtGui.QDialog, NUTWidget):
 
     def __init__(self, parent=0, *args, **kwargs):
-        QtGui.QWidget.__init__(self, parent, *args, **kwargs)
+        QtGui.QWidget.__init__(self, parent)
 
         self.username = None
         self.password = None

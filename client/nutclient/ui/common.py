@@ -86,7 +86,7 @@ class FormLabel(QtGui.QLabel):
         font = QtGui.QFont()
         font.setBold(True)
         self.setFont(font)
-        self.setAlignment(Qt.AlignLeft)
+        self.setAlignment(Qt.AlignLeft | Qt.AlignVCenter)
 
 class ErrorLabel(QtGui.QLabel):
 
@@ -127,7 +127,7 @@ class DateEdit(QtGui.QDateEdit):
 class ReportTable(QtGui.QTableWidget, NUTWidget):
 
     def __init__(self, parent, report=None, *args, **kwargs):
-
+        print(args)
         QtGui.QTableWidget.__init__(self, parent=parent, *args, **kwargs)
 
         self.setAlternatingRowColors(True)

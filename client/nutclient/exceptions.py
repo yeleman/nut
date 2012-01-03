@@ -3,3 +3,7 @@
 
 class UsernameNotFound(Exception):
     pass
+
+
+class UnableToCompleteWidget(Exception):
+    pass

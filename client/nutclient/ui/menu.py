@@ -78,16 +78,16 @@ class MainMenu(NUTMenu):
 
     def items(self):
         return [
-            NUTMenuItem(1, _(u"Dashboard"), self.dashboard),
+            NUTMenuItem(1, _(u"Tableau de bord"), self.dashboard),
             NUTMenuItem(2, _(u"Archives"), self.help),
-            NUTMenuItem(3, _(u"Data Entry"), self.data_entry),
-            #NUTMenuItem(5, _(u"Previous"), self.previous),
-            #NUTMenuItem(6, _(u"Next"), self.next),
-            NUTMenuItem(8, _(u"SIM Mgmt"), self.sim_mgmt),
+            NUTMenuItem(3, _(u"Rapport Mensuel"), self.data_entry),
+            #NUTMenuItem(5, _(u"Précédente"), self.previous),
+            #NUTMenuItem(6, _(u"Suivante"), self.next),
+            NUTMenuItem(8, _(u"Gestion SIM"), self.sim_mgmt),
             NUTMenuItem(9, _(u"Options"), self.preferences),
-            #NUTMenuItem(10, _(u"Send"), self.send),
-            NUTMenuItem(11, _(u"Help"), self.help),
-            NUTMenuItem(12, _(u"Quit"), self.quit),
+            #NUTMenuItem(10, _(u"Transmission"), self.send),
+            NUTMenuItem(11, _(u"Aide"), self.help),
+            NUTMenuItem(12, _(u"Quitter"), self.quit),
         ]
 
     def dashboard(self):
@@ -112,7 +112,6 @@ class MainMenu(NUTMenu):
         self.parent.change_context(PreferencesWidget)
 
     def send(self):
-        self.parent.setWindowTitle(_(u"Send"))
         self.parent.change_context(SendWidget)
 
     def quit(self):

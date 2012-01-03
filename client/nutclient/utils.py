@@ -29,5 +29,6 @@ def offline_login(username, password):
 
 def remote_login_request(username, password):
     """ sends formatted SMS to server to request login """
-    send_smd(u"nut login %(user)s %(pass)s" % {'user': username,
+    send_sms(config.SRV_NUM, \
+             u"nut login %(user)s %(password)s" % {'user': username,
                                                'password': password})

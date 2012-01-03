@@ -13,6 +13,7 @@ from common import NUTWidget
 from login import LoginWidget
 from menu import *
 from statusbar import NUTStatusBar
+from nutclient.exceptions import UnableToCompleteWidget
 
 import zmq
 import random
