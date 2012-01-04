@@ -143,7 +143,7 @@ class LoginWidget(NUTWidget):
             return
 
         # store User object to main window
-        self.parent.user = user
+        self.main_window._user = user
 
         # go to dashboard
         self.change_main_context(DashboardWidget)

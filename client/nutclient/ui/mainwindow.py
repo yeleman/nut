@@ -71,7 +71,7 @@ class MainWindow(QtGui.QMainWindow):
         self.dialog = None
 
         # store User in session
-        self.user = None
+        self._user = None
 
         self.resize(900, 650)
         self.setWindowTitle(_(u"NUT Client"))
@@ -176,4 +176,4 @@ class MainWindow(QtGui.QMainWindow):
         event.accept()
 
     def is_logged(self):
-        return self.user and self.user.active
+        return self._user and self._user.active

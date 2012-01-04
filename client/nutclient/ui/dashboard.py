@@ -17,9 +17,9 @@ class DashboardWidget(NUTWidget):
 
         vbox = QtGui.QVBoxLayout()
         self.title = PageTitle(_(u"Welcome %(user)s, %(hc)s (%(hccap)s)") \
-                               % {'user': self.parent.user,
-                                  'hc': self.parent.user.hc,
-                                  'hccap': self.parent.user.verb_caps()})
+                               % {'user': self.user,
+                                  'hc': self.user.hc,
+                                  'hccap': self.user.verb_caps()})
         self.intro = PageIntro(u"")
 
         vbox.addWidget(self.title)

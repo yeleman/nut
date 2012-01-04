@@ -6,11 +6,12 @@ from datetime import date, datetime
 
 from PyQt4 import QtGui, QtCore
 
-from common import NUTWidget, PageTitle, PageIntro, FormLabel, ErrorLabel, EnterTabbedLineEdit, ReportTable
+from common import NUTWidget, PageTitle, PageIntro, FormLabel, ErrorLabel, EnterTabbedLineEdit, ReportTable, ReportValueEdit
 from nutclient.exceptions import *
 from nutclient.utils import offline_login
 from dashboard import DashboardWidget
 from database import Report, Period
+
 
 class ReportPeriodWidget(QtGui.QDialog, NUTWidget):
 
@@ -84,12 +85,39 @@ class ReportPeriodWidget(QtGui.QDialog, NUTWidget):
     def confirm(self):
         period_date = self.date_field.date().toPyDate()
         period = Period.from_date(period_date)
-        
-        report = period
+
+        # a report exist for that period.
+        if Report.filter(period=period).count() == 1:
+            report = Report.filter(period=period).get()
+        else:
+            report = Report.create_safe(period=period, user=self.user)
 
         self.parent.view_widget.report = report
 
         self.close()
+
+
+def build_data_from(parent, report, readonly):
+
+    data = []
+    cols = 9
+    blank_line = [None for x in range(0, cols - 1)]
+
+    # Add SAM section
+    if report.is_sam:
+        # add blank line for SAM section header
+        data.append(blank_line)
+
+        # retrieve sam report
+        samr = report.pec_sam_report
+        
+        # under 59
+        u59 = blank_line
+        u59[0] = ReportValueEdit(parent, samr, 'u59_total_beginning_m')
+        
+        data.append(u59)
+
+    return data
 
 class ReportWidget(NUTWidget):
 
@@ -100,13 +128,11 @@ class ReportWidget(NUTWidget):
 
         super(ReportWidget, self).__init__(parent=parent, *args, **kwargs)
 
-        report = None
-
         self.init_timer = self.startTimer(0)
 
-    def gen_ui(self):
-        self.title = PageTitle(_(u"Monthly Nutrition Report"))
-        self.intro = PageIntro(_(u"%s") % self.report)
+    def build_pec_ui(self):
+        self.title = PageTitle(_(u"Rapport Statistique Mensuel - Traitement de la malnutrition aiguë") % self.report.period)
+        self.intro = PageIntro(_(u"%(period)s") % {'period': self.report.period})
 
         vbox = QtGui.QVBoxLayout()
         #gridbox = QtGui.QGridLayout()
@@ -130,11 +156,24 @@ class ReportWidget(NUTWidget):
                                             u"6-59 mois", u"FE/FA",
                                             u"Suivi 1&2"])
 
+        self.table.data = build_data_from(self, self.report, self.readonly)
+
         vbox.addWidget(self.table)
         self.setLayout(vbox)
 
         # set focus to username field
         self.setFocusProxy(self.table)
+        
+
+    def gen_ui(self):
+
+        # What do we display now?
+        self.build_pec_ui()
+
+
+    @property
+    def readonly(self):
+        return not self.report.can_edit()
 
     ############ DEBUG
     @classmethod
