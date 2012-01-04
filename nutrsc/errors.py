@@ -22,6 +22,7 @@ REPORT_ERRORS = {
     'BAD_FORM_ORDER': _(u"Malformed SMS (ORDER)."),
     'BAD_FORM_INFO': _(u"Malformed SMS (infos)."),
     'BAD_FORM_PERIOD': _(u"Malformed SMS (period)."),
+    'BAD_FORM_OTHER': _(u"Malformed SMS (others)."),
     'BAD_PERIOD': _(u"Unable to accept data for that period now."),
     'NOT_ENT': _(u"Account is not tied to any Health Center."),
     'BAD_CAP': _(u"Reports don't match HC capabilities. Try to log-in again."),
@@ -37,6 +38,7 @@ REPORT_ERRORS = {
     'ORDER_MAM': _(u"ORDER MAM Report Data Invalid"),
     'ORDER_SAM': _(u"ORDER SAM Report Data Invalid"),
     'ORDER_SAMP': _(u"ORDER SAM+ Report Data Invalid"),
+    'OTHER_INT': _(u"Others total does not match PEC data."),
     'SRV': _(u"A technical error occured. Please contact Tech Support."),
     'UNIQ': _(u"There is already a report for that period at your HC."),
 }

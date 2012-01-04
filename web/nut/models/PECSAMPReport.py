@@ -35,12 +35,8 @@ class PECSAMPReport(NUTReport, Report):
                                                     _(u"MUAC <11 or MUAC <18"))
     u6_oedema = models.PositiveIntegerField( \
                                                                   _(u"Oedema"))
-    u6_other_hiv = models.PositiveIntegerField( \
-                                                  _(u"Other: Living with HIV"))
-    u6_other_tb = models.PositiveIntegerField( \
-                                                               _(u"Other: TB"))
-    u6_other_lwb = models.PositiveIntegerField( \
-                                              _(u"Other: Low weight at birth"))
+    u6_other = models.PositiveIntegerField(_(u"Other"))
+
     u6_new_case = models.PositiveIntegerField( \
                                                                 _(u"New Case"))
     u6_relapse = models.PositiveIntegerField( \
@@ -82,12 +78,8 @@ class PECSAMPReport(NUTReport, Report):
                                                     _(u"MUAC <11 or MUAC <18"))
     u59_oedema = models.PositiveIntegerField( \
                                                                   _(u"Oedema"))
-    u59_other_hiv = models.PositiveIntegerField( \
-                                                  _(u"Other: Living with HIV"))
-    u59_other_tb = models.PositiveIntegerField( \
-                                                               _(u"Other: TB"))
-    u59_other_lwb = models.PositiveIntegerField( \
-                                              _(u"Other: Low weight at birth"))
+    u59_other = models.PositiveIntegerField(_(u"Other"))
+
     u59_new_case = models.PositiveIntegerField( \
                                                                 _(u"New Case"))
     u59_relapse = models.PositiveIntegerField( \
@@ -129,12 +121,8 @@ class PECSAMPReport(NUTReport, Report):
                                                     _(u"MUAC <11 or MUAC <18"))
     o59_oedema = models.PositiveIntegerField( \
                                                                   _(u"Oedema"))
-    o59_other_hiv = models.PositiveIntegerField( \
-                                                  _(u"Other: Living with HIV"))
-    o59_other_tb = models.PositiveIntegerField( \
-                                                               _(u"Other: TB"))
-    o59_other_lwb = models.PositiveIntegerField( \
-                                              _(u"Other: Low weight at birth"))
+    o59_other = models.PositiveIntegerField(_(u"Other"))
+
     o59_new_case = models.PositiveIntegerField( \
                                                                 _(u"New Case"))
     o59_relapse = models.PositiveIntegerField( \
@@ -173,7 +161,7 @@ class PECSAMPReport(NUTReport, Report):
     def add_u6_data(self, u6_total_beginning_m,
                     u6_total_beginning_f, u6_hw_u70_bmi_u16,
                     u6_muac_u11_muac_u18, u6_oedema,
-                    u6_other_hiv, u6_other_tb, u6_other_lwb,
+                    u6_other,
                     u6_new_case, u6_relapse,
                     u6_returned, u6_nut_transfered_in,
                     u6_admitted_m, u6_admitted_f,
@@ -186,9 +174,7 @@ class PECSAMPReport(NUTReport, Report):
         self.u6_hw_u70_bmi_u16 = u6_hw_u70_bmi_u16
         self.u6_muac_u11_muac_u18 = u6_muac_u11_muac_u18
         self.u6_oedema = u6_oedema
-        self.u6_other_hiv = u6_other_hiv
-        self.u6_other_tb = u6_other_tb
-        self.u6_other_lwb = u6_other_lwb
+        self.u6_other = u6_other
         self.u6_new_case = u6_new_case
         self.u6_relapse = u6_relapse
         self.u6_returned = u6_returned
@@ -207,8 +193,7 @@ class PECSAMPReport(NUTReport, Report):
     def add_u59_data(self, u59_total_beginning_m,
                     u59_total_beginning_f,
                     u59_hw_u70_bmi_u16, u59_muac_u11_muac_u18,
-                    u59_oedema, u59_other_hiv, u59_other_tb,
-                    u59_other_lwb, u59_new_case,
+                    u59_oedema, u59_other, u59_new_case,
                     u59_relapse, u59_returned,
                     u59_nut_transfered_in, u59_admitted_m,
                     u59_admitted_f, u59_healed,
@@ -221,9 +206,7 @@ class PECSAMPReport(NUTReport, Report):
         self.u59_hw_u70_bmi_u16 = u59_hw_u70_bmi_u16
         self.u59_muac_u11_muac_u18 = u59_muac_u11_muac_u18
         self.u59_oedema = u59_oedema
-        self.u59_other_hiv = u59_other_hiv
-        self.u59_other_tb = u59_other_tb
-        self.u59_other_lwb = u59_other_lwb
+        self.u59_other = u59_other
         self.u59_new_case = u59_new_case
         self.u59_relapse = u59_relapse
         self.u59_returned = u59_returned
@@ -242,8 +225,7 @@ class PECSAMPReport(NUTReport, Report):
     def add_o59_data(self, o59_total_beginning_m,
                     o59_total_beginning_f,
                     o59_hw_u70_bmi_u16, o59_muac_u11_muac_u18,
-                    o59_oedema, o59_other_hiv,
-                    o59_other_tb, o59_other_lwb, o59_new_case,
+                    o59_oedema, o59_other, o59_new_case,
                     o59_relapse, o59_returned,
                     o59_nut_transfered_in, 
                     o59_admitted_m, o59_admitted_f,
@@ -256,9 +238,7 @@ class PECSAMPReport(NUTReport, Report):
         self.o59_hw_u70_bmi_u16 = o59_hw_u70_bmi_u16
         self.o59_muac_u11_muac_u18 = o59_muac_u11_muac_u18
         self.o59_oedema = o59_oedema
-        self.o59_other_hiv = o59_other_hiv
-        self.o59_other_tb = o59_other_tb
-        self.o59_other_lwb = o59_other_lwb
+        self.o59_other = o59_other
         self.o59_new_case = o59_new_case
         self.o59_relapse = o59_relapse
         self.o59_returned = o59_returned

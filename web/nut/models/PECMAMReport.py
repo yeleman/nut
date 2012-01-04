@@ -34,12 +34,8 @@ class PECMAMReport(NUTReport, Report):
                                                  _(u"H/W ≥70%<80% or BMI <18"))
     u59_muac_u120 = models.PositiveIntegerField( \
                                                   _(u"MUAC <120 or MUAC <210"))
-    u59_other_hiv = models.PositiveIntegerField( \
-                                                  _(u"Other: Living with HIV"))
-    u59_other_tb = models.PositiveIntegerField( \
-                                                               _(u"Other: TB"))
-    u59_other_lwb = models.PositiveIntegerField( \
-                                              _(u"Other: Low weight at birth"))
+    u59_other = models.PositiveIntegerField(_(u"Other"))
+
     u59_new_case = models.PositiveIntegerField( \
                                                                 _(u"New Case"))
     u59_relapse = models.PositiveIntegerField( \
@@ -77,12 +73,8 @@ class PECMAMReport(NUTReport, Report):
                                                  _(u"H/W ≥70%<80% or BMI <18"))
     pw_muac_u120 = models.PositiveIntegerField( \
                                                   _(u"MUAC <120 or MUAC <210"))
-    pw_other_hiv = models.PositiveIntegerField( \
-                                                  _(u"Other: Living with HIV"))
-    pw_other_tb = models.PositiveIntegerField( \
-                                                               _(u"Other: TB"))
-    pw_other_lwb = models.PositiveIntegerField( \
-                                              _(u"Other: Low weight at birth"))
+    pw_other = models.PositiveIntegerField(_(u"Other"))
+
     pw_new_case = models.PositiveIntegerField( \
                                                                 _(u"New Case"))
     pw_relapse = models.PositiveIntegerField( \
@@ -119,12 +111,8 @@ class PECMAMReport(NUTReport, Report):
                                                  _(u"H/W ≥70%<80% or BMI <18"))
     fu12_muac_u120 = models.PositiveIntegerField( \
                                                   _(u"MUAC <120 or MUAC <210"))
-    fu12_other_hiv = models.PositiveIntegerField( \
-                                                  _(u"Other: Living with HIV"))
-    fu12_other_tb = models.PositiveIntegerField( \
-                                                               _(u"Other: TB"))
-    fu12_other_lwb = models.PositiveIntegerField( \
-                                              _(u"Other: Low weight at birth"))
+    fu12_other = models.PositiveIntegerField(_(u"Other"))
+
     fu12_nut_referred_in = models.PositiveIntegerField( \
                                                    _(u"Nutritional reference"))
     fu12_admitted_m = models.PositiveIntegerField( \
@@ -156,8 +144,7 @@ class PECMAMReport(NUTReport, Report):
 
     def add_u59_data(self, u59_total_beginning_m, u59_total_beginning_f,
                         u59_hw_b7080_bmi_u18, u59_muac_u120,
-                        u59_other_hiv, u59_other_tb,
-                        u59_other_lwb, u59_new_case,
+                        u59_other, u59_new_case,
                         u59_relapse, u59_returned,
                         u59_nut_referred_in, u59_admitted_m,
                         u59_admitted_f, u59_healed,
@@ -169,9 +156,7 @@ class PECMAMReport(NUTReport, Report):
         self.u59_total_beginning_f = u59_total_beginning_f
         self.u59_hw_b7080_bmi_u18 = u59_hw_b7080_bmi_u18
         self.u59_muac_u120 = u59_muac_u120
-        self.u59_other_hiv = u59_other_hiv
-        self.u59_other_tb = u59_other_tb
-        self.u59_other_lwb = u59_other_lwb
+        self.u59_other = u59_other
         self.u59_new_case = u59_new_case
         self.u59_relapse = u59_relapse
         self.u59_returned = u59_returned
@@ -188,8 +173,7 @@ class PECMAMReport(NUTReport, Report):
         self.u59_total_out_f = u59_total_out_f
 
     def add_pw_data(self, pw_total_beginning_f, pw_hw_b7080_bmi_u18,
-                        pw_muac_u120, pw_other_hiv,
-                        pw_other_tb, pw_other_lwb,
+                        pw_muac_u120, pw_other,
                         pw_new_case, pw_relapse,
                         pw_returned, pw_nut_referred_in,
                         pw_admitted_f, pw_healed,
@@ -199,9 +183,7 @@ class PECMAMReport(NUTReport, Report):
         self.pw_total_beginning_f = pw_total_beginning_f
         self.pw_hw_b7080_bmi_u18 = pw_hw_b7080_bmi_u18
         self.pw_muac_u120 = pw_muac_u120
-        self.pw_other_hiv = pw_other_hiv
-        self.pw_other_tb = pw_other_tb
-        self.pw_other_lwb = pw_other_lwb
+        self.pw_other = pw_other
         self.pw_new_case = pw_new_case
         self.pw_relapse = pw_relapse
         self.pw_returned = pw_returned
@@ -217,8 +199,7 @@ class PECMAMReport(NUTReport, Report):
 
     def add_fu12_data(self, fu12_total_beginning_m, fu12_total_beginning_f,
                         fu12_hw_b7080_bmi_u18, fu12_muac_u120,
-                        fu12_other_hiv, fu12_other_tb,
-                        fu12_other_lwb, fu12_nut_referred_in,
+                        fu12_other, fu12_nut_referred_in,
                         fu12_admitted_m, fu12_admitted_f,
                         fu12_healed, fu12_referred_out,
                         fu12_deceased, fu12_aborted,
@@ -228,9 +209,7 @@ class PECMAMReport(NUTReport, Report):
         self.fu12_total_beginning_f = fu12_total_beginning_f
         self.fu12_hw_b7080_bmi_u18 = fu12_hw_b7080_bmi_u18
         self.fu12_muac_u120 = fu12_muac_u120
-        self.fu12_other_hiv = fu12_other_hiv
-        self.fu12_other_tb = fu12_other_tb
-        self.fu12_other_lwb = fu12_other_lwb
+        self.fu12_other = fu12_other
         self.fu12_nut_referred_in = fu12_nut_referred_in
         self.fu12_admitted_m = fu12_admitted_m
         self.fu12_admitted_f = fu12_admitted_f

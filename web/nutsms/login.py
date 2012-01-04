@@ -19,9 +19,9 @@ def nut_login(message, args, sub_cmd, **kwargs):
     with an indication of the HC capabilities: MAM, SAM, SAM+.
 
     > nut login rgaudin renaud
-    < nut logged in 4663950500290933446 mam+sam ntil|N'Tillit
+    < nut logged-in 4663950500290933446 mam+sam ntil|N'Tillit
                 hash capabilities HC-code | HC Name
-    < nut logged out 0|Cet identifiant n'existe pas.
+    < nut logged-out 0|Cet identifiant n'existe pas.
                  Error-code | Error Message """
 
     def resp_error(code, msg):
@@ -78,9 +78,9 @@ def nut_login(message, args, sub_cmd, **kwargs):
         return resp_error('OTHER', _(u"Username's Entity is not NUT."))
 
     # all good, let's send that SMS back
-    msg = u"nut logged in %(hash)s %(nutcap)s %(hcslug)s|%(hcname)s" \
+    msg = u"nut logged-in %(user)s %(hash)s %(nutcap)s %(hcslug)s|%(hcname)s" \
           % {'hash': user_hash, 'nutcap': nutcap, 'hcslug': entity.slug,
-             'hcname': entity.name.title()}
+             'hcname': entity.name.title(), 'user': username}
 
     message.respond(msg)
     return True

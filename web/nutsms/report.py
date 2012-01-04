@@ -54,8 +54,9 @@ def nut_report(message, args, sub_cmd, **kwargs):
     1199 1199|oil 1199 1199 1199 1199|sugar 1199 1199 1199 1199|mil 1199 1199
     1199 1199|niebe 1199 1199 1199 1199&SAM|plumpy 1199 1199 1199
     1199#O&MAM|csb 1199|unimix 1199|oil 1199|sugar 1199|mil 1199|niebe
-    1199&SAM|plumpy 1199-EOM-
-
+    1199&SAM|plumpy 1199#T 1 2 3-EOM-
+    
+    T lwb tb hiv
     < nut report error Error-code | Error Message
     < nut report ok #P$MAM GA1/gao-343-VO5$SAM GA1/gao-343-VO5#C$MAM
     GA1/gao-343-VO5$SAM GA1/gao-343-VO5#O$MAM GA1/gao-343-VO5$SAM
@@ -110,7 +111,7 @@ def nut_report(message, args, sub_cmd, **kwargs):
         reversion.set_comment("SMS transmitted report")
         for secid, section in reports.items():
         
-            # create key for report type (P,C,O)
+            # create key for report type (P,C,O,T)
             if not receipts.has_key(secid):
                 receipts[secid] = {}
                 
@@ -121,7 +122,8 @@ def nut_report(message, args, sub_cmd, **kwargs):
                     receipts[secid][catid] = []
                     
                 for report in reports:
-                    logger.info("%s > %s > %s" % (secid, catid, report.__class__))
+                    logger.info("%s > %s > %s" \
+                                % (secid, catid, report.__class__))
                     try:
                         # HACK: write foreign key id if needed
                         if hasattr(report, 'cons_report_id'):
@@ -151,10 +153,12 @@ def nut_report(message, args, sub_cmd, **kwargs):
 
     # split up sections
     try:
-        infos, pec_sec, cons_sec, order_sec = args.strip().lower().split('#')
+        infos, pec_sec, cons_sec, order_sec, other_sec = \
+                                                 args.strip().lower().split('#')
         pec_sec = pec_sec[1:]
         cons_sec = cons_sec[1:]
         order_sec = order_sec[1:]
+        other_sec = other_sec[1:]
     except:
         return resp_error('BAD_FORM', REPORT_ERRORS['BAD_FORM'])
 
@@ -222,14 +226,17 @@ def nut_report(message, args, sub_cmd, **kwargs):
             'SAM': [pr]},
         'C':
             {'MAM': [icr, icr, icr, cr],
-             'SAM': [icr, cr]}
+             'SAM': [icr, cr]},
         'O':
             {'MAM': [ior, ior, ior, or],
-             'SAM': [ior, or]}
+             'SAM': [ior, or]},
+        'T': 
+            {'ALL': [tr]},
         } """
 
     # SECTIONS
-    for sid, section in {'P': 'pec', 'C': 'cons', 'O': 'order'}.items():
+    for sid, section in {'P': 'pec', 'C': 'cons',
+                         'O': 'order', 'T': 'other'}.items():
 
         logger.info("Processing %s" % section)
 
@@ -242,14 +249,15 @@ def nut_report(message, args, sub_cmd, **kwargs):
 
         # call sub-report section handler
         sec_succ, sec_data = eval('%s_sub_report' % section)(message,
-                                                             sec, infos)
+                                                             sec, infos,
+                                                             reports)
         # cancel if sub report failed.
         if not sec_succ:
             logger.warning(u"   FAILED.")
             return resp_error(sec_data[0], sec_data[1])
 
         # add sub-report to list of reports
-        reports [sid] = sec_data
+        reports[sid] = sec_data
         logger.info("---- Ended %s" % section)
     
     ## DB COMMIT
