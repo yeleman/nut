@@ -1,0 +1,148 @@
+#!/usr/bin/env python
+# encoding=utf-8
+
+from datetime import datetime
+
+import peewee
+
+from . import BaseModel, User, Period
+
+
+class Report(BaseModel):
+
+    STATUS_CREATED = 0 # blank created
+    STATUS_DRAFT = 1 # started edition
+    STATUS_COMPLETE = 2 # ready for transmission
+    STATUS_SENT = 3 # SMS sent
+    STATUS_REMOTE_MODIFIED = 4 # modified by server users
+    STATUS_LOCAL_MODIFIED = 5 # modified locally after remote. next is SENT
+    
+    created_by = peewee.ForeignKeyField(User, related_name='reports')
+    created_on = peewee.DateTimeField()
+    modified_on = peewee.DateTimeField(null=True)
+    period = peewee.ForeignKeyField(Period, unique=True)
+    status = peewee.IntegerField(default=STATUS_DRAFT)
+
+    # Health Center informations
+    # Subject to change over time
+    hc_code = peewee.CharField(max_length=20)
+    hc_name = peewee.CharField(max_length=50)
+    hc_ismam = peewee.BooleanField(default=False)
+    hc_issam = peewee.BooleanField(default=False)
+    hc_issamp = peewee.BooleanField(default=False)
+
+    # non-capability dependent fields: Others break down
+    others_lwb = peewee.IntegerField(default=0)
+    others_hiv = peewee.IntegerField(default=0)
+    others_tb = peewee.IntegerField(default=0)
+
+    def __unicode__(self):
+        return self.period.__unicode__()
+
+    @classmethod
+    def create_safe(cls, period, user):
+        # re-cast User
+        user = User.filter(username=user.username).get()
+        r = cls()
+        r.created_by = user
+        r.created_on = datetime.now()
+        r.modified_on = datetime.now()
+        r.period = period
+        r.status = cls.STATUS_CREATED
+        r.hc_code = user.hc_code
+        r.hc_name = user.hc_name
+        r.hc_ismam = user.hc_ismam
+        r.hc_issam = user.hc_issam
+        r.hc_issamp = user.hc_issamp
+        r.save()
+
+        # sorry: avoiding circular dependency
+        from pec import PECMAMReport, PECSAMReport, PECSAMPReport
+        from consumption import ConsumptionReport
+        from order import OrderReport
+
+        # creating all related reports with default values
+        if r.is_mam:
+            pec_mam = PECMAMReport(report=r)
+            pec_mam.save()
+            
+            cons_mam = ConsumptionReport.create_safe(report=r, 
+                                                 nut_type=ConsumptionReport.MAM)
+
+            order_mam = OrderReport.create_safe(report=r, 
+                                                nut_type=OrderReport.MAM)
+
+        if r.is_sam:
+            sam = PECSAMReport(report=r)
+            sam.save()
+
+            cons_sam = ConsumptionReport.create_safe(report=r, 
+                                                 nut_type=ConsumptionReport.SAM)
+
+            order_sam = OrderReport.create_safe(report=r, 
+                                                nut_type=OrderReport.SAM)
+
+        if r.is_samp:
+            samp = PECSAMPReport(report=r)
+            samp.save()
+
+            cons_samp = ConsumptionReport.create_safe(report=r, 
+                                                nut_type=ConsumptionReport.SAMP)
+
+            order_samp = OrderReport.create_safe(report=r, 
+                                                 nut_type=OrderReport.SAMP)
+
+        return r
+
+    def can_edit(self):
+        """ Only if report has not been sent or has been modified remotely """
+        return self.status in (self.STATUS_DRAFT,
+                               self.STATUS_REMOTE_MODIFIED,
+                               self.STATUS_LOCAL_MODIFIED)
+
+    @property
+    def is_mam(self):
+        return self.hc_ismam
+
+    @property
+    def is_sam(self):
+        return self.hc_issam
+
+    @property
+    def is_samp(self):
+        return self.hc_issamp
+
+    @property
+    def pec_mam_report(self):
+        try:
+            return self.pec_mam_reports.get()
+        except:
+            return None
+
+    @property
+    def pec_sam_report(self):
+        try:
+            return self.pec_sam_reports.get()
+        except:
+            return None
+
+    def pec_samp_report(self):
+        try:
+            return self.pec_samp_reports.get()
+        except:
+            return None
+
+    def reset_others(self):
+        self.others_tb = 0
+        self.others_hiv = 0
+        self.others_lwb = 0
+
+
+class ReportHistory(BaseModel):
+
+    report = peewee.ForeignKeyField(Report, related_name='exchanges')
+
+    previous_status = peewee.CharField()
+    # store a Pickle serialized version of changed fields
+    # with previous values
+    modified_fields = peewee.CharField()

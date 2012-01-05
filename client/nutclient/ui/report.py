@@ -6,7 +6,7 @@ from datetime import date, datetime
 
 from PyQt4 import QtGui, QtCore
 
-from common import NUTWidget, PageTitle, PageIntro, FormLabel, ErrorLabel, EnterTabbedLineEdit, ReportTable, ReportValueEdit
+from common import *
 from nutclient.exceptions import *
 from nutclient.utils import offline_login
 from dashboard import DashboardWidget
@@ -100,8 +100,9 @@ class ReportPeriodWidget(QtGui.QDialog, NUTWidget):
 def build_data_from(parent, report, readonly):
 
     data = []
-    cols = 9
-    blank_line = [None for x in range(0, cols - 1)]
+    cols = 10
+    blank_line = [BlankCell(parent) \
+                  for x in range(0, cols)]
 
     # Add SAM section
     if report.is_sam:
@@ -110,12 +111,24 @@ def build_data_from(parent, report, readonly):
 
         # retrieve sam report
         samr = report.pec_sam_report
-        
-        # under 59
-        u59 = blank_line
-        u59[0] = ReportValueEdit(parent, samr, 'u59_total_beginning_m')
-        
-        data.append(u59)
+
+        for age in ('u59', 'o59', 'fu1'):
+
+            cells = []
+            cells.append(ReportAutoBeginingTotal(parent, samr, age))
+            cells.append(ReportValueEdit(parent, 
+                                         samr, '%s_total_beginning_m' % age))
+            cells.append(ReportValueEdit(parent,
+                                         samr, '%s_total_beginning_f' % age))
+            cells.append(BlankCell(parent))
+            cells.append(BlankCell(parent))
+            for fname in ('hw_u70_bmi_u16', 'muac_u11_muac_u18',
+                          'oedema', 'other'):
+                cells.append(ReportValueEdit(parent, 
+                                             samr, '%s_%s' % (age, fname)))
+            cells.append(ReportAutoAdmissionTotal(parent, samr, age))
+            
+            data.append(cells)
 
     return data
 
@@ -156,7 +169,8 @@ class ReportWidget(NUTWidget):
                                             u"6-59 mois", u"FE/FA",
                                             u"Suivi 1&2"])
 
-        self.table.data = build_data_from(self, self.report, self.readonly)
+        self.table.data = build_data_from(self.table, self.report, self.readonly)
+        self.table.refresh()    
 
         vbox.addWidget(self.table)
         self.setLayout(vbox)

@@ -148,21 +148,136 @@ class DateEdit(QtGui.QDateEdit):
         self.setDateRange(QtCore.QDate(1999, 1, 1), QtCore.QDate(2100, 1, 1))
 
 
+class ReportValueLabel(QtGui.QLabel):
+
+    def __init__(self, parent, report, field):
+
+        QtGui.QLabel.__init__(self, parent)
+        self.setAlignment(Qt.AlignCenter | Qt.AlignVCenter)
+
+        if not report or not field:
+            self.setText('')
+        else:
+            self.setText(str(getattr(self._report, self._field)))
+
+class ReportAutoValueLabel(QtGui.QLabel):
+
+    def __init__(self, parent, report, field):
+
+        QtGui.QLabel.__init__(self, parent)
+        self.setAlignment(Qt.AlignCenter | Qt.AlignVCenter)
+
+    def refresh(self):
+        pass
+
+class ReportAutoField(QtGui.QLabel):
+
+    def __init__(self, parent, report, age):
+        QtGui.QLabel.__init__(self, parent)
+        self.setAlignment(Qt.AlignCenter | Qt.AlignVCenter)
+
+        # prevent tabs focus on cell
+        self.setFocusPolicy(QtCore.Qt.NoFocus)
+        self.parent().setFocusPolicy(QtCore.Qt.NoFocus)
+
+        #self.setFrameStyle(QtGui.QFrame.Panel | QtGui.QFrame.Sunken)
+        font = QtGui.QFont()
+        font.setBold(True)
+        self.setFont(font)
+
+        self._parent = parent
+        self._report = report
+        self._age = age
+
+        # calculate content
+        self.live_refresh()
+
+    def live_refresh(self):
+        pass
+
+class ReportAutoAdmissionTotal(ReportAutoField):
+
+    def live_refresh(self):
+
+        value = sum([self._parent.get_field_value('%s_%s'
+                                                  % (self._age, fname))
+                     for fname in ('total_beginning_m',
+                                   'total_beginning_f',
+                                   'hw_u70_bmi_u16',
+                                   'muac_u11_muac_u18',
+                                   'oedema',
+                                   'other')])
+        self.setText(str(value))
+
+class ReportAutoBeginingTotal(ReportAutoField):
+
+    def live_refresh(self):
+        m = self._parent.get_field_value('%s_total_beginning_m' % self._age)
+        f = self._parent.get_field_value('%s_total_beginning_f' % self._age)
+        value = m + f
+        self.setText(str(value))
+
+
+class BlankCell(QtGui.QTableWidgetItem):
+
+    def __init__(self, parent):
+        QtGui.QTableWidgetItem.__init__(self)
+        self.setBackground(QtGui.QBrush(QtCore.Qt.darkGray,
+                                        QtCore.Qt.Dense4Pattern))
+        self.setFlags(QtCore.Qt.NoItemFlags)
+
+    @property
+    def value(self):
+        return 0
+        
+        
+
 class ReportValueEdit(QtGui.QLineEdit):
     """  """
 
-    def __init__(self, parent=None):
-
+    def __init__(self, parent, report, field):
+        
         QtGui.QLineEdit.__init__(self, parent)
+        self.setAlignment(Qt.AlignRight | Qt.AlignVCenter)
+
+        self._parent = parent
+        self._report = report
+        self._field = field
+
+        value = str(getattr(self._report, self._field))
+        
+        if self._report.status == self._report.STATUS_CREATED:
+            self.setPlaceholderText(value)
+        else:
+            self.setText(value)
+
         self.setValidator(QtGui.QIntValidator(0, 100000, self))
+
+        self.editingFinished.connect(self.notify_parent)
+
+    @property
+    def value(self):
+        v = self.text()
+        if not v:
+            v = self.placeholderText()
+        return int(v)
+
+    def notify_parent(self):
+        self._parent.cell_updated(self)
+
+    
 
 
 
 class ReportTable(QtGui.QTableWidget, NUTWidget):
 
     def __init__(self, parent, report=None, *args, **kwargs):
-        print(args)
+
         QtGui.QTableWidget.__init__(self, parent=parent, *args, **kwargs)
+
+        self._parent = parent
+        self.header = []
+        self.data = []
 
         self.setAlternatingRowColors(True)
         
@@ -173,11 +288,13 @@ class ReportTable(QtGui.QTableWidget, NUTWidget):
         self.horizontalHeader().setDefaultSectionSize(78)
         self.horizontalHeader().setHighlightSections(True)
         self.horizontalHeader().setFont(QtGui.QFont("Courier New", 10))
+        self.horizontalHeader().setResizeMode(QtGui.QHeaderView.Fixed)
 
         self.verticalHeader().setVisible(True)
         self.verticalHeader().setDefaultSectionSize(30)
         self.verticalHeader().setHighlightSections(True)
         self.verticalHeader().setFont(QtGui.QFont("Courier New", 10))
+        self.verticalHeader().setResizeMode(QtGui.QHeaderView.Fixed)
 
         self.setSelectionMode(QtGui.QAbstractItemView.SingleSelection)
         #self.setFont(QtGui.QFont("Courier New", 10))
@@ -207,23 +324,25 @@ class ReportTable(QtGui.QTableWidget, NUTWidget):
             self.removeRow(index)
 
     def refresh(self, resize=False):
-        if not self.data or not self.header:
+        if not self.data: # or not self.header:
             return
 
         # increase rowCount by one if we have to display total row
         rc = self.data.__len__()
-        if self._display_total:
-            rc += 1
+        #if self._display_total:
+        #    rc += 1
         self.setRowCount(rc)
-        self.setColumnCount(self.header.__len__())
-        self.setHorizontalHeaderLabels(self.header)
+        #self.setColumnCount(self.header.__len__())
+        #self.setHorizontalHeaderLabels(self.header)
 
         n = 0
         for row in self.data:
             m = 0
             for item in row:
                 ui_item = self._item_for_data(n, m, item, row)
-                if isinstance(ui_item, QtGui.QTableWidgetItem):
+                if isinstance(item, QtGui.QWidget):
+                    self.setCellWidget(n, m, item)
+                elif isinstance(ui_item, QtGui.QTableWidgetItem):
                     self.setItem(n, m, ui_item)
                 elif isinstance(ui_item, QtGui.QWidget):
                     self.setCellWidget(n, m, ui_item)
@@ -239,6 +358,8 @@ class ReportTable(QtGui.QTableWidget, NUTWidget):
         # only resize columns at initial refresh
         if resize:
             self.resizeColumnsToContents()
+
+        self.live_refresh()
 
 
     def extend_rows(self):
@@ -259,7 +380,36 @@ class ReportTable(QtGui.QTableWidget, NUTWidget):
         if isinstance(value, (int, float, long)):
             return formatted_number(value)
 
+        if isinstance(value, QtGui.QTableWidgetItem):
+            return value
+
+        if value == None:
+            return ''
+
         return u"%s" % value
+
+    def get_field(self, field):
+        for row in self.data:
+            for cell in row:
+                if hasattr(cell, '_field'):
+                    if getattr(cell, '_field') == field:
+                        return cell
+        return None
+
+    def get_field_value(self, field):
+        field = self.get_field(field)
+        if not field:
+            return -1
+        return field.value
 
     def click_item(self, row, column, *args):
         pass
+
+    def cell_updated(self, item):
+        self.live_refresh()
+
+    def live_refresh(self):
+        for row in self.data:
+            for cell in row:
+                if hasattr(cell, 'live_refresh'):
+                    getattr(cell, 'live_refresh')()
