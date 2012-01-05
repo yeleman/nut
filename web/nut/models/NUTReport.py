@@ -129,16 +129,6 @@ class NUTReport(object):
             if hasattr(self, '%s_f' % field) else 0
         return male + female
 
-    def other_sum(self, field):
-        """ sum of all other field for an age """
-        hiv = getattr(self, '%s_hiv' % field) \
-            if hasattr(self, '%s_hiv' % field) else 0
-        tb = getattr(self, '%s_tb' % field) \
-            if hasattr(self, '%s_tb' % field) else 0
-        lwb = getattr(self, '%s_lwb' % field) \
-            if hasattr(self, '%s_lwb' % field) else 0
-        return sum([hiv, tb, lwb])
-
     def all_for_field(self, field):
         """ returns sum of all ages for a field """
         sum_ = 0
@@ -208,31 +198,6 @@ class NUTReport(object):
     @property
     def fu12_total_end_m(self):
         return self.total_end_for('fu12', 'm')
-
-    # OTHERS
-    @property
-    def u6_other(self):
-        return self.other_sum(inspect.stack()[0][3])
-
-    @property
-    def u59_other(self):
-        return self.other_sum(inspect.stack()[0][3])
-
-    @property
-    def o59_other(self):
-        return self.other_sum(inspect.stack()[0][3])
-
-    @property
-    def fu1_other(self):
-        return self.other_sum(inspect.stack()[0][3])
-
-    @property
-    def pw_other(self):
-        return self.other_sum(inspect.stack()[0][3])
-
-    @property
-    def fu12_other(self):
-        return self.other_sum(inspect.stack()[0][3])
 
     # MALE/FEMALE TOTALS
     @property
@@ -318,18 +283,6 @@ class NUTReport(object):
 
     @property
     def all_other(self):
-        return self.all_for_field(inspect.stack()[0][3][4:])
-
-    @property
-    def all_other_hiv(self):
-        return self.all_for_field(inspect.stack()[0][3][4:])
-
-    @property
-    def all_other_tb(self):
-        return self.all_for_field(inspect.stack()[0][3][4:])
-
-    @property
-    def all_other_lwb(self):
         return self.all_for_field(inspect.stack()[0][3][4:])
 
     @property
