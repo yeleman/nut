@@ -108,6 +108,9 @@ class MainWindow(QtGui.QMainWindow):
         # instanciate context
         self.view_widget = context_widget(parent=self, *args, **kwargs)
 
+        # adjust menu pagination
+        self.menu.setPagination(context_widget.has_pagination())
+
         # attach context to window
         self.setCentralWidget(self.view_widget)
 

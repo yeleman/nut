@@ -1,6 +1,8 @@
 #!/usr/bin/env python
 # encoding=utf-8
 # maintainer: rgaudin
+import weakref
+import gc
 
 from datetime import date, datetime
 
@@ -101,34 +103,103 @@ def build_data_from(parent, report, readonly):
 
     data = []
     cols = 10
-    blank_line = [BlankCell(parent) \
-                  for x in range(0, cols)]
+    def blank_line():
+        return [BlankCell(parent) for x in range(0, cols)]
 
-    # Add SAM section
-    if report.is_sam:
+    # Add SAMP section
+    if report.is_samp:
         # add blank line for SAM section header
-        data.append(blank_line)
+        data.append(blank_line())
 
         # retrieve sam report
-        samr = report.pec_sam_report
+        sampr = report.pec_samp_report
+        #parent.
 
-        for age in ('u59', 'o59', 'fu1'):
+        for age in ('u6', 'u59', 'o59'):
 
             cells = []
             cells.append(ReportAutoBeginingTotal(parent, samr, age))
-            cells.append(ReportValueEdit(parent, 
+            cells.append(ReportValueEditItem(parent, 
                                          samr, '%s_total_beginning_m' % age))
-            cells.append(ReportValueEdit(parent,
+            cells.append(ReportValueEditItem(parent,
                                          samr, '%s_total_beginning_f' % age))
             cells.append(BlankCell(parent))
             cells.append(BlankCell(parent))
             for fname in ('hw_u70_bmi_u16', 'muac_u11_muac_u18',
                           'oedema', 'other'):
-                cells.append(ReportValueEdit(parent, 
+                cells.append(ReportValueEditItem(parent, 
                                              samr, '%s_%s' % (age, fname)))
             cells.append(ReportAutoAdmissionTotal(parent, samr, age))
             
             data.append(cells)
+
+    # Add SAM section
+    if report.is_sam:
+        # add blank line for SAM section header
+        data.append(blank_line())
+
+        # retrieve sam report
+        samr = report.pec_sam_report
+        #parent.
+
+        for age in ('u59', 'o59', 'fu1'):
+
+            cells = []
+            cells.append(ReportAutoBeginingTotal(parent, samr, age))
+            cells.append(ReportValueEditItem(parent, 
+                                         samr, '%s_total_beginning_m' % age))
+            cells.append(ReportValueEditItem(parent,
+                                         samr, '%s_total_beginning_f' % age))
+            cells.append(BlankCell(parent))
+            cells.append(BlankCell(parent))
+            for fname in ('hw_u70_bmi_u16', 'muac_u11_muac_u18',
+                          'oedema', 'other'):
+                cells.append(ReportValueEditItem(parent, 
+                                             samr, '%s_%s' % (age, fname)))
+            cells.append(ReportAutoAdmissionTotal(parent, samr, age))
+            
+            data.append(cells)
+
+    # Add MAM section
+    if report.is_mam:
+        # add blank line for SAM section header
+        data.append(blank_line())
+
+        # retrieve sam report
+        samr = report.pec_mam_report
+        #parent.
+
+        for age in ('u59', 'pw', 'fu12'):
+
+            cells = []
+            cells.append(ReportAutoBeginingTotal(parent, samr, age))
+            if age == 'pw':
+                cells.append(BlankCell(parent))
+            else:
+                cells.append(ReportValueEditItem(parent, 
+                                         samr, '%s_total_beginning_m' % age))
+            cells.append(ReportValueEditItem(parent,
+                                         samr, '%s_total_beginning_f' % age))
+
+            cells.append(ReportValueEditItem(parent, 
+                                             samr, '%s_%s' % (age, 'hw_b7080_bmi_u18')))
+
+            cells.append(ReportValueEditItem(parent, 
+                                             samr, '%s_%s' % (age, 'muac_u120')))
+
+            cells.append(BlankCell(parent))
+            cells.append(BlankCell(parent))
+            cells.append(BlankCell(parent))
+
+            cells.append(ReportValueEditItem(parent, 
+                                             samr, '%s_%s' % (age, 'other')))
+
+            cells.append(ReportAutoAdmissionTotal(parent, samr, age))
+            
+            data.append(cells)
+
+    # add total line
+    data.append([ColumnSumItem(x, parent) for x in range(0, cols)])
 
     return data
 
@@ -137,25 +208,86 @@ class ReportWidget(NUTWidget):
     title = u"Nutrition Monthly Report"
     report = None
 
+    # Report U.I pages. Switch with next() previous()
+    PEC_ADM_CRIT = 'pec_adm_crit'
+    PEC_ADM_TYPE = 'pec_adm_type'
+    PEC_OUT = 'pec_out'
+    PEC_RECAP = 'pec_recap'
+    CONS_ORDER = 'cons_order'
+    PAGES = [PEC_ADM_CRIT, PEC_ADM_TYPE, PEC_OUT, PEC_RECAP, CONS_ORDER]
+
+    def next(self):
+        # can't go next if on last page
+        if self.current_page == self.PAGES[-1]:
+            return False
+
+        ind = self.PAGES.index(self.current_page)
+        return self.change_page(self.PAGES[ind + 1])
+
+    def previous(self):
+        # can't go next if on last page
+        if self.current_page == self.PAGES[0]:
+            return False
+
+        ind = self.PAGES.index(self.current_page)
+        return self.change_page(self.PAGES[ind - 1])
+
+    def change_page(self, new_page):
+        if not self.can_change_page():
+            return False
+
+        print('changing from %s to %s' % (self.current_page, new_page))
+        
+        # removes all widgets
+        self.clear_vbox()
+        
+        # build new page UI
+        self.build_ui(new_page)
+
+        # set current page pointer
+        self.current_page = new_page
+
+        return True
+
+    def clear_vbox(self):
+        for i in range(self.vbox.count()): self.vbox.itemAt(i).widget().close()
+        
+    def get_widgets_for(self, page):
+
+        return [self.table, self.title, self.intro]
+
+    def build_ui(self, page):
+
+        # launch build_xx method for page
+        if page in self.PAGES:
+            getattr(self, 'build_%s' % page.lower())()
+
+
+    def can_change_page(self):
+        # check if data validates
+        # if YES, save and move
+        # else trigger alert
+        return True
+
     def __init__(self, parent=0, *args, **kwargs):
 
         super(ReportWidget, self).__init__(parent=parent, *args, **kwargs)
 
         self.init_timer = self.startTimer(0)
 
-    def build_pec_ui(self):
+        self.vbox = QtGui.QVBoxLayout()
+
+        self.continue_button = ContinueWidget(self)
+
+        
+
+    def build_pec_adm_crit(self, do=False):
+
         self.title = PageTitle(_(u"Rapport Statistique Mensuel - Traitement de la malnutrition aiguë") % self.report.period)
         self.intro = PageIntro(_(u"%(period)s") % {'period': self.report.period})
 
-        vbox = QtGui.QVBoxLayout()
-        #gridbox = QtGui.QGridLayout()
-
-        # page title
-        vbox.addWidget(self.title)
-        vbox.addWidget(self.intro)
-
         # Table
-        self.table = ReportTable(self, None, 8, 10)
+        self.table = ReportTable(self, self.report, self.current_page, 9, 10)
         self.table.setHorizontalHeaderLabels([u"Total au\ndébut du\nmois",
                                               u"Dont\nSexe\nM", u"Dont\nSexe\nF",
                                               u"P/T≥70\n<80%\nIMC<18",
@@ -167,39 +299,51 @@ class ReportWidget(NUTWidget):
                                             u"6-59 mois", u"> 59 mois",
                                             u"Suivi URENI", u"URENAM 3",
                                             u"6-59 mois", u"FE/FA",
-                                            u"Suivi 1&2"])
+                                            u"Suivi 1&2", u"TOTAL"])
 
         self.table.data = build_data_from(self.table, self.report, self.readonly)
+
+        self.table.setVerticalHeaderItem(0, TableSectionHead(u"URENAS 2"))
+        self.table.setVerticalHeaderItem(4, TableSectionHead(u"URENAM 3"))
+        self.table.setVerticalHeaderItem(8, TableSectionHead(u"TOTAL"))
+
+        #self.table.
         self.table.refresh()    
 
-        vbox.addWidget(self.table)
-        self.setLayout(vbox)
+
+        # page title
+        self.vbox.addWidget(self.title)
+        self.vbox.addWidget(self.intro)
+        self.vbox.addWidget(self.table)
+        self.vbox.addWidget(self.continue_button)
+
+        # try to set layout (will silently fail if exist)
+        self.setLayout(self.vbox)
+
+        # set focus to username field
+        self.setFocusProxy(self.table)
+
+    def build_pec_adm_type(self):
+
+        self.title = PageTitle(u"COUCOU")
+        self.intro = PageIntro(_(u"%(period)s") % {'period': self.report.period})
+        self.table = ReportTable(self, self.report, self.current_page, 8, 10)
+
+        # page title
+        self.vbox.addWidget(self.title)
+        self.vbox.addWidget(self.intro)
+        self.vbox.addWidget(self.table)
+
+        # try to set layout (will silently fail if exist)
+        self.setLayout(self.vbox)
 
         # set focus to username field
         self.setFocusProxy(self.table)
         
 
-    def gen_ui(self):
+    def setup_report_ui(self):
 
-        # What do we display now?
-        self.build_pec_ui()
-
-
-    @property
-    def readonly(self):
-        return not self.report.can_edit()
-
-    ############ DEBUG
-    @classmethod
-    def require_logged_user(self):
-        return False
-
-    def cancel_period_request(self):
-        self.change_context(DashboardWidget)
-
-    def timerEvent(self, event):
-        self.killTimer(self.init_timer)
-
+        # ask User to select a period
         if not self.report:
             period_widget = self.open_dialog(ReportPeriodWidget)
 
@@ -210,5 +354,46 @@ class ReportWidget(NUTWidget):
             self.change_main_context(DashboardWidget)
             return
 
-        self.gen_ui()
+        print(self.report.is_mam)
+        print(self.report.is_sam)
+        print(self.report.is_samp)
+
+        # we now have a report, setup shortcuts
+        self.pec_mam_report = self.report.pec_mam_report
+        self.pec_sam_report = self.report.pec_sam_report
+        self.pec_samp_report = self.report.pec_samp_report
+        self.cons_mam_report = self.report.cons_mam_report
+        self.cons_sam_report = self.report.cons_sam_report
+        self.cons_samp_report = self.report.cons_samp_report
+        self.order_mam_report = self.report.order_mam_report
+        self.order_sam_report = self.report.order_sam_report
+        self.order_samp_report = self.report.order_samp_report
+
+        # setup default page
+        self.current_page = self.PEC_ADM_CRIT
+
+
+        # What do we display now?
+        self.build_ui(self.current_page)
+
+
+    @property
+    def readonly(self):
+        return not self.report.can_edit()
+
+    # TODO: Return True
+    @classmethod
+    def require_logged_user(self):
+        return False
+
+    @classmethod
+    def has_pagination(cls):
+        return True
+
+    def cancel_period_request(self):
+        self.change_context(DashboardWidget)
+
+    def timerEvent(self, event):
+        self.killTimer(self.init_timer)
+        self.setup_report_ui()
 

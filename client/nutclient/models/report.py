@@ -112,25 +112,70 @@ class Report(BaseModel):
     def is_samp(self):
         return self.hc_issamp
 
-    @property
-    def pec_mam_report(self):
+    def get_pec_report(self, cap):
         try:
-            return self.pec_mam_reports.get()
+            return getattr(self, 'pec_%s_reports' % cap.lower()).get()
         except:
             return None
+
+    def get_cons_report(self, cap):
+        from consumption import ConsumptionReport
+        caps = {
+                'mam': ConsumptionReport.MAM,
+                'sam': ConsumptionReport.SAM,
+                'samp': ConsumptionReport.SAMP}
+        try:
+            return self.cons_reports \
+                       .filter(nut_type=caps[cap]).get()
+        except:
+            return None
+
+    def get_order_report(self, cap):
+        from order import OrderReport
+        caps = {
+                'mam': OrderReport.MAM,
+                'sam': OrderReport.SAM,
+                'samp': OrderReport.SAMP}
+        try:
+            return self.order_reports \
+                       .filter(nut_type=caps[cap]).get()
+        except:
+            return None
+
+    @property
+    def pec_mam_report(self):
+        return self.get_pec_report('mam')
 
     @property
     def pec_sam_report(self):
-        try:
-            return self.pec_sam_reports.get()
-        except:
-            return None
+        return self.get_pec_report('sam')
 
     def pec_samp_report(self):
-        try:
-            return self.pec_samp_reports.get()
-        except:
-            return None
+        return self.get_pec_report('samp')
+
+    @property
+    def cons_mam_report(self):
+        return self.get_cons_report('mam')
+
+    @property
+    def cons_sam_report(self):
+        return self.get_cons_report('sam')
+
+    @property
+    def cons_samp_report(self):
+        return self.get_cons_report('samp')
+
+    @property
+    def order_mam_report(self):
+        return self.get_order_report('mam')
+
+    @property
+    def order_sam_report(self):
+        return self.get_order_report('sam')
+
+    @property
+    def order_samp_report(self):
+        return self.get_order_report('samp')
 
     def reset_others(self):
         self.others_tb = 0
