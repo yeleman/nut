@@ -271,6 +271,10 @@ class ReportWidget(NUTWidget):
 
     def __init__(self, parent=0, *args, **kwargs):
 
+        if 'report' in kwargs:
+            self.report = kwargs['report']
+            del kwargs['report']
+
         super(ReportWidget, self).__init__(parent=parent, *args, **kwargs)
 
         self.init_timer = self.startTimer(0)

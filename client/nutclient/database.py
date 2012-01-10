@@ -6,7 +6,7 @@ from datetime import datetime, date
 from models import (config, Report, ReportHistory, ConsumptionReport,
                     InputConsumptionReport, OrderReport, InputOrderReport,
                     PECMAMReport, PECSAMReport, PECSAMPReport,
-                    User, Period, NUTInput, Setting)
+                    User, Period, NUTInput, Message, Setting)
 
 def load_default_settings():
     for key, value in {'SRV_NUM': '73120896',
@@ -38,7 +38,7 @@ def setup():
                  Report, ReportHistory,
                  NUTInput, ConsumptionReport, InputConsumptionReport,
                  OrderReport, InputOrderReport,
-                 PECMAMReport, PECSAMReport, PECSAMPReport]:
+                 PECMAMReport, PECSAMReport, PECSAMPReport, Message]:
         if not model.table_exists():
             model.create_table()
             did_create = True

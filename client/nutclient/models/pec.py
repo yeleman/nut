@@ -1,6 +1,8 @@
 #!/usr/bin/env python
 # encoding=utf-8
 
+import inspect
+
 import peewee
 
 from . import BaseModel, Report
@@ -19,8 +21,253 @@ class PECReport(object):
     STATUS_REMOTE_MODIFIED = Report.STATUS_REMOTE_MODIFIED
     STATUS_LOCAL_MODIFIED = Report.STATUS_LOCAL_MODIFIED
 
+    def male_female_sum(self, field):
+        """ sum of male + female for a field """
+        male = getattr(self, '%s_m' % field) \
+            if hasattr(self, '%s_m' % field) else 0
+        female = getattr(self, '%s_f' % field) \
+            if hasattr(self, '%s_f' % field) else 0
+        return male + female
+
+    def all_for_field(self, field):
+        """ returns sum of all ages for a field """
+        sum_ = 0
+        for cat, cat_name in self.CATEGORIES:
+            if hasattr(self, '%s_%s' % (cat, field)):
+                sum_ += getattr(self, '%s_%s' % (cat, field))
+        return sum_
+
+    def total_end_for(self, age, sex):
+        """ calculates remaining people for an age and sex """
+        initial = getattr(self, '%s_total_beginning_%s' % (age, sex))
+        admitted = getattr(self, '%s_total_admitted_%s' % (age, sex))
+        out = getattr(self, '%s_total_out_%s' % (age, sex))
+        return (initial + admitted) - out
+
+    # REMAINING
+    @property
+    def u6_total_end_f(self):
+        return self.total_end_for('u6', 'f')
+
+    @property
+    def u6_total_end_m(self):
+        return self.total_end_for('u6', 'm')
+
+    @property
+    def u59_total_end_f(self):
+        return self.total_end_for('u59', 'f')
+
+    @property
+    def u59_total_end_m(self):
+        return self.total_end_for('u59', 'm')
+
+    @property
+    def o59_total_end_f(self):
+        return self.total_end_for('o59', 'f')
+
+    @property
+    def o59_total_end_m(self):
+        return self.total_end_for('o59', 'm')
+
+    @property
+    def fu1_total_end_f(self):
+        return self.total_end_for('fu1', 'f')
+
+    @property
+    def fu1_total_end_m(self):
+        return self.total_end_for('fu1', 'm')
+
+    @property
+    def pw_total_end_f(self):
+        return self.total_end_for('pw', 'f')
+
+    @property
+    def pw_total_end_m(self):
+        return self.total_end_for('pw', 'm')
+
+    @property
+    def fu12_total_end_f(self):
+        return self.total_end_for('fu12', 'f')
+
+    @property
+    def fu12_total_end_m(self):
+        return self.total_end_for('fu12', 'm')
+
+    # MALE/FEMALE TOTALS
+    @property
+    def u6_total_beginning(self):
+        return self.male_female_sum(inspect.stack()[0][3])
+
+    @property
+    def u6_admitted(self):
+        return self.male_female_sum(inspect.stack()[0][3])
+
+    @property
+    def u6_total_out(self):
+        return self.male_female_sum(inspect.stack()[0][3])
+
+    @property
+    def u6_total_end(self):
+        return self.male_female_sum(inspect.stack()[0][3])
+
+    @property
+    def u59_total_beginning(self):
+        return self.male_female_sum(inspect.stack()[0][3])
+
+    @property
+    def u59_admitted(self):
+        return self.male_female_sum(inspect.stack()[0][3])
+
+    @property
+    def u59_total_out(self):
+        return self.male_female_sum(inspect.stack()[0][3])
+
+    @property
+    def u59_total_end(self):
+        return self.male_female_sum(inspect.stack()[0][3])
+
+    @property
+    def o59_total_beginning(self):
+        return self.male_female_sum(inspect.stack()[0][3])
+
+    @property
+    def o59_admitted(self):
+        return self.male_female_sum(inspect.stack()[0][3])
+
+    @property
+    def o59_total_out(self):
+        return self.male_female_sum(inspect.stack()[0][3])
+
+    @property
+    def o59_total_end(self):
+        return self.male_female_sum(inspect.stack()[0][3])
+
+    # ALL AGE TOTALS
+    @property
+    def all_total_beginning(self):
+        return self.all_for_field(inspect.stack()[0][3][4:])
+
+    @property
+    def all_total_beginning_m(self):
+        return self.all_for_field(inspect.stack()[0][3][4:])
+
+    @property
+    def all_total_beginning_f(self):
+        return self.all_for_field(inspect.stack()[0][3][4:])
+
+    @property
+    def all_hw_b7080_bmi_u18(self):
+        return self.all_for_field(inspect.stack()[0][3][4:])
+
+    @property
+    def all_muac_u120(self):
+        return self.all_for_field(inspect.stack()[0][3][4:])
+
+    @property
+    def all_hw_u70_bmi_u16(self):
+        return self.all_for_field(inspect.stack()[0][3][4:])
+
+    @property
+    def all_muac_u11_muac_u18(self):
+        return self.all_for_field(inspect.stack()[0][3][4:])
+
+    @property
+    def all_oedema(self):
+        return self.all_for_field(inspect.stack()[0][3][4:])
+
+    @property
+    def all_other(self):
+        return self.all_for_field(inspect.stack()[0][3][4:])
+
+    @property
+    def all_new_case(self):
+        return self.all_for_field(inspect.stack()[0][3][4:])
+
+    @property
+    def all_relapse(self):
+        return self.all_for_field(inspect.stack()[0][3][4:])
+
+    @property
+    def all_returned(self):
+        return self.all_for_field(inspect.stack()[0][3][4:])
+
+    @property
+    def all_nut_transfered_in(self):
+        return self.all_for_field(inspect.stack()[0][3][4:])
+
+    @property
+    def all_nut_referred_in(self):
+        return self.all_for_field(inspect.stack()[0][3][4:])
+
+    @property
+    def all_total_admitted(self):
+        return self.all_for_field(inspect.stack()[0][3][4:])
+
+    @property
+    def all_total_admitted_m(self):
+        return self.all_for_field(inspect.stack()[0][3][4:])
+
+    @property
+    def all_total_admitted_f(self):
+        return self.all_for_field(inspect.stack()[0][3][4:])
+
+    @property
+    def all_healed(self):
+        return self.all_for_field(inspect.stack()[0][3][4:])
+
+    @property
+    def all_referred_out(self):
+        return self.all_for_field(inspect.stack()[0][3][4:])
+
+    @property
+    def all_deceased(self):
+        return self.all_for_field(inspect.stack()[0][3][4:])
+
+    @property
+    def all_aborted(self):
+        return self.all_for_field(inspect.stack()[0][3][4:])
+
+    @property
+    def all_non_respondant(self):
+        return self.all_for_field(inspect.stack()[0][3][4:])
+
+    @property
+    def all_medic_transfered_out(self):
+        return self.all_for_field(inspect.stack()[0][3][4:])
+
+    @property
+    def all_nut_transfered_out(self):
+        return self.all_for_field(inspect.stack()[0][3][4:])
+
+    @property
+    def all_total_out(self):
+        return self.all_for_field(inspect.stack()[0][3][4:])
+
+    @property
+    def all_total_out_m(self):
+        return self.all_for_field(inspect.stack()[0][3][4:])
+
+    @property
+    def all_total_out_f(self):
+        return self.all_for_field(inspect.stack()[0][3][4:])
+
+    @property
+    def all_total_end(self):
+        return self.all_for_field(inspect.stack()[0][3][4:])
+
+    @property
+    def all_total_end_m(self):
+        return self.all_for_field(inspect.stack()[0][3][4:])
+
+    @property
+    def all_total_end_f(self):
+        return self.all_for_field(inspect.stack()[0][3][4:])
 
 class PECMAMReport(BaseModel, PECReport):
+
+    CATEGORIES = (('u59', u"6 to 59 months old"),
+                  ('pw', u"Pregnant/Breast-feeding Women"),
+                  ('fu12', u"Follow-up URENI/UNRENAS"))
 
     report = peewee.ForeignKeyField(Report, unique=True,
                                     related_name='pec_mam_reports')
@@ -91,6 +338,10 @@ class PECMAMReport(BaseModel, PECReport):
 
 
 class PECSAMReport(BaseModel, PECReport):
+
+    CATEGORIES = (('u59', u"6 to 59 months old"),
+                  ('o59', u"Over 59 months old"),
+                  ('fu1', u"Follow-up URENI 1"))
 
     report = peewee.ForeignKeyField(Report, unique=True,
                                     related_name='pec_sam_reports')
@@ -175,6 +426,10 @@ class PECSAMReport(BaseModel, PECReport):
 
 
 class PECSAMPReport(BaseModel, PECReport):
+
+    CATEGORIES = (('u6', u"Under 6 months old"),
+                  ('u59', u"6 to 59 months old"),
+                  ('o59', u"Over 59 months old"))
 
     report = peewee.ForeignKeyField(Report, unique=True,
                                     related_name='pec_samp_reports')

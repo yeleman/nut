@@ -1,6 +1,8 @@
 #!/usr/bin/env python
 # encoding=utf-8
 
+import locale
+
 from database import *
 from nutrsc.tools import generate_user_hash
 from nutclient.exceptions import *
@@ -32,3 +34,11 @@ def remote_login_request(username, password):
     send_sms(config.SRV_NUM, \
              u"nut login %(user)s %(password)s" % {'user': username,
                                                'password': password})
+
+
+def formatted_number(number):
+    try:
+        return locale.format("%d", number, grouping=True) \
+                     .decode(locale.getlocale()[1])
+    except:
+        return "%s" % number

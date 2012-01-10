@@ -5,18 +5,303 @@
 from PyQt4 import QtGui, QtCore
 from PyQt4.QtCore import Qt
 
+from utils import formatted_number
+
 MAIN_WIDGET_SIZE = 900
 
+
+def fixed_size_table(row, col, hheader, vheader):
+
+    header_row_height = 25
+    row_height = 28
+    header_col_width = 120
+    col_width = 101
+
+    width = col_width * col
+    if hheader:
+        width += header_col_width
+
+    height = row_height * row
+    if vheader:
+        height += header_row_height
+
+    return QtCore.QSize(width, height)
+
+
+class FlexibleTable(QtGui.QTableWidget):
+
+    # Arbitrary values to play with
+    # TODO: find a way to calculate those
+    MARGIN_FOR_PARENT_MAX = 20
+    SCROLL_WIDTH = 17
+
+    def __init__(self, parent=0):
+        super(FlexibleTable, self).__init__(parent)
+
+        self.data = []  # main data holder
+        self.hheaders = []  # horizontal headers
+        self.vheaders = []  # vertical headers
+        self.max_width = 0
+        self.max_height = 0
+        self.max_rows = 0
+        self.stretch_columns = []
+
+        # vHeaders to Content (default)
+        self.verticalHeader().setResizeMode(QtGui.QHeaderView.ResizeToContents)
+        #self.verticalHeader().setStretchLastSection(True)
+
+        self.horizontalHeader().setResizeMode(QtGui.QHeaderView.ResizeToContents)
+        #self.horizontalHeader().setStretchLastSection(True)
+
+        self.setSizePolicy(QtGui.QSizePolicy(QtGui.QSizePolicy.Preferred,
+                                             QtGui.QSizePolicy.Preferred))
+
+    def max_width():
+        def fget(self):
+            return self._max_width
+        def fset(self, value):
+            self._max_width = value
+        def fdel(self):
+            del self._max_width
+        return locals()
+    max_width = property(**max_width())
+
+    def max_height():
+        def fget(self):
+            return self._max_height
+        def fset(self, value):
+            self._max_height = value
+        def fdel(self):
+            del self._max_height
+        return locals()
+    max_height = property(**max_height())
+
+    def max_rows():
+        def fget(self):
+            return self._max_rows
+        def fset(self, value):
+            self._max_rows = value
+        def fdel(self):
+            del self._max_rows
+        return locals()
+    max_rows = property(**max_rows())
+
+    def stretch_columns():
+        def fget(self):
+            return self._stretch_columns
+        def fset(self, value):
+            self._stretch_columns = value
+        def fdel(self):
+            del self._stretch_columns
+        return locals()
+    stretch_columns = property(**stretch_columns())
+
+    def data():
+        def fget(self):
+            return self._data
+        def fset(self, value):
+            self._data = value
+        def fdel(self):
+            del self._data
+        return locals()
+    data = property(**data())
+
+    def _item_for_data(self, row, column, data, context=None):
+        ''' returns QTableWidgetItem or QWidget to add to a cell
+
+            override it to add new type of data '''
+        return QtGui.QTableWidgetItem(self._format_for_table(data))
+
+    def _format_for_table(self, value):
+        ''' formats input value for string in table widget 
+
+            override it to add more formats'''
+
+        if isinstance(value, basestring):
+            return value
+
+        if isinstance(value, (int, float, long)):
+            return formatted_number(value)
+
+        if value == None:
+            return ''
+
+        return u"%s" % value
+
+    def extend_rows(self):
+        ''' override this to add more rows/data ar refresh() '''
+        pass
+
+    def live_refresh(self):
+        ''' calls live-refresh method on each cell. '''
+        pass
+
+    def refresh(self):
+        # don't refresh if there's no data #TODO: sure?
+        if not self.data:
+            return
+
+        # set row count
+        self.setRowCount(len(self.data))
+        self.setColumnCount(len(self.hheaders))
+        self.setHorizontalHeaderLabels(self.hheaders)
+        self.setVerticalHeaderLabels(self.vheaders)
+
+        rowid = 0
+        for row in self.data:
+            colid = 0
+            for item in row:
+                
+                # item is already a QTableWidgetItem, display it
+                if isinstance(item, QtGui.QTableWidgetItem):
+                    self.setItem(rowid, colid, item)
+                # item is QWidget, display it
+                elif isinstance(item, QtGui.QWidget):
+                    self.setCellWidget(rowid, colid, item)
+                # item is not ready for display, try to format it
+                else:
+                    ui_item = self._item_for_data(rowid, colid, item, row)
+
+                    # new item is a QTableWidgetItem or QWidget
+                    if isinstance(ui_item, QtGui.QTableWidgetItem):
+                        self.setItem(rowid, colid, ui_item)
+                    elif isinstance(ui_item, QtGui.QWidget):
+                        self.setCellWidget(rowid, colid, ui_item)
+                    # something failed, let's build a QTableWidgetItem
+                    else:
+                        self.setItem(QtGui.QTableWidgetItem(u"%s" % ui_item))
+                colid += 1
+            rowid += 1
+
+        # call subclass extension
+        self.extend_rows()
+
+        # apply resize rules
+        self.apply_resize_rules()
+        print(self.sizeHint())
+        self.updateGeometry()
+
+        # emit post-refresh signal
+        self.live_refresh()
+
+    def apply_resize_rules(self):
+        # set a fixed outbox
+        if self.max_width:
+            self.horizontalHeader().setResizeMode(QtGui.QHeaderView.ResizeToContents)
+        else:
+            # let parent & all set appropriate
+            self.max_width = self.parentWidget().maximumWidth() - self.MARGIN_FOR_PARENT_MAX
+
+        self.resize(self.max_width, self.size().height())
+
+        ### WIDTH
+        # width is adjusted to the max_size/width of the table
+        # each cell gets resized to content.
+        # if there is more space available, designed columns are streched.
+
+        # get width once resized to content
+        contented_width = 0 ##self.width()
+        for ind in range(0, self.horizontalHeader().count()):
+            contented_width += self.horizontalHeader().sectionSize(ind)
+
+        # get content-sized with of header
+        vheader_width = self.verticalHeader().width()
+        extra_width = self.max_width - contented_width
+
+        # space filled-up.
+        if extra_width:
+            remaining_width = extra_width - vheader_width
+            try:
+                indiv_extra = remaining_width / len(self.stretch_columns)
+            except ZeroDivisionError:
+                indiv_extra = 0
+
+            self.horizontalHeader().setResizeMode(QtGui.QHeaderView.Fixed)
+            for colnum in self.stretch_columns:
+                self.horizontalHeader().resizeSection(colnum, self.horizontalHeader().sectionSize(colnum) + indiv_extra)
+
+        self.horizontalHeader().update()
+        self.update()
+        new_width = self.size().width()
+
+        ### HEIGHT
+        # table height stops at last row.
+        # if max_row/max_height specified and rows above it,
+        # it it shrink to this height.
+
+        self.verticalHeader().setResizeMode(QtGui.QHeaderView.ResizeToContents)
+        self.resize(new_width, self.size().height())
+
+        hheader_height = self.horizontalHeader().height()
+        
+        #total_rows_height = self.size().height() - hheader_height
+        total_rows_height = 0 ##self.width()
+        for ind in range(0, self.verticalHeader().count()):
+            total_rows_height += self.verticalHeader().sectionSize(ind)
+
+        total_height = hheader_height + total_rows_height
+        
+        max_height = 0
+        if not self.max_height and self.max_rows:
+            max_height = hheader_height
+            for ind in range(0, self.max_rows):
+                max_height += self.verticalHeader().sectionSize(ind)
+
+        # user-defined max_height has precedence
+        if self.max_height:
+            max_height = self.max_height
+
+        self.setSizePolicy(QtGui.QSizePolicy(QtGui.QSizePolicy.Fixed,
+                                             QtGui.QSizePolicy.Fixed))
+
+        if max_height and total_height > max_height:
+            new_height = max_height
+        else:
+            new_height = total_height
+
+        rows_with_widgets = []
+        for rowid in range(0, len(self.data)):
+            for colid in range(0, len(self.data[rowid])):
+                if not isinstance(self.item(rowid, colid), QtGui.QTableWidgetItem) and not rowid in rows_with_widgets:
+                    rows_with_widgets.append(rowid)
+
+        print('rows_with_widgets: %s' % rows_with_widgets)
+
+        if len(rows_with_widgets) >= 1:
+            if len(rows_with_widgets) <= 2:
+                new_height += 4 * len(rows_with_widgets)
+            else:
+                new_height += (3 * (len(rows_with_widgets) + 1)) - 1
+
+        # content is trimed and a scroll bar will appear
+        # let's have its size supported by strecthed (if any)
+        # or equally across all fields
+        if new_height < total_height:
+            if len(self.stretch_columns):
+                share = self.SCROLL_WIDTH / len(self.stretch_columns)
+                for colid in self.stretch_columns:
+                    self.horizontalHeader().resizeSection(colid, self.horizontalHeader().sectionSize(colid) - share)
+            else:
+                share = self.SCROLL_WIDTH / self.horizontalHeader().count()
+                for colid in range(0, self.horizontalHeader().count()):
+                    self.horizontalHeader().resizeSection(colid, self.horizontalHeader().sectionSize(colid) - share)
+
+        self.resize(new_width, new_height)
+        self.setMaximumSize(new_width + 2, new_height + 0)
+        self.setMinimumSize(new_width - 2, new_height + 0)
+
+        self.verticalHeader().update()
+        self.update()
 
 class NUTWidget(QtGui.QWidget):
 
     title = "?"
 
-    def __init__(self, parent=0, *args, **kwargs):
+    def __init__(self, parent, *args, **kwargs):
 
-        QtGui.QWidget.__init__(self, parent=parent, *args, **kwargs)
+        super(NUTWidget, self).__init__(*args, **kwargs)
 
-        self.parent = parent
+        self._parent = parent
 
         self.setMaximumWidth(MAIN_WIDGET_SIZE)
 
@@ -41,8 +326,8 @@ class NUTWidget(QtGui.QWidget):
         while w:
             if w.__class__.__name__ == 'MainWindow':
                 return w
-            if hasattr(w, 'parent'):
-                w = w.parent
+            if hasattr(w, '_parent'):
+                w = w._parent
                 continue
             else:
                 return None
@@ -170,6 +455,14 @@ class DateEdit(QtGui.QDateEdit):
         self.setDisplayFormat("MMMM yyyy")
         self.setDateRange(QtCore.QDate(1999, 1, 1), QtCore.QDate(2100, 1, 1))
 
+class PageSection(QtGui.QLabel):
+
+    def __init__(self, text, parent=None):
+        QtGui.QLabel.__init__(self, text, parent)
+        font = QtGui.QFont("Times New Roman", 14)
+        font.setBold(True)
+        self.setFont(font)
+        self.setAlignment(Qt.AlignLeft | Qt.AlignVCenter)
 
 class ReportValueLabel(QtGui.QLabel):
 
@@ -596,3 +889,111 @@ class ReportTable(QtGui.QTableWidget, NUTWidget):
             for cell in row:
                 if hasattr(cell, 'live_refresh'):
                     getattr(cell, 'live_refresh')()
+
+
+class LinkButton(QtGui.QPushButton):
+
+    def __init__(self, text, handler, ident):
+
+        super(LinkButton, self).__init__(text)
+
+        self.ident = ident
+        self.handler = handler
+        self.clicked.connect(self.on_command)
+
+    def on_command(self):
+        self.handler(self.ident)
+
+
+class InfoTable(QtGui.QTableWidget, NUTWidget):
+
+    def __init__(self, *args, **kwargs):
+
+        QtGui.QTableWidget.__init__(self, *args, **kwargs)
+
+        self._data = []
+
+        self.setAlternatingRowColors(True)
+        
+        self.setShowGrid(True)
+        #self.setWordWrap(True)
+
+        self.horizontalHeader().setVisible(True)
+        #self.horizontalHeader().setDefaultSectionSize(78)
+        self.horizontalHeader().setHighlightSections(True)
+        self.horizontalHeader().setFont(QtGui.QFont("Courier New", 10))
+        self.horizontalHeader().setResizeMode(QtGui.QHeaderView.Fixed)
+        
+        #self.horizontalHeader().setStretchLastSection(True)
+
+        self.verticalHeader().setVisible(False)
+        #self.verticalHeader().setDefaultSectionSize(30)
+        self.verticalHeader().setHighlightSections(True)
+        self.verticalHeader().setFont(QtGui.QFont("Courier New", 10))
+        self.verticalHeader().setResizeMode(QtGui.QHeaderView.ResizeToContents)
+
+        self.setSelectionMode(QtGui.QAbstractItemView.SingleSelection)
+        self.setSelectionBehavior(QtGui.QAbstractItemView.SelectRows)
+        #self.setFont(QtGui.QFont("Courier New", 10))
+
+    def refresh(self, resize=False):
+        if not self.data: # or not self.header:
+            return
+
+        # increase rowCount by one if we have to display total row
+        rc = self.data.__len__()
+
+        self.setRowCount(rc)
+
+        n = 0
+        for row in self.data:
+            m = 0
+            for item in row:
+                ui_item = self._item_for_data(n, m, item, row)
+                ui_item.setFlags(QtCore.Qt.ItemIsEnabled)
+                if isinstance(item, QtGui.QTableWidgetItem):
+                    self.setItem(n, m, item)
+                elif isinstance(item, QtGui.QWidget):
+                    self.setCellWidget(n, m, item)
+                elif isinstance(ui_item, QtGui.QTableWidgetItem):
+                    self.setItem(n, m, ui_item)
+                elif isinstance(ui_item, QtGui.QWidget):
+                    self.setCellWidget(n, m, ui_item)
+                else:
+                    self.setItem(QtGui.QTableWidgetItem(u"%s" % ui_item))
+                m += 1
+            n += 1
+
+        # only resize columns at initial refresh
+        if resize:
+            self.resizeColumnsToContents()
+
+    def datap():
+        def fget(self):
+            return self._data
+        def fset(self, value):
+            self._data = value
+        def fdel(self):
+            del self._data
+        return locals()
+    data = property(**datap())
+
+    def _item_for_data(self, row, column, data, context=None):
+        ''' returns QTableWidgetItem or QWidget to add to a cell '''
+        return QtGui.QTableWidgetItem(self._format_for_table(data))
+
+    def _format_for_table(self, value):
+        ''' formats input value for string in table widget '''
+        if isinstance(value, basestring):
+            return value
+
+        if isinstance(value, (int, float, long)):
+            return formatted_number(value)
+
+        if isinstance(value, QtGui.QTableWidgetItem):
+            return value
+
+        if value == None:
+            return ''
+
+        return u"%s" % value

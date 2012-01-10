@@ -83,7 +83,7 @@ class Period(BaseModel):
 
     def __unicode__(self):
         d = date(self.year, self.month, 1)
-        return d.strftime('%B %Y')
+        return unicode(d.strftime('%B %Y').decode('utf-8'))
 
     @classmethod
     def from_date(cls, date_obj):
@@ -94,7 +94,7 @@ class Period(BaseModel):
             return p
         else:
             return cls.select().get(datestr=datestr)
-    
+
 
 class NUTInput(BaseModel):
 
@@ -103,6 +103,17 @@ class NUTInput(BaseModel):
 
     def __unicode__(self):
         return self.name
+
+
+class Message(BaseModel):
+
+    identity = peewee.CharField(max_length=50)
+    date = peewee.DateTimeField()
+    text = peewee.TextField()
+
+    def __unicode__(self):
+        return self.date.strftime('%c')
+
 
 from report import Report, ReportHistory
 from consumption import ConsumptionReport, InputConsumptionReport

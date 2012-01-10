@@ -16,7 +16,16 @@ class Report(BaseModel):
     STATUS_SENT = 3 # SMS sent
     STATUS_REMOTE_MODIFIED = 4 # modified by server users
     STATUS_LOCAL_MODIFIED = 5 # modified locally after remote. next is SENT
+    STATUS_VALIDATED = 6 # has been validated online.
+    STATUSES = ((STATUS_CREATED, u"Vide"),
+                (STATUS_DRAFT, u"Commencé"),
+                (STATUS_COMPLETE, u"Terminé (non envoyé)"),
+                (STATUS_SENT, u"Envoyé"),
+                (STATUS_REMOTE_MODIFIED, u"Attente corrections"),
+                (STATUS_LOCAL_MODIFIED, u"Corrigé (non envoyé)"),
+                (STATUS_VALIDATED, u"Validé"))
     
+    #report_id = peewee.PrimaryKeyField()
     created_by = peewee.ForeignKeyField(User, related_name='reports')
     created_on = peewee.DateTimeField()
     modified_on = peewee.DateTimeField(null=True)
@@ -38,6 +47,20 @@ class Report(BaseModel):
 
     def __unicode__(self):
         return self.period.__unicode__()
+
+    def caps(self):
+        caps = []
+        for cap in ['mam', 'sam', 'samp']:
+            if getattr(self, 'hc_is%s' % cap):
+                caps.append(cap)
+        return caps
+
+    def verbose_caps(self):
+        return "+".join([_(cap.upper()) for cap in self.caps()])
+
+    @classmethod
+    def opened(cls):
+        return cls.filter(status__ne=cls.STATUS_SENT)
 
     @classmethod
     def create_safe(cls, period, user):
@@ -99,6 +122,12 @@ class Report(BaseModel):
         return self.status in (self.STATUS_DRAFT,
                                self.STATUS_REMOTE_MODIFIED,
                                self.STATUS_LOCAL_MODIFIED)
+
+    def verbose_status(self):
+        for status, name in self.STATUSES:
+            if status == self.status:
+                return name
+        return self.status
 
     @property
     def is_mam(self):
@@ -181,6 +210,14 @@ class Report(BaseModel):
         self.others_tb = 0
         self.others_hiv = 0
         self.others_lwb = 0
+
+    def sum_for_field(self, field):
+        total = 0
+        for cap in ('mam', 'sam', 'samp'):
+            rep = getattr(self, 'pec_%s_report' % cap)
+            if hasattr(rep, field):
+                total += getattr(rep, field)
+        return total
 
 
 class ReportHistory(BaseModel):

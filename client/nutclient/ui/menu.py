@@ -11,6 +11,7 @@ from helps import HelpWidget
 from sim_management import SIM_managementWidget
 from data_entry import DataEntryWidget
 from preferences import PreferencesWidget
+from archives import ArchivesWidget
 
 
 class NUTMenu(QtGui.QToolBar):
@@ -86,21 +87,24 @@ class MainMenu(NUTMenu):
 
     def items(self):
         return [
-            NUTMenuItem(1, _(u"Résumé"), self.dashboard, u"Tableau de bord"),
-            NUTMenuItem(2, _(u"Archives"), self.help, u"Liste des rapports créés et envoyés"),
+            NUTMenuItem(1, _(u"Tableau de bord"), self.dashboard, u"Tableau de bord"),
+            NUTMenuItem(2, _(u"Archives"), self.archives, u"Liste des rapports créés et envoyés"),
             NUTMenuItem(3, _(u"Rapport"), self.data_entry, u"Créer (ou reprendre) le rapport courant"),
             NUTMenuItem(5, _(u"↢",), 
                         self.previous, u"Page précédente", self.has_pagination),
             NUTMenuItem(6, _(u"↣"), self.next, u"Page suivante", self.has_pagination),
             NUTMenuItem(8, _(u"Gestion SIM"), self.sim_mgmt, u"Gestion du crédit téléphone"),
             NUTMenuItem(9, _(u"Options"), self.preferences, u"Regler les paramètres"),
-            NUTMenuItem(10, _(u"?"), self.whatis, u"Obtenir des informations sur un élément"),
+            #NUTMenuItem(10, _(u"?"), self.whatis, u"Obtenir des informations sur un élément"),
             NUTMenuItem(11, _(u"Aide"), self.help),
             NUTMenuItem(12, _(u"Quitter"), self.quit, u"Quitter et éteindre la machine"),
         ]
 
     def dashboard(self):
         self.parent.change_context(DashboardWidget)
+
+    def archives(self):
+        self.parent.change_context(ArchivesWidget)
 
     def help(self):
         self.parent.change_context(HelpWidget, 
