@@ -101,7 +101,7 @@ class InputConsumptionReport(BaseModel):
 
     #unique_together = ('cons_report', 'nut_input')
 
-    cons_report = peewee.ForeignKeyField(ConsumptionReport)
+    cons_report = peewee.ForeignKeyField(ConsumptionReport, related_name='nutinput_reports')
     nut_input = peewee.ForeignKeyField(NUTInput,
                                        related_name='cons_reports')
 

@@ -4,16 +4,16 @@ import sys
 import site
 import os
 
-vepath = '/home/nut/src/envs/nutweb/lib/python2.6/site-packages'
+vepath = '/home/reg/src/envs/nutweb/lib/python2.7/site-packages'
 if not os.path.exists(vepath):
-    sys.stderr.write("Virtual Env not found.")
+    sys.stderr.write("Virtual Env not found.\n")
 
 prev_sys_path = list(sys.path)
 
 # add the site-packages of our virtualenv as a site dir
 site.addsitedir(vepath)
 
-sys.path.append('/home/nut/src/nut/web')
+sys.path.append('/home/reg/src/nut/web')
 
 # reorder sys.path so new directories from the addsitedir show up first
 new_sys_path = [p for p in sys.path if p not in prev_sys_path]

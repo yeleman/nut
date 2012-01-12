@@ -17,7 +17,7 @@ class Report(BaseModel):
     STATUS_REMOTE_MODIFIED = 4 # modified by server users
     STATUS_LOCAL_MODIFIED = 5 # modified locally after remote. next is SENT
     STATUS_VALIDATED = 6 # has been validated online.
-    STATUSES = ((STATUS_CREATED, u"Vide"),
+    STATUSES = ((STATUS_CREATED, u"Commencé"),
                 (STATUS_DRAFT, u"Commencé"),
                 (STATUS_COMPLETE, u"Terminé (non envoyé)"),
                 (STATUS_SENT, u"Envoyé"),

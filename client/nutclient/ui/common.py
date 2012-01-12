@@ -33,6 +33,7 @@ class FlexibleTable(QtGui.QTableWidget):
     # Arbitrary values to play with
     # TODO: find a way to calculate those
     MARGIN_FOR_PARENT_MAX = 20
+    MARGIN_FOR_PARENT_MAX2 = 50
     SCROLL_WIDTH = 17
 
     def __init__(self, parent=0):
@@ -45,6 +46,18 @@ class FlexibleTable(QtGui.QTableWidget):
         self.max_height = 0
         self.max_rows = 0
         self.stretch_columns = []
+        self.display_hheaders = True
+        self.display_vheaders = True
+
+        self.setAlternatingRowColors(True)
+        self.setShowGrid(True)
+        self.setWordWrap(True)
+        #self.horizontalHeader().setFont(QtGui.QFont("Courier New", 10))
+        self.horizontalHeader().setHighlightSections(True)
+        self.verticalHeader().setHighlightSections(True)
+        #self.verticalHeader().setFont(QtGui.QFont("Courier New", 10))
+        self.setSelectionMode(QtGui.QAbstractItemView.SingleSelection)
+        self.setSelectionBehavior(QtGui.QAbstractItemView.SelectRows)
 
         # vHeaders to Content (default)
         self.verticalHeader().setResizeMode(QtGui.QHeaderView.ResizeToContents)
@@ -55,6 +68,26 @@ class FlexibleTable(QtGui.QTableWidget):
 
         self.setSizePolicy(QtGui.QSizePolicy(QtGui.QSizePolicy.Preferred,
                                              QtGui.QSizePolicy.Preferred))
+
+    def display_hheaders():
+        def fget(self):
+            return self._display_hheaders
+        def fset(self, value):
+            self._display_hheaders = value
+        def fdel(self):
+            del self._display_hheaders
+        return locals()
+    display_hheaders = property(**display_hheaders())
+
+    def display_vheaders():
+        def fget(self):
+            return self._display_vheaders
+        def fset(self, value):
+            self._display_vheaders = value
+        def fdel(self):
+            del self._display_vheaders
+        return locals()
+    display_vheaders = property(**display_vheaders())
 
     def max_width():
         def fget(self):
@@ -137,15 +170,21 @@ class FlexibleTable(QtGui.QTableWidget):
         pass
 
     def refresh(self):
-        # don't refresh if there's no data #TODO: sure?
-        if not self.data:
-            return
-
         # set row count
         self.setRowCount(len(self.data))
         self.setColumnCount(len(self.hheaders))
-        self.setHorizontalHeaderLabels(self.hheaders)
-        self.setVerticalHeaderLabels(self.vheaders)
+        #self.setHorizontalHeaderLabels(self.hheaders)
+        for col in xrange(len(self.hheaders)):
+            self.setHorizontalHeaderItem(col, QtGui.QTableWidgetItem(self.hheaders[col]))
+        #self.setVerticalHeaderLabels(self.vheaders)
+        for row in xrange(len(self.vheaders)):
+            self.setVerticalHeaderItem(row, QtGui.QTableWidgetItem(self.vheaders[row]))
+        
+
+        # don't refresh if there's no data #TODO: sure?
+        if not self.data:
+            pass
+            #return
 
         rowid = 0
         for row in self.data:
@@ -169,7 +208,7 @@ class FlexibleTable(QtGui.QTableWidget):
                         self.setCellWidget(rowid, colid, ui_item)
                     # something failed, let's build a QTableWidgetItem
                     else:
-                        self.setItem(QtGui.QTableWidgetItem(u"%s" % ui_item))
+                        self.setItem(rowid, colid, QtGui.QTableWidgetItem(u"%s" % ui_item))
                 colid += 1
             rowid += 1
 
@@ -178,19 +217,28 @@ class FlexibleTable(QtGui.QTableWidget):
 
         # apply resize rules
         self.apply_resize_rules()
-        print(self.sizeHint())
+
         self.updateGeometry()
 
         # emit post-refresh signal
         self.live_refresh()
 
     def apply_resize_rules(self):
+        print('begin')
+
+        # set headers visibility according to our prop
+        self.verticalHeader().setVisible(self.display_vheaders)
+        self.horizontalHeader().setVisible(self.display_hheaders)
+
         # set a fixed outbox
         if self.max_width:
             self.horizontalHeader().setResizeMode(QtGui.QHeaderView.ResizeToContents)
         else:
             # let parent & all set appropriate
             self.max_width = self.parentWidget().maximumWidth() - self.MARGIN_FOR_PARENT_MAX
+        
+        if self.max_width > 10000:
+            self.max_width = self.parentWidget().width() - self.MARGIN_FOR_PARENT_MAX2
 
         self.resize(self.max_width, self.size().height())
 
@@ -204,9 +252,14 @@ class FlexibleTable(QtGui.QTableWidget):
         for ind in range(0, self.horizontalHeader().count()):
             contented_width += self.horizontalHeader().sectionSize(ind)
 
+        self.verticalHeader().adjustSize()
         # get content-sized with of header
-        vheader_width = self.verticalHeader().width()
-        extra_width = self.max_width - contented_width
+        if self.display_vheaders:
+            vheader_width = self.verticalHeader().width()
+        else:
+            vheader_width = 0
+        print('vheader_width: %d' % vheader_width)
+        extra_width = self.max_width - contented_width ## - vheader_width
 
         # space filled-up.
         if extra_width:
@@ -222,8 +275,12 @@ class FlexibleTable(QtGui.QTableWidget):
 
         self.horizontalHeader().update()
         self.update()
-        new_width = self.size().width()
 
+        # don't update size if not data
+        new_width = self.size().width()
+        print('new_width: %d' % new_width)
+
+        print('height')
         ### HEIGHT
         # table height stops at last row.
         # if max_row/max_height specified and rows above it,
@@ -273,6 +330,15 @@ class FlexibleTable(QtGui.QTableWidget):
             else:
                 new_height += (3 * (len(rows_with_widgets) + 1)) - 1
 
+
+        if self.display_vheaders and self.vheaders:
+            new_height += 2
+
+        # add extra space if table is empty
+        if not len(self.data):
+            new_height += 3 + hheader_height
+            new_width += 4
+
         # content is trimed and a scroll bar will appear
         # let's have its size supported by strecthed (if any)
         # or equally across all fields
@@ -286,12 +352,75 @@ class FlexibleTable(QtGui.QTableWidget):
                 for colid in range(0, self.horizontalHeader().count()):
                     self.horizontalHeader().resizeSection(colid, self.horizontalHeader().sectionSize(colid) - share)
 
+
+        print((new_width, new_height))
+        self.horizontalHeader().setStretchLastSection(True)
+        self.verticalHeader().setStretchLastSection(True)
         self.resize(new_width, new_height)
         self.setMaximumSize(new_width + 2, new_height + 0)
         self.setMinimumSize(new_width - 2, new_height + 0)
 
         self.verticalHeader().update()
         self.update()
+        print('done')
+
+
+class FlexibleReadOnlyTable(FlexibleTable):
+
+    def __init__(self, parent=0):
+        super(FlexibleReadOnlyTable, self).__init__(parent)
+        self.align_map = {}
+
+    def align_map():
+        def fget(self):
+            return self._align_map
+        def fset(self, value):
+            self._align_map = value
+        def fdel(self):
+            del self._align_map
+        return locals()
+    align_map = property(**align_map())
+
+    def _item_for_data(self, row, column, data, context=None):
+        if isinstance(data, (basestring, int)):
+            if column in self.align_map.keys():
+                widget = self.widget_from_align(self.align_map[column])
+            else:
+                widget = FlexibleReadOnlyWidget
+            return widget(self._format_for_table(data))
+        else:
+            super(FlexibleReadOnlyTable, self)._item_for_data(row, column, data, context)
+
+    def widget_from_align(self, align):
+        if align.lower() == 'l':
+            return FlexibleReadOnlyWidgetAL
+        elif align.lower() == 'r':
+            return FlexibleReadOnlyWidgetAR
+        else:
+            return FlexibleReadOnlyWidget
+
+
+class FlexibleReadOnlyWidget(QtGui.QTableWidgetItem):
+
+    def __init__(self, *args, **kwargs):
+        super(FlexibleReadOnlyWidget, self).__init__(*args, **kwargs)
+        
+        self.setTextAlignment(Qt.AlignCenter | Qt.AlignVCenter)
+
+        self.setFlags(QtCore.Qt.ItemIsEnabled | QtCore.Qt.ItemIsSelectable)
+
+
+class FlexibleReadOnlyWidgetAL(FlexibleReadOnlyWidget):
+    def __init__(self, *args, **kwargs):
+        super(FlexibleReadOnlyWidgetAL, self).__init__(*args, **kwargs)
+        self.setTextAlignment(Qt.AlignLeft | Qt.AlignVCenter)
+
+
+class FlexibleReadOnlyWidgetAR(FlexibleReadOnlyWidget):
+    def __init__(self, *args, **kwargs):
+        super(FlexibleReadOnlyWidgetAR, self).__init__(*args, **kwargs)
+        self.setTextAlignment(Qt.AlignRight | Qt.AlignVCenter)
+
 
 class NUTWidget(QtGui.QWidget):
 

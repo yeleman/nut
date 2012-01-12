@@ -128,7 +128,7 @@ INSTALLED_APPS = (
     'django.contrib.admin',
     'django.contrib.humanize',
     'babeldjango',
-    'nosms',
+    'nosmsd',
     'bolibana',
     'nut',
     'reversion',

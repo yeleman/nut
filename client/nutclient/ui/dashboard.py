@@ -4,18 +4,19 @@
 
 from PyQt4 import QtGui
 
-from common import NUTWidget, PageTitle, PageIntro, PageSection, InfoTable, LinkButton, FlexibleTable
+from common import (NUTWidget, PageTitle, PageIntro, PageSection,
+                    InfoTable, LinkButton, FlexibleReadOnlyTable)
 from database import Report, Message
 
 
-class InProgressTable(FlexibleTable):
+class InProgressTable(FlexibleReadOnlyTable):
 
     def __init__(self, parent):
         super(InProgressTable, self).__init__(parent)
 
         def edit_report(ident):
             from report import ReportWidget
-            self.change_main_context(ReportWidget, 
+            self.parentWidget().change_main_context(ReportWidget, 
                                      report=Report.filter(id=ident).get())
 
         date_fmt = '%d %B, %Hh%M'
@@ -27,12 +28,12 @@ class InProgressTable(FlexibleTable):
                               LinkButton(u"Éditer", edit_report, report.id)))
         self.hheaders = [u"Statut", u"Rapport", 
                          u"Créé le", u"Modifié le", u"Action"]
-        self.verticalHeader().setVisible(False)
         self.stretch_columns = [1,]
+        self.align_map = {0: 'l', 1: 'l'}
         self.max_rows = 5
         self.refresh()
 
-class MessagesTable(FlexibleTable):
+class MessagesTable(FlexibleReadOnlyTable):
 
     def __init__(self, parent):
         super(MessagesTable, self).__init__(parent)
@@ -43,9 +44,10 @@ class MessagesTable(FlexibleTable):
                               message.identity,
                               message.text.replace('\n', '')[:90]))
         self.hheaders = [u"Date", u"From", u"Message"]
-        self.verticalHeader().setVisible(False)
+        self.display_vheaders = False
         self.stretch_columns = [2,]
         self.max_rows = 8
+        self.align_map = {0: 'l', 1: 'l', 2:'l'}
         self.refresh()
 
 

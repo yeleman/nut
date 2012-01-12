@@ -329,9 +329,21 @@ class ReportWidget(NUTWidget):
 
     def build_pec_adm_type(self):
 
-        self.title = PageTitle(u"COUCOU")
+        self.title = PageTitle(u"-")
         self.intro = PageIntro(_(u"%(period)s") % {'period': self.report.period})
         self.table = ReportTable(self, self.report, self.current_page, 8, 10)
+        self.table.setHorizontalHeaderLabels([u"Total au\ndébut du\nmois",
+                                              u"Dont\nSexe\nM", u"Dont\nSexe\nF",
+                                              u"P/T≥70\n<80%\nIMC<18",
+                                              u"PB<120\nou\nPB<210",
+                                              u"P/T<70%\nou\nIMC<16",
+                                              u"PB<11cm\nou\nPB<18cm",
+                                              u"Œdeme", u"Autre", "TOTAL\nADMIS"])
+        self.table.setVerticalHeaderLabels([u"URENAS 2",
+                                            u"6-59 mois", u"> 59 mois",
+                                            u"Suivi URENI", u"URENAM 3",
+                                            u"6-59 mois", u"FE/FA",
+                                            u"Suivi 1&2", u"TOTAL"])
 
         # page title
         self.vbox.addWidget(self.title)
