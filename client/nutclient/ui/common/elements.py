@@ -1,0 +1,142 @@
+#!/usr/bin/env python
+# -*- coding: utf-8 -*-
+# vim: ai ts=4 sts=4 et sw=4 nu}
+
+
+from PyQt4 import QtGui, QtCore
+from PyQt4.QtCore import Qt
+
+
+MAIN_WIDGET_SIZE = 900
+
+
+class NUTWidget(QtGui.QWidget):
+
+    title = "?"
+
+    def __init__(self, parent, *args, **kwargs):
+
+        super(NUTWidget, self).__init__(*args, **kwargs)
+
+        self._parent = parent
+
+        self.setMaximumWidth(MAIN_WIDGET_SIZE)
+
+        self.main_window.setWindowTitle(self.title)
+
+    def refresh(self):
+        pass
+
+    def get_main_prop(self, name):
+        if hasattr(self.main_window, name):
+            return getattr(self.main_window, name)
+        else:
+            return None
+
+    @property
+    def user(self):
+        return self.get_main_prop('_user')
+
+    @property
+    def main_window(self):
+        w = self
+        while w:
+            if w.__class__.__name__ == 'MainWindow':
+                return w
+            if hasattr(w, '_parent'):
+                w = w._parent
+                continue
+            else:
+                return None
+        return None
+
+    @classmethod
+    def require_logged_user(self):
+        return True
+
+    def process_event(self, event):
+        pass
+
+    def change_main_context(self, context_widget, *args, **kwargs):
+        return self.parentWidget()\
+                          .change_context(context_widget, *args, **kwargs)
+
+    def open_dialog(self, dialog, modal=False, *args, **kwargs):
+        return self.parentWidget().open_dialog(dialog, \
+                                               modal=modal, *args, **kwargs)
+
+    def default_focus(self):
+        """ widget which should receive focus on NUTWidget display
+
+            Called from MainWindows as FocusProxy is buggy. """
+        return None
+
+    @classmethod
+    def has_pagination(cls):
+        return False
+
+
+class PageTitle(QtGui.QLabel):
+    """ Formatage du titre de page """
+
+    def __init__(self, text, parent=None):
+        QtGui.QLabel.__init__(self, text, parent)
+        font = QtGui.QFont("Times New Roman", 16)
+        font.setBold(True)
+        self.setFont(font)
+        self.setAlignment(Qt.AlignLeft | Qt.AlignVCenter)
+
+
+class PageIntro(QtGui.QLabel):
+    """ Formatage de l'introduction de page """
+
+    def __init__(self, text, parent=None):
+        QtGui.QLabel.__init__(self, text, parent)
+        font = QtGui.QFont("Times New Roman", 12)
+        self.setAlignment(Qt.AlignLeft | Qt.AlignVCenter)
+
+
+class FormLabel(QtGui.QLabel):
+
+    def __init__(self, text, parent=None):
+        QtGui.QLabel.__init__(self, text, parent)
+        font = QtGui.QFont()
+        font.setBold(True)
+        self.setFont(font)
+        self.setAlignment(Qt.AlignLeft | Qt.AlignVCenter)
+
+class ErrorLabel(QtGui.QLabel):
+
+    def __init__(self, text, parent=None):
+        QtGui.QLabel.__init__(self, text, parent)
+        font = QtGui.QFont()
+        self.setFont(font)
+        red = QtGui.QColor(QtCore.Qt.red)
+        palette = QtGui.QPalette()
+        palette.setColor(QtGui.QPalette.WindowText, red)
+        self.setPalette(palette)
+        self.setAlignment(Qt.AlignLeft | Qt.AlignVCenter)
+
+
+class PageSection(QtGui.QLabel):
+
+    def __init__(self, text, parent=None):
+        QtGui.QLabel.__init__(self, text, parent)
+        font = QtGui.QFont("Times New Roman", 14)
+        font.setBold(True)
+        self.setFont(font)
+        self.setAlignment(Qt.AlignLeft | Qt.AlignVCenter)
+
+
+class LinkButton(QtGui.QPushButton):
+
+    def __init__(self, text, handler, ident):
+
+        super(LinkButton, self).__init__(text)
+
+        self.ident = ident
+        self.handler = handler
+        self.clicked.connect(self.on_command)
+
+    def on_command(self):
+        self.handler(self.ident)

@@ -4,8 +4,8 @@
 
 from PyQt4 import QtGui, QtCore
 
-from common import (NUTWidget, PageTitle, PageIntro, InfoTable,
-                    LinkButton, PageSection, fixed_size_table, 
+from common import (NUTWidget, PageTitle, PageIntro,
+                    LinkButton, PageSection,
                     FlexibleReadOnlyTable, FlexibleReadOnlyWidget)
 from database import Report, InputOrderReport
 
@@ -21,9 +21,7 @@ class PECTable(FlexibleReadOnlyTable):
                           report.all_total_end))
         self.hheaders = [u"Début mois", u"Admissions",
                          u"Sorties", u"Fin du mois"]
-        #self.display_vheaders = False
         self.vheaders = [u"PRISE EN CHARGE"]
-        self.stretch_columns = [0,]
         self.max_rows = 1
         self.refresh()
 

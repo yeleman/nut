@@ -9,7 +9,6 @@ from report import ReportWidget
 from send import SendWidget
 from helps import HelpWidget
 from sim_management import SIM_managementWidget
-from data_entry import DataEntryWidget
 from preferences import PreferencesWidget
 from archives import ArchivesWidget
 

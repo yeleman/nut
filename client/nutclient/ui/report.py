@@ -169,6 +169,8 @@ def build_data_from(parent, report, readonly):
         samr = report.pec_mam_report
         #parent.
 
+        print('MAM REPORT: %s' % samr)
+
         for age in ('u59', 'pw', 'fu12'):
 
             cells = []
@@ -199,7 +201,7 @@ def build_data_from(parent, report, readonly):
             data.append(cells)
 
     # add total line
-    data.append([ColumnSumItem(x, parent) for x in range(0, cols)])
+    data.append([ColumnSumItem(parent, None, None) for x in range(0, cols)])
 
     return data
 
@@ -291,34 +293,16 @@ class ReportWidget(NUTWidget):
         self.intro = PageIntro(_(u"%(period)s") % {'period': self.report.period})
 
         # Table
-        self.table = ReportTable(self, self.report, self.current_page, 9, 10)
-        self.table.setHorizontalHeaderLabels([u"Total au\ndébut du\nmois",
-                                              u"Dont\nSexe\nM", u"Dont\nSexe\nF",
-                                              u"P/T≥70\n<80%\nIMC<18",
-                                              u"PB<120\nou\nPB<210",
-                                              u"P/T<70%\nou\nIMC<16",
-                                              u"PB<11cm\nou\nPB<18cm",
-                                              u"Œdeme", u"Autre", "TOTAL\nADMIS"])
-        self.table.setVerticalHeaderLabels([u"URENAS 2",
-                                            u"6-59 mois", u"> 59 mois",
-                                            u"Suivi URENI", u"URENAM 3",
-                                            u"6-59 mois", u"FE/FA",
-                                            u"Suivi 1&2", u"TOTAL"])
-
+        self.table = PECADMCRITReportTable(self, self.report, self.current_page)
         self.table.data = build_data_from(self.table, self.report, self.readonly)
-
-        self.table.setVerticalHeaderItem(0, TableSectionHead(u"URENAS 2"))
-        self.table.setVerticalHeaderItem(4, TableSectionHead(u"URENAM 3"))
-        self.table.setVerticalHeaderItem(8, TableSectionHead(u"TOTAL"))
-
-        #self.table.
-        self.table.refresh()    
+        self.table.refresh()
 
 
         # page title
         self.vbox.addWidget(self.title)
         self.vbox.addWidget(self.intro)
         self.vbox.addWidget(self.table)
+        self.vbox.addStretch(50)
         self.vbox.addWidget(self.continue_button)
 
         # try to set layout (will silently fail if exist)
@@ -349,6 +333,7 @@ class ReportWidget(NUTWidget):
         self.vbox.addWidget(self.title)
         self.vbox.addWidget(self.intro)
         self.vbox.addWidget(self.table)
+        self.vbox.addStretch(50)
 
         # try to set layout (will silently fail if exist)
         self.setLayout(self.vbox)

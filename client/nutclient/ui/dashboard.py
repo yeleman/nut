@@ -5,7 +5,7 @@
 from PyQt4 import QtGui
 
 from common import (NUTWidget, PageTitle, PageIntro, PageSection,
-                    InfoTable, LinkButton, FlexibleReadOnlyTable)
+                    LinkButton, FlexibleReadOnlyTable)
 from database import Report, Message
 
 
@@ -42,7 +42,7 @@ class MessagesTable(FlexibleReadOnlyTable):
         for message in Message.select().order_by(('date', 'desc')).limit(10):
             self.data.append((message.date.strftime('%d %B, %Hh%M'),
                               message.identity,
-                              message.text.replace('\n', '')[:90]))
+                              message.text))
         self.hheaders = [u"Date", u"From", u"Message"]
         self.display_vheaders = False
         self.stretch_columns = [2,]
