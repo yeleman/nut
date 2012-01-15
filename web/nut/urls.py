@@ -36,8 +36,13 @@ urlpatterns = patterns('',
     url(r'^upload/$', views.excel_upload.upload_form, name='upload'),
 
     # for districts and regions
-    url(r'^validation/$', \
-        views.validation.validation_list, name='validation'),
+    url(r'^validations/$', \
+        views.validation.validation_list, name='validation-list'),
+
+    # for districts and regions
+    url(r'^validation/(?P<entity>\d+)/(?P<slug>[a-z0-9_\-]+/)?(?P<year>\d{4})/(?P<month>\d{1,2})$',
+        views.validation.report_validation, name='validation'),
+
 
     # Indicator Views
     url(r'^browse/' + RGXP_ENTITY + '/' + RGXP_PERIODS + '/' \
