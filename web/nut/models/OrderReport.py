@@ -15,6 +15,26 @@ from nutrsc.constants import *
 from nutrsc.mali import *
 
 
+class MAMManager(models.Manager):
+
+    def get_query_set(self):
+        return super(MAMManager, self).get_query_set() \
+                                      .filter(nut_type=MODERATE)
+
+
+class SAMManager(models.Manager):
+
+    def get_query_set(self):
+        return super(SAMManager, self).get_query_set() \
+                                      .filter(nut_type=SEVERE)
+
+
+class SAMPManager(models.Manager):
+
+    def get_query_set(self):
+        return super(SAMPManager, self).get_query_set() \
+                                      .filter(nut_type=SEVERE_COMP)
+
 class OrderReport(Report):
 
     NUT_TYPES = (
@@ -33,6 +53,18 @@ class OrderReport(Report):
     version = models.CharField(max_length=2,
                                verbose_name=_(u"Version"),
                                default=DEFAULT_VERSION)
+
+    objects = models.Manager()
+    mam = MAMManager()
+    sam = SAMManager()
+    samp = SAMPManager()
+
+    def __unicode__(self):
+        cap = self.nut_type.upper()
+        return ugettext(u"%(entity)s/%(cap)s/%(period)s") \
+                        % {'entity': self.entity, \
+                           'period': self.period,
+                           'cap': cap}
 
     def is_complete(self):
         print('is_complete %s' % self)

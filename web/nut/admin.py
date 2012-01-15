@@ -16,7 +16,8 @@ from bolibana.admin import (RoleAdmin, PermissionAdmin, \
                                  AccessAdmin, ProviderAdmin)
 from nut.models import (PECSAMReport, PECMAMReport, PECSAMPReport,
                         NUTInput, InputConsumptionReport, ConsumptionReport,
-                        InputOrderReport, OrderReport, NUTEntity)
+                        InputOrderReport, OrderReport, NUTEntity,
+                        PECOthersReport)
 
 
 class ProviderUserStacked(admin.StackedInline):
@@ -40,6 +41,7 @@ admin.site.register(Role, RoleAdmin)
 admin.site.register(Access, AccessAdmin)
 admin.site.register(Permission, PermissionAdmin)
 admin.site.register(NUTEntity)
+admin.site.register(PECOthersReport)
 
 
 class InputAdmin(admin.ModelAdmin):

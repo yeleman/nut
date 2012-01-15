@@ -8,5 +8,6 @@ from NUTReport import NUTReport
 from PECSAMPReport import PECSAMPReport
 from PECSAMReport import PECSAMReport
 from PECMAMReport import PECMAMReport
+from PECOthers import PECOthersReport
 
 from NUTEntity import NUTEntity

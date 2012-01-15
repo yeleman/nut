@@ -2,29 +2,52 @@
 # encoding=utf-8
 # maintainer: rgaudin
 
+import datetime
 import inspect
+import calendar
 
 import reversion
-from django.db import models
-from django.db.models.signals import pre_save, post_save
-from django.contrib import admin
-from django.dispatch import receiver
-from django.utils.translation import ugettext_lazy as _, ugettext
 
-from bolibana.models import EntityType, Entity, Report, MonthPeriod
+from django.db import models
+from django.utils.translation import ugettext
+
+from bolibana.models import Report, MonthPeriod
 from bolibana.tools.utils import generate_receipt
 from nutrsc.constants import *
 
 
-class NUTReport(object):
+class NUTReportManager(models.Manager):
+
+    use_for_related_fields = True
+
+    def formonth(self, month, year):
+        """
+            Return a queryset for this report for a particular period
+        """
+        start = datetime.datetime(year, month, 1, 0, 0, 0)
+        max_day = calendar.mdays[month]
+        if month == 2 and calendar.isleap(year):
+            max_day += 1
+        end = datetime.datetime(year, month, max_day, 23, 59, 59)
+
+        return super(NUTReportManager, self).get_query_set()\
+                                            .filter(period__start_on=start,
+                                                    period__end_on=end)
+
+
+class NUTReport(models.Model):
 
     """ NUT Meta Report """
+
+
+    class Meta:
+        abstract = True
 
     def cap_from_class(self):
         for cap in ('mam', 'samp', 'sam'):
             if cap in str(self.__class__).lower():
                 return cap.upper()
-            
+
 
     def __unicode__(self):
         cap = self.cap_from_class()
@@ -41,11 +64,11 @@ class NUTReport(object):
             return []
 
         versions = reversion.get_for_object(self)
-        
+
         # no dirty fields if only one rev.
         if len(versions) <= 1:
             return []
-        
+
         last, previous = versions[0:2]
 
         diff = []

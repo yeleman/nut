@@ -7,7 +7,7 @@ from django.db import models
 from django.utils.translation import ugettext_lazy as _, ugettext
 from django.db.models.signals import pre_save, post_save
 
-from NUTReport import NUTReport, pre_save_report, post_save_report
+from NUTReport import NUTReport, pre_save_report, post_save_report, NUTReportManager
 from bolibana.models import EntityType, Entity, Report, MonthPeriod
 
 
@@ -24,6 +24,8 @@ class PECMAMReport(NUTReport, Report):
     CATEGORIES = (('u59', _(u"6 to 59 months old")),
                   ('pw', _(u"Pregnant/Breast-feeding Women")),
                   ('fu12', _(u"Follow-up URENI/UNRENAS")))
+
+    byperiod = NUTReportManager()
 
     # over 59 months
     u59_total_beginning_m = models.PositiveIntegerField( \

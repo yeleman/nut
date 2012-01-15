@@ -6,10 +6,11 @@ from django.db import models
 from django.utils.translation import ugettext_lazy as _, ugettext
 from django.db.models.signals import pre_save, post_save
 
-from NUTReport import NUTReport, pre_save_report, post_save_report
+from bolibana.models import Report
+from NUTReport import NUTReport, pre_save_report, post_save_report, NUTReportManager
 
 
-class PECOthersReport(NUTReport):
+class PECOthersReport(Report, NUTReport):
 
     """ PEC Others Data """
 
@@ -23,6 +24,8 @@ class PECOthersReport(NUTReport):
     other_tb = models.PositiveIntegerField(_(u"Others having TB"))
     other_lwb = models.PositiveIntegerField(_(u"Others with Low Weight " \
                                               u"at Birth"))
+
+    byperiod = NUTReportManager()
 
     # Aggregation
     sources = models.ManyToManyField('PECOthersReport', \

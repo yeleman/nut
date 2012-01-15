@@ -5,11 +5,14 @@
 {% block pagetitle %}
     <h1 class="pagetitle">
         Validation du rapport de {{ entity }} pour la
-        période de {{ month }}/{{ year }}
+        période du {{ month }}/{{ year }}
     </h1>
 {% endblock %}
 
 {% block content %}
+
+<form action='.' method='get'>
+
 <table>
 
 <thead>
@@ -49,8 +52,16 @@
 </thead>
 
 <tbody>
+
+    {% if samp_report %}
+
     <tr>
-      <td>URENI 1</td>
+      <th colspan="11" >URENI 1</th>
+    </tr>
+
+    <tr>
+      <th>&lt; 6 mois
+      </th>
       <td>
       </td>
       <td>
@@ -73,8 +84,8 @@
       </td>
     </tr>
     <tr>
-      <td>&lt; 6 mois
-      </td>
+      <th> 6-59 mois
+      </th>
       <td>
       </td>
       <td>
@@ -97,8 +108,40 @@
       </td>
     </tr>
     <tr>
-      <td> 6-59 mois
+      <th>&gt; 59 mois
+      </th>
+      <td>
       </td>
+      <td>
+      </td>
+      <td>
+      </td>
+      <td>
+      </td>
+      <td>
+      </td>
+      <td>
+      </td>
+      <td>
+      </td>
+      <td>
+      </td>
+      <td>
+      </td>
+      <td>
+      </td>
+    </tr>
+
+    {% endif %}
+
+    {% if sam_report %}
+
+    <tr>
+      <th colspan="11" >URENAS 2</th>
+    </tr>
+    <tr>
+      <th>6-59 mois
+      </th>
       <td>
       </td>
       <td>
@@ -121,8 +164,8 @@
       </td>
     </tr>
     <tr>
-      <td>&gt; 59 mois
-      </td>
+      <th>&gt; 59 mois
+      </th>
       <td>
       </td>
       <td>
@@ -145,7 +188,39 @@
       </td>
     </tr>
     <tr>
-      <td>URENAS 2</td>
+      <th>Suivi de URENI 1</th>
+      <td>
+      </td>
+      <td>
+      </td>
+      <td>
+      </td>
+      <td>
+      </td>
+      <td>
+      </td>
+      <td>
+      </td>
+      <td>
+      </td>
+      <td>
+      </td>
+      <td>
+      </td>
+      <td>
+      </td>
+    </tr>
+
+    {% endif %}
+
+    {% if mam_report %}
+
+    <tr>
+      <th colspan="11" >URENAM 3</th>
+    </tr>
+    <tr>
+      <th>6-59 mois
+      </th>
       <td>
       </td>
       <td>
@@ -168,8 +243,7 @@
       </td>
     </tr>
     <tr>
-      <td>6-59 mois
-      </td>
+      <th>FE/FA</th>
       <td>
       </td>
       <td>
@@ -192,8 +266,7 @@
       </td>
     </tr>
     <tr>
-      <td>&gt; 59 mois
-      </td>
+      <th>Suivi de 1 et 2</th>
       <td>
       </td>
       <td>
@@ -215,8 +288,11 @@
       <td>
       </td>
     </tr>
+
+    {% endif %}
+
     <tr>
-      <td>Suivi de URENI 1</td>
+      <th>Total</th>
       <td>
       </td>
       <td>
@@ -238,161 +314,13 @@
       <td>
       </td>
     </tr>
-    <tr>
-      <td>URENAM 3</td>
-      <td>
-      </td>
-      <td>
-      </td>
-      <td>
-      </td>
-      <td>
-      </td>
-      <td>
-      </td>
-      <td>
-      </td>
-      <td>
-      </td>
-      <td>
-      </td>
-      <td>
-      </td>
-      <td>
-      </td>
-    </tr>
-    <tr>
-      <td>6-59 mois
-      </td>
-      <td>
-      </td>
-      <td>
-      </td>
-      <td>
-      </td>
-      <td>
-      </td>
-      <td>
-      </td>
-      <td>
-      </td>
-      <td>
-      </td>
-      <td>
-      </td>
-      <td>
-      </td>
-      <td>
-      </td>
-    </tr>
-    <tr>
-      <td>FE/FA</td>
-      <td>
-      </td>
-      <td>
-      </td>
-      <td>
-      </td>
-      <td>
-      </td>
-      <td>
-      </td>
-      <td>
-      </td>
-      <td>
-      </td>
-      <td>
-      </td>
-      <td>
-      </td>
-      <td>
-      </td>
-    </tr>
-    <tr>
-      <td>Suivi de 1 et 2</td>
-      <td>
-      </td>
-      <td>
-      </td>
-      <td>
-      </td>
-      <td>
-      </td>
-      <td>
-      </td>
-      <td>
-      </td>
-      <td>
-      </td>
-      <td>
-      </td>
-      <td>
-      </td>
-      <td>
-      </td>
-    </tr>
-    <tr>
-      <td>Total</td>
-      <td>
-      </td>
-      <td>
-      </td>
-      <td>
-      </td>
-      <td>
-      </td>
-      <td>
-      </td>
-      <td>
-      </td>
-      <td>
-      </td>
-      <td>
-      </td>
-      <td>
-      </td>
-      <td>
-      </td>
-    </tr>
+
   </tbody>
 </table>
 
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 <table border="1" cellpadding="2" cellspacing="2">
+
   <thead>
     <tr>
       <th colspan="1" rowspan="3">Groupe d'age
@@ -427,9 +355,16 @@
 </thead>
 
 <tbody>
+
+    {% if samp_report %}
+
     <tr>
-      <td><span>URENI 1</span>
-      </td>
+      <th colspan="9" >URENI 1
+      </th>
+    </tr>
+    <tr>
+      <th>&lt; 6 mois
+      </th>
       <td>
       </td>
       <td>
@@ -448,8 +383,8 @@
       </td>
     </tr>
     <tr>
-      <td>&lt; 6 mois
-      </td>
+      <th> 6-59 mois
+      </th>
       <td>
       </td>
       <td>
@@ -468,8 +403,36 @@
       </td>
     </tr>
     <tr>
-      <td> 6-59 mois
+      <th>&gt; 59 mois
+      </th>
+      <td>
       </td>
+      <td>
+      </td>
+      <td>
+      </td>
+      <td>
+      </td>
+      <td>
+      </td>
+      <td>
+      </td>
+      <td>
+      </td>
+      <td>
+      </td>
+    </tr>
+
+    {% endif %}
+
+    {% if sam_report %}
+
+    <tr>
+      <th colspan="9" >URENAS 2</th>
+    </tr>
+    <tr>
+      <th>6-59 mois
+      </th>
       <td>
       </td>
       <td>
@@ -488,8 +451,8 @@
       </td>
     </tr>
     <tr>
-      <td>&gt; 59 mois
-      </td>
+      <th>&gt; 59 mois
+      </th>
       <td>
       </td>
       <td>
@@ -508,7 +471,37 @@
       </td>
     </tr>
     <tr>
-      <td>URENAS 2</td>
+      <th>Suivi de URENI 1
+      </th>
+      <td>
+      </td>
+      <td>
+      </td>
+      <td>
+      </td>
+      <td>
+      </td>
+      <td>
+      </td>
+      <td>
+      </td>
+      <td>
+      </td>
+      <td>
+      </td>
+    </tr>
+
+    {% endif %}
+
+    {% if mam_report %}
+
+    <tr>
+      <th colspan="9" >URENAM 3
+      </th>
+    </tr>
+    <tr>
+      <th>6-59 mois
+      </th>
       <td>
       </td>
       <td>
@@ -527,8 +520,8 @@
       </td>
     </tr>
     <tr>
-      <td>6-59 mois
-      </td>
+      <th>FE/FA
+      </th>
       <td>
       </td>
       <td>
@@ -547,8 +540,8 @@
       </td>
     </tr>
     <tr>
-      <td>&gt; 59 mois
-      </td>
+      <th>Suivi de 1 et 2
+      </th>
       <td>
       </td>
       <td>
@@ -566,109 +559,12 @@
       <td>
       </td>
     </tr>
+
+    {% endif %}
+
     <tr>
-      <td>Suivi de URENI 1
-      </td>
-      <td>
-      </td>
-      <td>
-      </td>
-      <td>
-      </td>
-      <td>
-      </td>
-      <td>
-      </td>
-      <td>
-      </td>
-      <td>
-      </td>
-      <td>
-      </td>
-    </tr>
-    <tr>
-      <td><span>URENAM 3</span>
-      </td>
-      <td>
-      </td>
-      <td>
-      </td>
-      <td>
-      </td>
-      <td>
-      </td>
-      <td>
-      </td>
-      <td>
-      </td>
-      <td>
-      </td>
-      <td>
-      </td>
-    </tr>
-    <tr>
-      <td>6-59 mois
-      </td>
-      <td>
-      </td>
-      <td>
-      </td>
-      <td>
-      </td>
-      <td>
-      </td>
-      <td>
-      </td>
-      <td>
-      </td>
-      <td>
-      </td>
-      <td>
-      </td>
-    </tr>
-    <tr>
-      <td>FE/FA
-      </td>
-      <td>
-      </td>
-      <td>
-      </td>
-      <td>
-      </td>
-      <td>
-      </td>
-      <td>
-      </td>
-      <td>
-      </td>
-      <td>
-      </td>
-      <td>
-      </td>
-    </tr>
-    <tr>
-      <td>Suivi de 1 et 2
-      </td>
-      <td>
-      </td>
-      <td>
-      </td>
-      <td>
-      </td>
-      <td>
-      </td>
-      <td>
-      </td>
-      <td>
-      </td>
-      <td>
-      </td>
-      <td>
-      </td>
-    </tr>
-    <tr>
-      <td><span>Total</span>
-      </td>
+      <th>Total
+      </th>
       <td>
       </td>
       <td>
@@ -737,9 +633,41 @@
 </thead>
 
 <tbody>
+
+    {% if samp_report %}
+
     <tr>
-      <td><span>URENI 1</span>
+      <th colspan="14" >URENI 1
+      </th>
       </td>
+      <td>
+      </td>
+      <td>
+      </td>
+      <td>
+      </td>
+      <td>
+      </td>
+      <td>
+      </td>
+      <td>
+      </td>
+      <td>
+      </td>
+      <td>
+      </td>
+      <td>
+      </td>
+      <td>
+      </td>
+      <td>
+      </td>
+      <td>
+      </td>
+    </tr>
+    <tr>
+      <th>&lt; 6 mois
+      </th>
       <td>
       </td>
       <td>
@@ -768,8 +696,8 @@
       </td>
     </tr>
     <tr>
-      <td>&lt; 6 mois
-      </td>
+      <th> 6-59 mois
+      </th>
       <td>
       </td>
       <td>
@@ -798,8 +726,47 @@
       </td>
     </tr>
     <tr>
-      <td> 6-59 mois
+      <th><span>&gt; 59 mois </span>
+      </th>
+      <td>
       </td>
+      <td>
+      </td>
+      <td>
+      </td>
+      <td>
+      </td>
+      <td>
+      </td>
+      <td>
+      </td>
+      <td>
+      </td>
+      <td>
+      </td>
+      <td>
+      </td>
+      <td>
+      </td>
+      <td>
+      </td>
+      <td>
+      </td>
+      <td>
+      </td>
+    </tr>
+
+    {% endif %}
+
+    {% if sam_report %}
+
+    <tr>
+      <th  colspan="14" >URENAS 2
+      </th>
+    </tr>
+    <tr>
+      <th>&lt; 6 mois
+      </th>
       <td>
       </td>
       <td>
@@ -828,8 +795,8 @@
       </td>
     </tr>
     <tr>
-      <td><span>&gt; 59 mois </span>
-      </td>
+      <th>6-59 mois
+      </th>
       <td>
       </td>
       <td>
@@ -858,8 +825,8 @@
       </td>
     </tr>
     <tr>
-      <td>URENAS 2
-      </td>
+      <th>&gt; 59 mois
+      </th>
       <td>
       </td>
       <td>
@@ -888,8 +855,17 @@
       </td>
     </tr>
     <tr>
-      <td>&lt; 6 mois
-      </td>
+      <th colspan="14" >Suivi de URENI 1
+      </th>
+    </tr>
+
+    {% endif %}
+
+    {% if mam_report %}
+
+    <tr>
+      <th>URENAM 3
+      </th>
       <td>
       </td>
       <td>
@@ -918,8 +894,8 @@
       </td>
     </tr>
     <tr>
-      <td>6-59 mois
-      </td>
+      <th>6-59 mois
+      </th>
       <td>
       </td>
       <td>
@@ -948,8 +924,8 @@
       </td>
     </tr>
     <tr>
-      <td>&gt; 59 mois
-      </td>
+      <th>FE/FA
+      </th>
       <td>
       </td>
       <td>
@@ -978,8 +954,8 @@
       </td>
     </tr>
     <tr>
-      <td>Suivi de URENI 1
-      </td>
+      <th>Suivi de 1 et 2
+      </th>
       <td>
       </td>
       <td>
@@ -1008,8 +984,8 @@
       </td>
     </tr>
     <tr>
-      <td><span>URENAM 3</span>
-      </td>
+      <th>Total
+      </th>
       <td>
       </td>
       <td>
@@ -1037,128 +1013,16 @@
       <td>
       </td>
     </tr>
-    <tr>
-      <td>6-59 mois
-      </td>
-      <td>
-      </td>
-      <td>
-      </td>
-      <td>
-      </td>
-      <td>
-      </td>
-      <td>
-      </td>
-      <td>
-      </td>
-      <td>
-      </td>
-      <td>
-      </td>
-      <td>
-      </td>
-      <td>
-      </td>
-      <td>
-      </td>
-      <td>
-      </td>
-      <td>
-      </td>
-    </tr>
-    <tr>
-      <td>FE/FA
-      </td>
-      <td>
-      </td>
-      <td>
-      </td>
-      <td>
-      </td>
-      <td>
-      </td>
-      <td>
-      </td>
-      <td>
-      </td>
-      <td>
-      </td>
-      <td>
-      </td>
-      <td>
-      </td>
-      <td>
-      </td>
-      <td>
-      </td>
-      <td>
-      </td>
-      <td>
-      </td>
-    </tr>
-    <tr>
-      <td>Suivi de 1 et 2
-      </td>
-      <td>
-      </td>
-      <td>
-      </td>
-      <td>
-      </td>
-      <td>
-      </td>
-      <td>
-      </td>
-      <td>
-      </td>
-      <td>
-      </td>
-      <td>
-      </td>
-      <td>
-      </td>
-      <td>
-      </td>
-      <td>
-      </td>
-      <td>
-      </td>
-      <td>
-      </td>
-    </tr>
-    <tr>
-      <td>Total
-      </td>
-      <td>
-      </td>
-      <td>
-      </td>
-      <td>
-      </td>
-      <td>
-      </td>
-      <td>
-      </td>
-      <td>
-      </td>
-      <td>
-      </td>
-      <td>
-      </td>
-      <td>
-      </td>
-      <td>
-      </td>
-      <td>
-      </td>
-      <td>
-      </td>
-      <td>
-      </td>
-    </tr>
+
+    {% endif %}
+
   </tbody>
 </table>
+
+{% if other_report %}
+    <p>Others...</p>
+{% endif %}
+
 
 <table border="1" cellpadding="2" cellspacing="2">
   <thead>
@@ -1180,8 +1044,8 @@
 
 <tbody>
     <tr>
-      <td>CSB
-      </td>
+      <th>CSB
+      </th>
       <td>
       </td>
       <td>
@@ -1194,8 +1058,8 @@
       </td>
     </tr>
     <tr>
-      <td>UNIMIX
-      </td>
+      <th>UNIMIX
+      </th>
       <td>
       </td>
       <td>
@@ -1208,8 +1072,8 @@
       </td>
     </tr>
     <tr>
-      <td>HUILE
-      </td>
+      <th>HUILE
+      </th>
       <td>
       </td>
       <td>
@@ -1222,8 +1086,8 @@
       </td>
     </tr>
     <tr>
-      <td>Sucre
-      </td>
+      <th>Sucre
+      </th>
       <td>
       </td>
       <td>
@@ -1236,8 +1100,8 @@
       </td>
     </tr>
     <tr>
-      <td>Mil
-      </td>
+      <th>Mil
+      </th>
       <td>
       </td>
       <td>
@@ -1250,8 +1114,8 @@
       </td>
     </tr>
     <tr>
-      <td>Niébé
-      </td>
+      <th>Niébé
+      </th>
       <td>
       </td>
       <td>
@@ -1264,8 +1128,8 @@
       </td>
     </tr>
     <tr>
-      <td>Plumpy Nut
-      </td>
+      <th>Plumpy Nut
+      </th>
       <td>
       </td>
       <td>
@@ -1278,8 +1142,8 @@
       </td>
     </tr>
     <tr>
-      <td>F 75
-      </td>
+      <th>F 75
+      </th>
       <td>
       </td>
       <td>
@@ -1292,8 +1156,8 @@
       </td>
     </tr>
     <tr>
-      <td>BP 100
-      </td>
+      <th>BP 100
+      </th>
       <td>
       </td>
       <td>
@@ -1306,8 +1170,8 @@
       </td>
     </tr>
     <tr>
-      <td>CMV
-      </td>
+      <th>CMV
+      </th>
       <td>
       </td>
       <td>
@@ -1321,4 +1185,9 @@
     </tr>
   </tbody>
 </table>
+
+{% csrf_token %}
+<input type="submit">
+</form>
+
 {% endblock %}
