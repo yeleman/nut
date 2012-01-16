@@ -380,9 +380,16 @@
     <tr>
       <th>Total
       </th>
-      {% for field in pec_mam_form.part2_total_fields %}
-          <td>{{ field }}</td>
-      {% endfor %}
+      {% with fields=pec_mam_form.part2_total_fields %}
+             {% include '_field_cell.html' with field=fields.next %}
+             {% include '_field_cell.html' with field=fields.next %}
+             {% include '_field_cell.html' with field=fields.next %}
+             {% include '_field_cell.html' with field=fields.next %}
+             {% include '_field_cell.html' with field=fields.next %}
+             <td></td>
+             {% include '_field_cell.html' with field=fields.next %}
+             {% include '_field_cell.html' with field=fields.next %}
+      {% endwith %}
     </tr>
   </tbody>
 </table>
@@ -660,9 +667,23 @@
     <tr>
       <th>Total
       </th>
-      {% for field in pec_mam_form.part3_total_fields %}
-          <td>{{ field }}</td>
-      {% endfor %}
+
+      {% with fields=pec_mam_form.part3_total_fields %}
+            {% include '_field_cell.html' with field=fields.next %}
+            {% include '_field_cell.html' with field=fields.next %}
+            {% include '_field_cell.html' with field=fields.next %}
+            {% include '_field_cell.html' with field=fields.next %}
+            {% include '_field_cell.html' with field=fields.next %}
+            {% include '_field_cell.html' with field=fields.next %}
+            {% include '_field_cell.html' with field=fields.next %}
+            <td></td>
+             {% include '_field_cell.html' with field=fields.next %}
+             {% include '_field_cell.html' with field=fields.next %}
+      {% endwith %}
+      <td></td>
+      <td></td>
+      <td></td>
+
     </tr>
 
     {% endif %}

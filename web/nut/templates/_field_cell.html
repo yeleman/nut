@@ -1,1 +1,11 @@
-<td>{{ field }}</td>
+{% if field == None %}
+<td style='background: none repeat scroll 0 0 #6f9bd1;'>
+
+</td>
+{% else %}
+
+<td >
+    {{ field }}
+</td>
+
+{% endif %}
