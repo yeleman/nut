@@ -53,7 +53,7 @@
 
 <tbody>
 
-    {% if samp_report %}
+    {% if pec_samp_report %}
 
     <tr>
       <th colspan="11" >URENI 1</th>
@@ -134,86 +134,50 @@
 
     {% endif %}
 
-    {% if sam_report %}
+    {% if pec_sam_report %}
 
     <tr>
       <th colspan="11" >URENAS 2</th>
     </tr>
+
     <tr>
       <th>6-59 mois
       </th>
       <td>
       </td>
-      <td>
-      </td>
-      <td>
-      </td>
-      <td>
-      </td>
-      <td>
-      </td>
-      <td>
-      </td>
-      <td>
-      </td>
-      <td>
-      </td>
-      <td>
-      </td>
+      {% for field in pec_sam_form.part1_form_fields %}
+            <td>{{ field }}</td>
+      {% endfor %}
       <td>
       </td>
     </tr>
+
     <tr>
       <th>&gt; 59 mois
       </th>
       <td>
       </td>
-      <td>
-      </td>
-      <td>
-      </td>
-      <td>
-      </td>
-      <td>
-      </td>
-      <td>
-      </td>
-      <td>
-      </td>
-      <td>
-      </td>
-      <td>
-      </td>
+      {% for field in pec_sam_form.part1_form_fields %}
+            <td>{{ field }}</td>
+      {% endfor %}
       <td>
       </td>
     </tr>
+
     <tr>
       <th>Suivi de URENI 1</th>
       <td>
       </td>
-      <td>
-      </td>
-      <td>
-      </td>
-      <td>
-      </td>
-      <td>
-      </td>
-      <td>
-      </td>
-      <td>
-      </td>
-      <td>
-      </td>
-      <td>
-      </td>
+      {% for field in pec_sam_form.part1_form_fields %}
+            <td>{{ field }}</td>
+      {% endfor %}
       <td>
       </td>
     </tr>
 
     {% endif %}
 
-    {% if mam_report %}
+    {% if pec_mam_report %}
 
     <tr>
       <th colspan="11" >URENAM 3</th>
@@ -356,7 +320,7 @@
 
 <tbody>
 
-    {% if samp_report %}
+    {% if pec_samp_report %}
 
     <tr>
       <th colspan="9" >URENI 1
@@ -425,75 +389,61 @@
 
     {% endif %}
 
-    {% if sam_report %}
+    {% if pec_sam_report %}
 
     <tr>
       <th colspan="9" >URENAS 2</th>
     </tr>
+
     <tr>
       <th>6-59 mois
       </th>
-      <td>
-      </td>
-      <td>
-      </td>
-      <td>
-      </td>
-      <td>
-      </td>
-      <td>
-      </td>
-      <td>
-      </td>
-      <td>
-      </td>
-      <td>
-      </td>
+      {% with fields=pec_sam_form.part2_form_fields %}
+            <td>{{ fields.next }}</td>
+            <td>{{ fields.next }}</td>
+            <td>{{ fields.next }}</td>
+            <td>{{ fields.next }}</td>
+            <td>{{ fields.next }}</td>
+            <td></td>
+            <td>{{ fields.next }}</td>
+            <td>{{ fields.next }}</td>
+      {% endwith %}
     </tr>
+
     <tr>
       <th>&gt; 59 mois
       </th>
-      <td>
-      </td>
-      <td>
-      </td>
-      <td>
-      </td>
-      <td>
-      </td>
-      <td>
-      </td>
-      <td>
-      </td>
-      <td>
-      </td>
-      <td>
-      </td>
+      {% with fields=pec_sam_form.part2_form_fields %}
+            <td>{{ fields.next }}</td>
+            <td>{{ fields.next }}</td>
+            <td>{{ fields.next }}</td>
+            <td>{{ fields.next }}</td>
+            <td>{{ fields.next }}</td>
+            <td></td>
+            <td>{{ fields.next }}</td>
+            <td>{{ fields.next }}</td>
+      {% endwith %}
     </tr>
+
     <tr>
-      <th>Suivi de URENI 1
-      </th>
-      <td>
+      <th>Suivi de URENI 1</th>
       </td>
-      <td>
-      </td>
-      <td>
-      </td>
-      <td>
-      </td>
-      <td>
-      </td>
-      <td>
-      </td>
-      <td>
-      </td>
-      <td>
-      </td>
+
+      {% with fields=pec_sam_form.part2_form_fields %}
+            <td>{{ fields.next }}</td>
+            <td>{{ fields.next }}</td>
+            <td>{{ fields.next }}</td>
+            <td>{{ fields.next }}</td>
+            <td>{{ fields.next }}</td>
+            <td></td>
+            <td>{{ fields.next }}</td>
+            <td>{{ fields.next }}</td>
+      {% endwith %}
     </tr>
 
     {% endif %}
 
-    {% if mam_report %}
+    {% if pec_mam_report %}
 
     <tr>
       <th colspan="9" >URENAM 3
@@ -634,7 +584,7 @@
 
 <tbody>
 
-    {% if samp_report %}
+    {% if pec_samp_report %}
 
     <tr>
       <th colspan="14" >URENI 1
@@ -758,7 +708,7 @@
 
     {% endif %}
 
-    {% if sam_report %}
+    {% if pec_sam_report %}
 
     <tr>
       <th  colspan="14" >URENAS 2
@@ -861,7 +811,7 @@
 
     {% endif %}
 
-    {% if mam_report %}
+    {% if pec_mam_report %}
 
     <tr>
       <th>URENAM 3
@@ -1019,12 +969,18 @@
   </tbody>
 </table>
 
-{% if other_report %}
-    <p>Others...</p>
+{% if pec_other_report %}
+    <p>
+        {% for field in pec_other_form %}
+            <span>{{ field.label }}: {{field}}</span>
+        {% endfor %}
+    </p>
 {% endif %}
 
+{% if cons_samp_report %}
 
 <table border="1" cellpadding="2" cellspacing="2">
+  <caption>SAMP consumption report</caption>
   <thead>
     <tr>
       <th>Désignation
@@ -1043,148 +999,130 @@
 </thead>
 
 <tbody>
-    <tr>
-      <th>CSB
-      </th>
-      <td>
-      </td>
-      <td>
-      </td>
-      <td>
-      </td>
-      <td>
-      </td>
-      <td>
-      </td>
-    </tr>
-    <tr>
-      <th>UNIMIX
-      </th>
-      <td>
-      </td>
-      <td>
-      </td>
-      <td>
-      </td>
-      <td>
-      </td>
-      <td>
-      </td>
-    </tr>
-    <tr>
-      <th>HUILE
-      </th>
-      <td>
-      </td>
-      <td>
-      </td>
-      <td>
-      </td>
-      <td>
-      </td>
-      <td>
-      </td>
-    </tr>
-    <tr>
-      <th>Sucre
-      </th>
-      <td>
-      </td>
-      <td>
-      </td>
-      <td>
-      </td>
-      <td>
-      </td>
-      <td>
-      </td>
-    </tr>
-    <tr>
-      <th>Mil
-      </th>
-      <td>
-      </td>
-      <td>
-      </td>
-      <td>
-      </td>
-      <td>
-      </td>
-      <td>
-      </td>
-    </tr>
-    <tr>
-      <th>Niébé
-      </th>
-      <td>
-      </td>
-      <td>
-      </td>
-      <td>
-      </td>
-      <td>
-      </td>
-      <td>
-      </td>
-    </tr>
-    <tr>
-      <th>Plumpy Nut
-      </th>
-      <td>
-      </td>
-      <td>
-      </td>
-      <td>
-      </td>
-      <td>
-      </td>
-      <td>
-      </td>
-    </tr>
-    <tr>
-      <th>F 75
-      </th>
-      <td>
-      </td>
-      <td>
-      </td>
-      <td>
-      </td>
-      <td>
-      </td>
-      <td>
-      </td>
-    </tr>
-    <tr>
-      <th>BP 100
-      </th>
-      <td>
-      </td>
-      <td>
-      </td>
-      <td>
-      </td>
-      <td>
-      </td>
-      <td>
-      </td>
-    </tr>
-    <tr>
-      <th>CMV
-      </th>
-      <td>
-      </td>
-      <td>
-      </td>
-      <td>
-      </td>
-      <td>
-      </td>
-      <td>
-      </td>
-    </tr>
+    {% for line in cons_samp_form.forms %}
+
+        <tr>
+          <th>{{ line.instance.nut_input.name }}
+          </th>
+          <td>
+          {{ line.initial }}
+          </td>
+          <td>
+          {{ line.received }}
+          </td>
+          <td>
+          {{ line.used }}
+          </td>
+          <td>
+          {{ line.lost }}
+          </td>
+          <td>
+          </td>
+        </tr>
+
+    {% endfor %}
   </tbody>
 </table>
+
+{% endif %}
+
+{% if cons_sam_report %}
+
+<table border="1" cellpadding="2" cellspacing="2">
+  <caption>SAM consumption report</caption>
+  <thead>
+    <tr>
+      <th>Désignation
+      </th>
+      <th>Stock Initial
+      </th>
+      <th>Quantités Reçues pendant la période
+      </th>
+      <th>Quantités Utlisées pendant la période
+      </th>
+      <th>Quantités Perdues* pendant la période
+      </th>
+      <th>Quantités Disponibles Utilisables en Fin de période
+      </th>
+    </tr>
+</thead>
+
+<tbody>
+    {% for line in cons_sam_form.forms %}
+
+        <tr>
+          <th>{{ line.instance.nut_input.name }}
+          </th>
+          <td>
+          {{ line.initial }}
+          </td>
+          <td>
+          {{ line.received }}
+          </td>
+          <td>
+          {{ line.used }}
+          </td>
+          <td>
+          {{ line.lost }}
+          </td>
+          <td>
+          </td>
+        </tr>
+
+    {% endfor %}
+  </tbody>
+</table>
+
+{% endif %}
+
+{% if cons_mam_report %}
+
+<table border="1" cellpadding="2" cellspacing="2">
+  <caption>MAM consumption report</caption>
+  <thead>
+    <tr>
+      <th>Désignation
+      </th>
+      <th>Stock Initial
+      </th>
+      <th>Quantités Reçues pendant la période
+      </th>
+      <th>Quantités Utlisées pendant la période
+      </th>
+      <th>Quantités Perdues* pendant la période
+      </th>
+      <th>Quantités Disponibles Utilisables en Fin de période
+      </th>
+    </tr>
+</thead>
+
+<tbody>
+    {% for line in cons_mam_form.forms %}
+
+        <tr>
+          <th>{{ line.instance.nut_input.name }}
+          </th>
+          <td>
+          {{ line.initial }}
+          </td>
+          <td>
+          {{ line.received }}
+          </td>
+          <td>
+          {{ line.used }}
+          </td>
+          <td>
+          {{ line.lost }}
+          </td>
+          <td>
+          </td>
+        </tr>
+
+    {% endfor %}
+  </tbody>
+</table>
+
+{% endif %}
 
 {% csrf_token %}
 <input type="submit">

@@ -8,7 +8,7 @@ from django.db import models
 from django.utils.translation import ugettext_lazy as _, ugettext
 from django.db.models.signals import pre_save, post_save
 
-from NUTReport import NUTReport, pre_save_report, post_save_report, NUTReportManager
+from NUTReport import NUTReport, pre_save_report, post_save_report
 from bolibana.models import EntityType, Entity, Report, MonthPeriod
 
 
@@ -25,8 +25,6 @@ class PECSAMReport(NUTReport, Report):
     CATEGORIES = (('u59', _(u"6 to 59 months old")),
                   ('o59', _(u"Over 59 months old")),
                   ('fu1', _(u"Follow-up URENI 1")))
-
-    byperiod = NUTReportManager()
 
     # 6 months old to 59 months old
     u59_total_beginning_m = models.PositiveIntegerField( \

@@ -16,25 +16,6 @@ from bolibana.tools.utils import generate_receipt
 from nutrsc.constants import *
 
 
-class NUTReportManager(models.Manager):
-
-    use_for_related_fields = True
-
-    def formonth(self, month, year):
-        """
-            Return a queryset for this report for a particular period
-        """
-        start = datetime.datetime(year, month, 1, 0, 0, 0)
-        max_day = calendar.mdays[month]
-        if month == 2 and calendar.isleap(year):
-            max_day += 1
-        end = datetime.datetime(year, month, max_day, 23, 59, 59)
-
-        return super(NUTReportManager, self).get_query_set()\
-                                            .filter(period__start_on=start,
-                                                    period__end_on=end)
-
-
 class NUTReport(models.Model):
 
     """ NUT Meta Report """
