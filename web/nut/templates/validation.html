@@ -64,70 +64,29 @@
       </th>
       <td>
       </td>
-      <td>
-      </td>
-      <td>
-      </td>
-      <td>
-      </td>
-      <td>
-      </td>
-      <td>
-      </td>
-      <td>
-      </td>
-      <td>
-      </td>
-      <td>
-      </td>
+      {% for field in pec_samp_form.part1_form_fields %}
+          {% include '_field_cell.html' with field=field %}
+      {% endfor %}
       <td>
       </td>
     </tr>
     <tr>
       <th> 6-59 mois
-      </th>
       <td>
       </td>
-      <td>
-      </td>
-      <td>
-      </td>
-      <td>
-      </td>
-      <td>
-      </td>
-      <td>
-      </td>
-      <td>
-      </td>
-      <td>
-      </td>
-      <td>
-      </td>
+      {% for field in pec_samp_form.part1_form_fields %}
+          {% include '_field_cell.html' with field=field %}
+      {% endfor %}
       <td>
       </td>
     </tr>
     <tr>
       <th>&gt; 59 mois
-      </th>
       <td>
       </td>
-      <td>
-      </td>
-      <td>
-      </td>
-      <td>
-      </td>
-      <td>
-      </td>
-      <td>
-      </td>
-      <td>
-      </td>
-      <td>
-      </td>
-      <td>
-      </td>
+      {% for field in pec_samp_form.part1_form_fields %}
+          {% include '_field_cell.html' with field=field %}
+      {% endfor %}
       <td>
       </td>
     </tr>
@@ -146,7 +105,7 @@
       <td>
       </td>
       {% for field in pec_sam_form.part1_form_fields %}
-            <td>{{ field }}</td>
+          {% include '_field_cell.html' with field=field %}
       {% endfor %}
       <td>
       </td>
@@ -158,7 +117,7 @@
       <td>
       </td>
       {% for field in pec_sam_form.part1_form_fields %}
-            <td>{{ field }}</td>
+             {% include '_field_cell.html' with field=field %}
       {% endfor %}
       <td>
       </td>
@@ -169,7 +128,7 @@
       <td>
       </td>
       {% for field in pec_sam_form.part1_form_fields %}
-            <td>{{ field }}</td>
+             {% include '_field_cell.html' with field=field %}
       {% endfor %}
       <td>
       </td>
@@ -184,25 +143,11 @@
     </tr>
     <tr>
       <th>6-59 mois
-      </th>
       <td>
       </td>
-      <td>
-      </td>
-      <td>
-      </td>
-      <td>
-      </td>
-      <td>
-      </td>
-      <td>
-      </td>
-      <td>
-      </td>
-      <td>
-      </td>
-      <td>
-      </td>
+      {% for field in pec_mam_form.part1_form_fields %}
+          {% include '_field_cell.html' with field=field %}
+      {% endfor %}
       <td>
       </td>
     </tr>
@@ -210,22 +155,9 @@
       <th>FE/FA</th>
       <td>
       </td>
-      <td>
-      </td>
-      <td>
-      </td>
-      <td>
-      </td>
-      <td>
-      </td>
-      <td>
-      </td>
-      <td>
-      </td>
-      <td>
-      </td>
-      <td>
-      </td>
+      {% for field in pec_mam_form.part1_form_fields %}
+          {% include '_field_cell.html' with field=field %}
+      {% endfor %}
       <td>
       </td>
     </tr>
@@ -233,22 +165,9 @@
       <th>Suivi de 1 et 2</th>
       <td>
       </td>
-      <td>
-      </td>
-      <td>
-      </td>
-      <td>
-      </td>
-      <td>
-      </td>
-      <td>
-      </td>
-      <td>
-      </td>
-      <td>
-      </td>
-      <td>
-      </td>
+      {% for field in pec_mam_form.part1_form_fields %}
+          {% include '_field_cell.html' with field=field %}
+      {% endfor %}
       <td>
       </td>
     </tr>
@@ -258,25 +177,10 @@
     <tr>
       <th>Total</th>
       <td>
-      </td>
+      {% for field in pec_mam_form.part1_total_fields %}
+          <td>{{ field }}</td>
+      {% endfor %}
       <td>
-      </td>
-      <td>
-      </td>
-      <td>
-      </td>
-      <td>
-      </td>
-      <td>
-      </td>
-      <td>
-      </td>
-      <td>
-      </td>
-      <td>
-      </td>
-      <td>
-      </td>
     </tr>
 
   </tbody>
@@ -328,63 +232,42 @@
     </tr>
     <tr>
       <th>&lt; 6 mois
-      </th>
-      <td>
-      </td>
-      <td>
-      </td>
-      <td>
-      </td>
-      <td>
-      </td>
-      <td>
-      </td>
-      <td>
-      </td>
-      <td>
-      </td>
-      <td>
-      </td>
+      {% with fields=pec_samp_form.part2_form_fields %}
+             {% include '_field_cell.html' with field=fields.next %}
+             {% include '_field_cell.html' with field=fields.next %}
+             {% include '_field_cell.html' with field=fields.next %}
+             {% include '_field_cell.html' with field=fields.next %}
+             {% include '_field_cell.html' with field=fields.next %}
+            <td></td>
+             {% include '_field_cell.html' with field=fields.next %}
+             {% include '_field_cell.html' with field=fields.next %}
+      {% endwith %}
     </tr>
     <tr>
-      <th> 6-59 mois
-      </th>
-      <td>
-      </td>
-      <td>
-      </td>
-      <td>
-      </td>
-      <td>
-      </td>
-      <td>
-      </td>
-      <td>
-      </td>
-      <td>
-      </td>
-      <td>
-      </td>
+      <th> 6-59 mois</th>
+      {% with fields=pec_samp_form.part2_form_fields %}
+             {% include '_field_cell.html' with field=fields.next %}
+             {% include '_field_cell.html' with field=fields.next %}
+             {% include '_field_cell.html' with field=fields.next %}
+             {% include '_field_cell.html' with field=fields.next %}
+             {% include '_field_cell.html' with field=fields.next %}
+            <td></td>
+             {% include '_field_cell.html' with field=fields.next %}
+             {% include '_field_cell.html' with field=fields.next %}
+      {% endwith %}
     </tr>
     <tr>
-      <th>&gt; 59 mois
-      </th>
-      <td>
-      </td>
-      <td>
-      </td>
-      <td>
-      </td>
-      <td>
-      </td>
-      <td>
-      </td>
-      <td>
-      </td>
-      <td>
-      </td>
-      <td>
-      </td>
+      <th>&gt; 59 mois</th>
+      {% with fields=pec_samp_form.part2_form_fields %}
+             {% include '_field_cell.html' with field=fields.next %}
+             {% include '_field_cell.html' with field=fields.next %}
+             {% include '_field_cell.html' with field=fields.next %}
+             {% include '_field_cell.html' with field=fields.next %}
+             {% include '_field_cell.html' with field=fields.next %}
+            <td></td>
+             {% include '_field_cell.html' with field=fields.next %}
+             {% include '_field_cell.html' with field=fields.next %}
+      {% endwith %}
     </tr>
 
     {% endif %}
@@ -399,14 +282,14 @@
       <th>6-59 mois
       </th>
       {% with fields=pec_sam_form.part2_form_fields %}
-            <td>{{ fields.next }}</td>
-            <td>{{ fields.next }}</td>
-            <td>{{ fields.next }}</td>
-            <td>{{ fields.next }}</td>
-            <td>{{ fields.next }}</td>
+             {% include '_field_cell.html' with field=fields.next %}
+             {% include '_field_cell.html' with field=fields.next %}
+             {% include '_field_cell.html' with field=fields.next %}
+             {% include '_field_cell.html' with field=fields.next %}
+             {% include '_field_cell.html' with field=fields.next %}
             <td></td>
-            <td>{{ fields.next }}</td>
-            <td>{{ fields.next }}</td>
+             {% include '_field_cell.html' with field=fields.next %}
+             {% include '_field_cell.html' with field=fields.next %}
       {% endwith %}
     </tr>
 
@@ -414,14 +297,14 @@
       <th>&gt; 59 mois
       </th>
       {% with fields=pec_sam_form.part2_form_fields %}
-            <td>{{ fields.next }}</td>
-            <td>{{ fields.next }}</td>
-            <td>{{ fields.next }}</td>
-            <td>{{ fields.next }}</td>
-            <td>{{ fields.next }}</td>
+             {% include '_field_cell.html' with field=fields.next %}
+             {% include '_field_cell.html' with field=fields.next %}
+             {% include '_field_cell.html' with field=fields.next %}
+             {% include '_field_cell.html' with field=fields.next %}
+             {% include '_field_cell.html' with field=fields.next %}
             <td></td>
-            <td>{{ fields.next }}</td>
-            <td>{{ fields.next }}</td>
+             {% include '_field_cell.html' with field=fields.next %}
+             {% include '_field_cell.html' with field=fields.next %}
       {% endwith %}
     </tr>
 
@@ -430,14 +313,14 @@
       </td>
 
       {% with fields=pec_sam_form.part2_form_fields %}
-            <td>{{ fields.next }}</td>
-            <td>{{ fields.next }}</td>
-            <td>{{ fields.next }}</td>
-            <td>{{ fields.next }}</td>
-            <td>{{ fields.next }}</td>
+             {% include '_field_cell.html' with field=fields.next %}
+             {% include '_field_cell.html' with field=fields.next %}
+             {% include '_field_cell.html' with field=fields.next %}
+             {% include '_field_cell.html' with field=fields.next %}
+             {% include '_field_cell.html' with field=fields.next %}
             <td></td>
-            <td>{{ fields.next }}</td>
-            <td>{{ fields.next }}</td>
+             {% include '_field_cell.html' with field=fields.next %}
+             {% include '_field_cell.html' with field=fields.next %}
       {% endwith %}
     </tr>
 
@@ -452,62 +335,44 @@
     <tr>
       <th>6-59 mois
       </th>
-      <td>
-      </td>
-      <td>
-      </td>
-      <td>
-      </td>
-      <td>
-      </td>
-      <td>
-      </td>
-      <td>
-      </td>
-      <td>
-      </td>
-      <td>
-      </td>
+      {% with fields=pec_mam_form.part2_form_fields %}
+             {% include '_field_cell.html' with field=fields.next %}
+             {% include '_field_cell.html' with field=fields.next %}
+             {% include '_field_cell.html' with field=fields.next %}
+             {% include '_field_cell.html' with field=fields.next %}
+             {% include '_field_cell.html' with field=fields.next %}
+            <td></td>
+             {% include '_field_cell.html' with field=fields.next %}
+             {% include '_field_cell.html' with field=fields.next %}
+      {% endwith %}
     </tr>
     <tr>
       <th>FE/FA
       </th>
-      <td>
-      </td>
-      <td>
-      </td>
-      <td>
-      </td>
-      <td>
-      </td>
-      <td>
-      </td>
-      <td>
-      </td>
-      <td>
-      </td>
-      <td>
-      </td>
+      {% with fields=pec_mam_form.part2_form_fields %}
+             {% include '_field_cell.html' with field=fields.next %}
+             {% include '_field_cell.html' with field=fields.next %}
+             {% include '_field_cell.html' with field=fields.next %}
+             {% include '_field_cell.html' with field=fields.next %}
+             {% include '_field_cell.html' with field=fields.next %}
+            <td></td>
+             {% include '_field_cell.html' with field=fields.next %}
+             {% include '_field_cell.html' with field=fields.next %}
+      {% endwith %}
     </tr>
     <tr>
       <th>Suivi de 1 et 2
       </th>
-      <td>
-      </td>
-      <td>
-      </td>
-      <td>
-      </td>
-      <td>
-      </td>
-      <td>
-      </td>
-      <td>
-      </td>
-      <td>
-      </td>
-      <td>
-      </td>
+      {% with fields=pec_mam_form.part2_form_fields %}
+             {% include '_field_cell.html' with field=fields.next %}
+             {% include '_field_cell.html' with field=fields.next %}
+             {% include '_field_cell.html' with field=fields.next %}
+             {% include '_field_cell.html' with field=fields.next %}
+             {% include '_field_cell.html' with field=fields.next %}
+            <td></td>
+             {% include '_field_cell.html' with field=fields.next %}
+             {% include '_field_cell.html' with field=fields.next %}
+      {% endwith %}
     </tr>
 
     {% endif %}
@@ -515,22 +380,9 @@
     <tr>
       <th>Total
       </th>
-      <td>
-      </td>
-      <td>
-      </td>
-      <td>
-      </td>
-      <td>
-      </td>
-      <td>
-      </td>
-      <td>
-      </td>
-      <td>
-      </td>
-      <td>
-      </td>
+      {% for field in pec_mam_form.part2_total_fields %}
+          <td>{{ field }}</td>
+      {% endfor %}
     </tr>
   </tbody>
 </table>
@@ -587,123 +439,65 @@
     {% if pec_samp_report %}
 
     <tr>
-      <th colspan="14" >URENI 1
-      </th>
-      </td>
-      <td>
-      </td>
-      <td>
-      </td>
-      <td>
-      </td>
-      <td>
-      </td>
-      <td>
-      </td>
-      <td>
-      </td>
-      <td>
-      </td>
-      <td>
-      </td>
-      <td>
-      </td>
-      <td>
-      </td>
-      <td>
-      </td>
-      <td>
-      </td>
+      <th colspan="14" >URENI 1</th>
     </tr>
+
     <tr>
-      <th>&lt; 6 mois
-      </th>
-      <td>
-      </td>
-      <td>
-      </td>
-      <td>
-      </td>
-      <td>
-      </td>
-      <td>
-      </td>
-      <td>
-      </td>
-      <td>
-      </td>
-      <td>
-      </td>
-      <td>
-      </td>
-      <td>
-      </td>
-      <td>
-      </td>
-      <td>
-      </td>
-      <td>
-      </td>
+      <th>&lt; 6 mois</th>
+      {% with fields=pec_samp_form.part3_form_fields %}
+            {% include '_field_cell.html' with field=fields.next %}
+            {% include '_field_cell.html' with field=fields.next %}
+            {% include '_field_cell.html' with field=fields.next %}
+            {% include '_field_cell.html' with field=fields.next %}
+            {% include '_field_cell.html' with field=fields.next %}
+            {% include '_field_cell.html' with field=fields.next %}
+            {% include '_field_cell.html' with field=fields.next %}
+            <td></td>
+             {% include '_field_cell.html' with field=fields.next %}
+             {% include '_field_cell.html' with field=fields.next %}
+      {% endwith %}
+      <td></td>
+      <td></td>
+      <td></td>
     </tr>
+
     <tr>
-      <th> 6-59 mois
-      </th>
-      <td>
-      </td>
-      <td>
-      </td>
-      <td>
-      </td>
-      <td>
-      </td>
-      <td>
-      </td>
-      <td>
-      </td>
-      <td>
-      </td>
-      <td>
-      </td>
-      <td>
-      </td>
-      <td>
-      </td>
-      <td>
-      </td>
-      <td>
-      </td>
-      <td>
-      </td>
+      <th> 6-59 mois</th>
+      {% with fields=pec_samp_form.part3_form_fields %}
+            {% include '_field_cell.html' with field=fields.next %}
+            {% include '_field_cell.html' with field=fields.next %}
+            {% include '_field_cell.html' with field=fields.next %}
+            {% include '_field_cell.html' with field=fields.next %}
+            {% include '_field_cell.html' with field=fields.next %}
+            {% include '_field_cell.html' with field=fields.next %}
+            {% include '_field_cell.html' with field=fields.next %}
+            <td></td>
+             {% include '_field_cell.html' with field=fields.next %}
+             {% include '_field_cell.html' with field=fields.next %}
+      {% endwith %}
+      <td></td>
+      <td></td>
+      <td></td>
     </tr>
+
     <tr>
-      <th><span>&gt; 59 mois </span>
+      <th>&gt; 59 mois
       </th>
-      <td>
-      </td>
-      <td>
-      </td>
-      <td>
-      </td>
-      <td>
-      </td>
-      <td>
-      </td>
-      <td>
-      </td>
-      <td>
-      </td>
-      <td>
-      </td>
-      <td>
-      </td>
-      <td>
-      </td>
-      <td>
-      </td>
-      <td>
-      </td>
-      <td>
-      </td>
+      {% with fields=pec_samp_form.part3_form_fields %}
+            {% include '_field_cell.html' with field=fields.next %}
+            {% include '_field_cell.html' with field=fields.next %}
+            {% include '_field_cell.html' with field=fields.next %}
+            {% include '_field_cell.html' with field=fields.next %}
+            {% include '_field_cell.html' with field=fields.next %}
+            {% include '_field_cell.html' with field=fields.next %}
+            {% include '_field_cell.html' with field=fields.next %}
+            <td></td>
+             {% include '_field_cell.html' with field=fields.next %}
+             {% include '_field_cell.html' with field=fields.next %}
+      {% endwith %}
+      <td></td>
+      <td></td>
+      <td></td>
     </tr>
 
     {% endif %}
@@ -714,96 +508,67 @@
       <th  colspan="14" >URENAS 2
       </th>
     </tr>
+
     <tr>
       <th>&lt; 6 mois
       </th>
-      <td>
-      </td>
-      <td>
-      </td>
-      <td>
-      </td>
-      <td>
-      </td>
-      <td>
-      </td>
-      <td>
-      </td>
-      <td>
-      </td>
-      <td>
-      </td>
-      <td>
-      </td>
-      <td>
-      </td>
-      <td>
-      </td>
-      <td>
-      </td>
-      <td>
-      </td>
+      {% with fields=pec_sam_form.part3_form_fields %}
+            {% include '_field_cell.html' with field=fields.next %}
+            {% include '_field_cell.html' with field=fields.next %}
+            {% include '_field_cell.html' with field=fields.next %}
+            {% include '_field_cell.html' with field=fields.next %}
+            {% include '_field_cell.html' with field=fields.next %}
+            {% include '_field_cell.html' with field=fields.next %}
+            {% include '_field_cell.html' with field=fields.next %}
+            <td></td>
+             {% include '_field_cell.html' with field=fields.next %}
+             {% include '_field_cell.html' with field=fields.next %}
+      {% endwith %}
+      <td></td>
+      <td></td>
+      <td></td>
     </tr>
+
     <tr>
       <th>6-59 mois
       </th>
-      <td>
-      </td>
-      <td>
-      </td>
-      <td>
-      </td>
-      <td>
-      </td>
-      <td>
-      </td>
-      <td>
-      </td>
-      <td>
-      </td>
-      <td>
-      </td>
-      <td>
-      </td>
-      <td>
-      </td>
-      <td>
-      </td>
-      <td>
-      </td>
-      <td>
-      </td>
+      {% with fields=pec_sam_form.part3_form_fields %}
+            {% include '_field_cell.html' with field=fields.next %}
+            {% include '_field_cell.html' with field=fields.next %}
+            {% include '_field_cell.html' with field=fields.next %}
+            {% include '_field_cell.html' with field=fields.next %}
+            {% include '_field_cell.html' with field=fields.next %}
+            {% include '_field_cell.html' with field=fields.next %}
+            {% include '_field_cell.html' with field=fields.next %}
+            <td></td>
+             {% include '_field_cell.html' with field=fields.next %}
+             {% include '_field_cell.html' with field=fields.next %}
+      {% endwith %}
+      <td></td>
+      <td></td>
+      <td></td>
     </tr>
+
     <tr>
       <th>&gt; 59 mois
       </th>
-      <td>
-      </td>
-      <td>
-      </td>
-      <td>
-      </td>
-      <td>
-      </td>
-      <td>
-      </td>
-      <td>
-      </td>
-      <td>
-      </td>
-      <td>
-      </td>
-      <td>
-      </td>
-      <td>
-      </td>
-      <td>
-      </td>
-      <td>
-      </td>
-      <td>
-      </td>
+      {% with fields=pec_sam_form.part3_form_fields %}
+            {% include '_field_cell.html' with field=fields.next %}
+            {% include '_field_cell.html' with field=fields.next %}
+            {% include '_field_cell.html' with field=fields.next %}
+            {% include '_field_cell.html' with field=fields.next %}
+            {% include '_field_cell.html' with field=fields.next %}
+            {% include '_field_cell.html' with field=fields.next %}
+            {% include '_field_cell.html' with field=fields.next %}
+            <td></td>
+             {% include '_field_cell.html' with field=fields.next %}
+             {% include '_field_cell.html' with field=fields.next %}
+      {% endwith %}
+      <td></td>
+      <td></td>
+      <td></td>
     </tr>
+
     <tr>
       <th colspan="14" >Suivi de URENI 1
       </th>
@@ -816,152 +581,88 @@
     <tr>
       <th>URENAM 3
       </th>
-      <td>
-      </td>
-      <td>
-      </td>
-      <td>
-      </td>
-      <td>
-      </td>
-      <td>
-      </td>
-      <td>
-      </td>
-      <td>
-      </td>
-      <td>
-      </td>
-      <td>
-      </td>
-      <td>
-      </td>
-      <td>
-      </td>
-      <td>
-      </td>
-      <td>
-      </td>
+      {% with fields=pec_mam_form.part3_form_fields %}
+            {% include '_field_cell.html' with field=fields.next %}
+            {% include '_field_cell.html' with field=fields.next %}
+            {% include '_field_cell.html' with field=fields.next %}
+            {% include '_field_cell.html' with field=fields.next %}
+            {% include '_field_cell.html' with field=fields.next %}
+            {% include '_field_cell.html' with field=fields.next %}
+            {% include '_field_cell.html' with field=fields.next %}
+            <td></td>
+             {% include '_field_cell.html' with field=fields.next %}
+             {% include '_field_cell.html' with field=fields.next %}
+      {% endwith %}
+      <td></td>
+      <td></td>
+      <td></td>
     </tr>
+
     <tr>
       <th>6-59 mois
       </th>
-      <td>
-      </td>
-      <td>
-      </td>
-      <td>
-      </td>
-      <td>
-      </td>
-      <td>
-      </td>
-      <td>
-      </td>
-      <td>
-      </td>
-      <td>
-      </td>
-      <td>
-      </td>
-      <td>
-      </td>
-      <td>
-      </td>
-      <td>
-      </td>
-      <td>
-      </td>
+      {% with fields=pec_mam_form.part3_form_fields %}
+            {% include '_field_cell.html' with field=fields.next %}
+            {% include '_field_cell.html' with field=fields.next %}
+            {% include '_field_cell.html' with field=fields.next %}
+            {% include '_field_cell.html' with field=fields.next %}
+            {% include '_field_cell.html' with field=fields.next %}
+            {% include '_field_cell.html' with field=fields.next %}
+            {% include '_field_cell.html' with field=fields.next %}
+            <td></td>
+             {% include '_field_cell.html' with field=fields.next %}
+             {% include '_field_cell.html' with field=fields.next %}
+      {% endwith %}
+      <td></td>
+      <td></td>
+      <td></td>
     </tr>
+
     <tr>
       <th>FE/FA
-      </th>
-      <td>
-      </td>
-      <td>
-      </td>
-      <td>
-      </td>
-      <td>
-      </td>
-      <td>
-      </td>
-      <td>
-      </td>
-      <td>
-      </td>
-      <td>
-      </td>
-      <td>
-      </td>
-      <td>
-      </td>
-      <td>
-      </td>
-      <td>
-      </td>
-      <td>
-      </td>
+      {% with fields=pec_mam_form.part3_form_fields %}
+            {% include '_field_cell.html' with field=fields.next %}
+            {% include '_field_cell.html' with field=fields.next %}
+            {% include '_field_cell.html' with field=fields.next %}
+            {% include '_field_cell.html' with field=fields.next %}
+            {% include '_field_cell.html' with field=fields.next %}
+            {% include '_field_cell.html' with field=fields.next %}
+            {% include '_field_cell.html' with field=fields.next %}
+            <td></td>
+             {% include '_field_cell.html' with field=fields.next %}
+             {% include '_field_cell.html' with field=fields.next %}
+      {% endwith %}
+      <td></td>
+      <td></td>
+      <td></td>
     </tr>
+
     <tr>
       <th>Suivi de 1 et 2
       </th>
-      <td>
-      </td>
-      <td>
-      </td>
-      <td>
-      </td>
-      <td>
-      </td>
-      <td>
-      </td>
-      <td>
-      </td>
-      <td>
-      </td>
-      <td>
-      </td>
-      <td>
-      </td>
-      <td>
-      </td>
-      <td>
-      </td>
-      <td>
-      </td>
-      <td>
-      </td>
+      {% with fields=pec_mam_form.part3_form_fields %}
+            {% include '_field_cell.html' with field=fields.next %}
+            {% include '_field_cell.html' with field=fields.next %}
+            {% include '_field_cell.html' with field=fields.next %}
+            {% include '_field_cell.html' with field=fields.next %}
+            {% include '_field_cell.html' with field=fields.next %}
+            {% include '_field_cell.html' with field=fields.next %}
+            {% include '_field_cell.html' with field=fields.next %}
+            <td></td>
+             {% include '_field_cell.html' with field=fields.next %}
+             {% include '_field_cell.html' with field=fields.next %}
+      {% endwith %}
+      <td></td>
+      <td></td>
+      <td></td>
     </tr>
+
     <tr>
       <th>Total
       </th>
-      <td>
-      </td>
-      <td>
-      </td>
-      <td>
-      </td>
-      <td>
-      </td>
-      <td>
-      </td>
-      <td>
-      </td>
-      <td>
-      </td>
-      <td>
-      </td>
-      <td>
-      </td>
-      <td>
-      </td>
-      <td>
-      </td>
-      <td>
-      </td>
-      <td>
-      </td>
+      {% for field in pec_mam_form.part3_total_fields %}
+          <td>{{ field }}</td>
+      {% endfor %}
     </tr>
 
     {% endif %}

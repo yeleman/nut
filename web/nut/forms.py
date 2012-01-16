@@ -33,15 +33,16 @@ class BasePECForm(object):
                       'nut_referred_in',
                       'admitted_m',
                       'admitted_f',)
-                      # 'healed',
-                      # 'referred_out',
-                      # 'deceased',
-                      # 'aborted',
-                      # 'non_respondant',
-                      # 'medic_transfered_out',
-                      # 'nut_transfered_out',
-                      # 'total_out_m',
-                      # 'total_out_f')
+
+    part3_suffixes = ('healed',
+                      'referred_out',
+                      'deceased',
+                      'aborted',
+                      'non_respondant',
+                      'medic_transfered_out',
+                      'nut_transfered_out',
+                      'total_out_m',
+                      'total_out_f')
 
 
     def field_names_matrix(self, prefixes=None, suffixes=None):
@@ -51,6 +52,7 @@ class BasePECForm(object):
         """
         prefixes = prefixes if prefixes is not None else self.prefixes
         suffixes = suffixes if suffixes is not None else self.suffixes
+
         for prefix in prefixes:
             for suffix in suffixes:
                 yield '%s_%s' % (prefix, suffix)
@@ -61,6 +63,8 @@ class BasePECForm(object):
             Return a generator that allows you to loop over all field in the
             form. If the field doesn't exist, return the default value.
         """
+        if prefixes == ('all',):
+          import ipdb; ipdb.set_trace()
         names = self.field_names_matrix(prefixes, suffixes)
         for name in names:
             try:
@@ -69,58 +73,94 @@ class BasePECForm(object):
                 yield default
 
 
-    def part1_form_fields(self, prefixes=None, suffixes=None,
-                          default=None, refresh=False):
+    def cycle_fields(self, func, fields, cycle_size, refresh=False):
         """
-            Return a generator that allow you to loop over all field of
-            the first part of the forms since in the template we had to
-            devide the form in two tables.
+            Allow to cycle through fields in 3 iterations instead of ones
+            This method does just the slicing and the cache, you
+            need to pass another method to it so its results get sliced.
+        """
 
-            The generator is cached to avoid having to set a variable
-            which is hard to do in a template. We use itertools
-            functions to make the fields comme in 3 rounds, in a cycle.
-        """
-        cache_key = self.__class__.__name__ + '.part1_form_fields'
+        cache_key = self.__class__.__name__ + '.' + func.__name__
+
         if cache_key not in self._cache or refresh:
-            fields = list(self.fields_matrix(self.prefixes,
-                                             self.part1_suffixes,
-                                             default))
-            l = len(self.part1_suffixes)
-
-            self._cache[cache_key] = (x for x in (islice(fields, l),
-                                                  islice(fields, l, l * 2),
-                                                  islice(fields, l * 2, l * 3)))
+            self._cache[cache_key] = (x for x in (
+                        islice(fields, cycle_size),
+                        islice(fields, cycle_size, cycle_size * 2),
+                        islice(fields, cycle_size * 2, cycle_size * 3))
+            )
 
         try:
           return self._cache[cache_key].next()
         except StopIteration:
-          return self.part1_form_fields(prefixes, suffixes, default, True)
+          return self.cycle_fields(func, fields, cycle_size, True)
+
+
+    def part1_form_fields(self, prefixes=None, suffixes=None,
+                          default=None, refresh=False):
+        """
+            Return a generator that allow you to loop over all fields of
+            the first part of the forms since in the template we had to
+            devide the form in 3 tables.
+
+
+        """
+        fields = list(self.fields_matrix(self.prefixes,
+                                         self.part1_suffixes,
+                                         default))
+        return self.cycle_fields(self.part1_form_fields,
+                                 fields, len(self.part1_suffixes),
+                                 refresh=refresh)
+
 
 
     def part2_form_fields(self, prefixes=None, suffixes=None, default=None,
                           refresh=False):
         """
-            Return a generator that allow you to loop over all field of
+            Return a generator that allow you to loop over all fields of
             the second part of the forms since in the template we had to
-            devide the form in two tables.
-
-            The generator is cached to avoid having to set a variable
-            which is hard to do in a template. To avoid problem with
-            generator exhaustion, we wrap the generator into itertoos.cycle
+            devide the form in 3 tables.
         """
-        cache_key = self.__class__ .__name__+ '.part2_form_fields'
-        if cache_key not in self._cache or refresh:
-            fields = list(self.fields_matrix(self.prefixes,
-                                             self.part2_suffixes,
-                                             default))
-            l = len(self.part2_suffixes)
-            self._cache[cache_key] = (x for x in (islice(fields, l),
-                                                  islice(fields, l, l * 2),
-                                                  islice(fields, l * 2, l * 3)))
-        try:
-          return self._cache[cache_key].next()
-        except StopIteration:
-          return self.part2_form_fields(prefixes, suffixes, default, True)
+        fields = list(self.fields_matrix(self.prefixes,
+                                         self.part2_suffixes,
+                                         default))
+        return self.cycle_fields(self.part2_form_fields,
+                                 fields, len(self.part2_suffixes),
+                                 refresh=refresh)
+
+
+    def part3_form_fields(self, prefixes=None, suffixes=None, default=None,
+                          refresh=False):
+        """
+            Return a generator that allow you to loop over all fields of
+            the third part of the forms since in the template we had to
+            devide the form in 3 tables.
+        """
+        fields = list(self.fields_matrix(self.prefixes,
+                                         self.part3_suffixes,
+                                         default))
+        return self.cycle_fields(self.part3_form_fields,
+                                 fields, len(self.part3_suffixes),
+                                 refresh=refresh)
+
+
+    def part_total_fields(self, suffixes, default=None):
+        """
+            Return a generator that allow you to loop over total fields
+        """
+        for name in self.field_names_matrix(('all',), suffixes):
+            yield getattr(self.instance, name, default)
+
+
+    def part1_total_fields(self, default=None):
+        return self.part_total_fields(self.part1_suffixes, default)
+
+
+    def part2_total_fields(self, default=None):
+        return self.part_total_fields(self.part2_suffixes, default)
+
+
+    def part3_total_fields(self, default=None):
+        return self.part_total_fields(self.part3_suffixes, default)
 
 
 
