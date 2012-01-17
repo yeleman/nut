@@ -99,112 +99,6 @@ class ReportPeriodWidget(QtGui.QDialog, NUTWidget):
         self.close()
 
 
-def build_data_from(parent, report, readonly):
-
-    data = []
-    cols = 10
-    def blank_line():
-        return [BlankCell(parent) for x in range(0, cols)]
-
-    # Add SAMP section
-    if report.is_samp:
-        # add blank line for SAM section header
-        data.append(blank_line())
-
-        # retrieve sam report
-        sampr = report.pec_samp_report
-        #parent.
-
-        for age in ('u6', 'u59', 'o59'):
-
-            cells = []
-            cells.append(ReportAutoBeginingTotal(parent, samr, age))
-            cells.append(ReportValueEditItem(parent, 
-                                         samr, '%s_total_beginning_m' % age))
-            cells.append(ReportValueEditItem(parent,
-                                         samr, '%s_total_beginning_f' % age))
-            cells.append(BlankCell(parent))
-            cells.append(BlankCell(parent))
-            for fname in ('hw_u70_bmi_u16', 'muac_u11_muac_u18',
-                          'oedema', 'other'):
-                cells.append(ReportValueEditItem(parent, 
-                                             samr, '%s_%s' % (age, fname)))
-            cells.append(ReportAutoAdmissionTotal(parent, samr, age))
-            
-            data.append(cells)
-
-    # Add SAM section
-    if report.is_sam:
-        # add blank line for SAM section header
-        data.append(blank_line())
-
-        # retrieve sam report
-        samr = report.pec_sam_report
-        #parent.
-
-        for age in ('u59', 'o59', 'fu1'):
-
-            cells = []
-            cells.append(ReportAutoBeginingTotal(parent, samr, age))
-            cells.append(ReportValueEditItem(parent, 
-                                         samr, '%s_total_beginning_m' % age))
-            cells.append(ReportValueEditItem(parent,
-                                         samr, '%s_total_beginning_f' % age))
-            cells.append(BlankCell(parent))
-            cells.append(BlankCell(parent))
-            for fname in ('hw_u70_bmi_u16', 'muac_u11_muac_u18',
-                          'oedema', 'other'):
-                cells.append(ReportValueEditItem(parent, 
-                                             samr, '%s_%s' % (age, fname)))
-            cells.append(ReportAutoAdmissionTotal(parent, samr, age))
-            
-            data.append(cells)
-
-    # Add MAM section
-    if report.is_mam:
-        # add blank line for SAM section header
-        data.append(blank_line())
-
-        # retrieve sam report
-        samr = report.pec_mam_report
-        #parent.
-
-        print('MAM REPORT: %s' % samr)
-
-        for age in ('u59', 'pw', 'fu12'):
-
-            cells = []
-            cells.append(ReportAutoBeginingTotal(parent, samr, age))
-            if age == 'pw':
-                cells.append(BlankCell(parent))
-            else:
-                cells.append(ReportValueEditItem(parent, 
-                                         samr, '%s_total_beginning_m' % age))
-            cells.append(ReportValueEditItem(parent,
-                                         samr, '%s_total_beginning_f' % age))
-
-            cells.append(ReportValueEditItem(parent, 
-                                             samr, '%s_%s' % (age, 'hw_b7080_bmi_u18')))
-
-            cells.append(ReportValueEditItem(parent, 
-                                             samr, '%s_%s' % (age, 'muac_u120')))
-
-            cells.append(BlankCell(parent))
-            cells.append(BlankCell(parent))
-            cells.append(BlankCell(parent))
-
-            cells.append(ReportValueEditItem(parent, 
-                                             samr, '%s_%s' % (age, 'other')))
-
-            cells.append(ReportAutoAdmissionTotal(parent, samr, age))
-            
-            data.append(cells)
-
-    # add total line
-    data.append([ColumnSumItem(parent, None, None) for x in range(0, cols)])
-
-    return data
-
 class ReportWidget(NUTWidget):
 
     title = u"Nutrition Monthly Report"
@@ -212,11 +106,11 @@ class ReportWidget(NUTWidget):
 
     # Report U.I pages. Switch with next() previous()
     PEC_ADM_CRIT = 'pec_adm_crit'
-    PEC_ADM_TYPE = 'pec_adm_type'
+    PEC_ADM_TYP = 'pec_adm_typ'
     PEC_OUT = 'pec_out'
     PEC_RECAP = 'pec_recap'
     CONS_ORDER = 'cons_order'
-    PAGES = [PEC_ADM_CRIT, PEC_ADM_TYPE, PEC_OUT, PEC_RECAP, CONS_ORDER]
+    PAGES = [PEC_ADM_CRIT, PEC_ADM_TYP, PEC_OUT, PEC_RECAP, CONS_ORDER]
 
     def next(self):
         # can't go next if on last page
@@ -236,40 +130,77 @@ class ReportWidget(NUTWidget):
 
     def change_page(self, new_page):
         if not self.can_change_page():
+            QtGui.QMessageBox.warning(self, u"Impossible de changer de page.",
+                              u"Les données en cours ne sont pas correctes." \
+                              u"\nVous devez les corriger pour continuer."),
             return False
 
         print('changing from %s to %s' % (self.current_page, new_page))
         
-        # removes all widgets
-        self.clear_vbox()
-        
-        # build new page UI
-        self.build_ui(new_page)
+        index = self.PAGES.index(new_page)
+        self.stacked_table.setCurrentIndex(index)
+        self.table.load_data(self.readonly)
+        self.table.refresh()
 
         # set current page pointer
         self.current_page = new_page
 
         return True
 
+    @property
+    def table(self):
+        return self.stacked_table.currentWidget().table
+
+    @property
+    def instructions(self):
+        return self.stacked_table.currentWidget().instructions
+
     def clear_vbox(self):
-        for i in range(self.vbox.count()): self.vbox.itemAt(i).widget().close()
+        return
+        for i in range(self.vbox.count()):
+            w = self.vbox.itemAt(i).widget()
+            if hasattr(w, 'close'):
+                w.close()
         
     def get_widgets_for(self, page):
 
         return [self.table, self.title, self.intro]
 
-    def build_ui(self, page):
+    def build_ui(self):
 
-        # launch build_xx method for page
-        if page in self.PAGES:
-            getattr(self, 'build_%s' % page.lower())()
+        self.stacked_table = QtGui.QStackedWidget()
 
+        for lpage in self.PAGES:
+            self.stacked_table.addWidget(getattr(self, 'build_%s' % lpage.lower())(lpage))
+
+        self.current_page = self.PAGES[0]
+        self.table.load_data(self.readonly)
+        self.table.refresh()
+
+        self.continue_button = ContinueWidget(self)
+        #self.continue_button.clicked.connect(self.next)
+        self.vbox.addWidget(self.stacked_table)
+        self.vbox.addStretch(100)
+        #self.vbox.addWidget(self.continue_button)
 
     def can_change_page(self):
         # check if data validates
         # if YES, save and move
         # else trigger alert
-        return True
+        return self.save_and_validate_current_page()
+
+    def save_and_validate_current_page(self):
+        
+        if self.current_page in (self.PEC_ADM_CRIT, self.PEC_ADM_TYP):
+            if self.table.validate():
+                self.table.save()
+                return True
+            else:
+                return False
+
+        # don't know where we at
+        return False
+            
 
     def __init__(self, parent=0, *args, **kwargs):
 
@@ -283,64 +214,80 @@ class ReportWidget(NUTWidget):
 
         self.vbox = QtGui.QVBoxLayout()
 
-        self.continue_button = ContinueWidget(self)
+        self.setLayout(self.vbox)
 
-        
+    def build_pec_adm_crit(self, page):
 
-    def build_pec_adm_crit(self, do=False):
-
-        self.title = PageTitle(_(u"Rapport Statistique Mensuel - Traitement de la malnutrition aiguë") % self.report.period)
-        self.intro = PageIntro(_(u"%(period)s") % {'period': self.report.period})
+        widget = NUTWidget(self)
+        vbox = QtGui.QVBoxLayout()
+        title = PageTitle(_(u"Rapport Statistique Mensuel - Traitement de la malnutrition aiguë") % self.report.period)
+        intro = PageIntro(_(u"%(period)s – PRISE EN CHARGE: Critère d'admissions") % {'period': self.report.period})
 
         # Table
-        self.table = PECADMCRITReportTable(self, self.report, self.current_page)
-        self.table.data = build_data_from(self.table, self.report, self.readonly)
-        self.table.refresh()
-
-
-        # page title
-        self.vbox.addWidget(self.title)
-        self.vbox.addWidget(self.intro)
-        self.vbox.addWidget(self.table)
-        self.vbox.addStretch(50)
-        self.vbox.addWidget(self.continue_button)
-
-        # try to set layout (will silently fail if exist)
-        self.setLayout(self.vbox)
-
-        # set focus to username field
-        self.setFocusProxy(self.table)
-
-    def build_pec_adm_type(self):
-
-        self.title = PageTitle(u"-")
-        self.intro = PageIntro(_(u"%(period)s") % {'period': self.report.period})
-        self.table = ReportTable(self, self.report, self.current_page, 8, 10)
-        self.table.setHorizontalHeaderLabels([u"Total au\ndébut du\nmois",
-                                              u"Dont\nSexe\nM", u"Dont\nSexe\nF",
-                                              u"P/T≥70\n<80%\nIMC<18",
-                                              u"PB<120\nou\nPB<210",
-                                              u"P/T<70%\nou\nIMC<16",
-                                              u"PB<11cm\nou\nPB<18cm",
-                                              u"Œdeme", u"Autre", "TOTAL\nADMIS"])
-        self.table.setVerticalHeaderLabels([u"URENAS 2",
-                                            u"6-59 mois", u"> 59 mois",
-                                            u"Suivi URENI", u"URENAM 3",
-                                            u"6-59 mois", u"FE/FA",
-                                            u"Suivi 1&2", u"TOTAL"])
-
-        # page title
-        self.vbox.addWidget(self.title)
-        self.vbox.addWidget(self.intro)
-        self.vbox.addWidget(self.table)
-        self.vbox.addStretch(50)
-
-        # try to set layout (will silently fail if exist)
-        self.setLayout(self.vbox)
-
-        # set focus to username field
-        self.setFocusProxy(self.table)
+        widget.table = PECADMCRITReportTable(widget, self.report, page)
         
+        widget.instructions = PECADMCRITInstructions(self, widget.table, self.report, page)
+
+        widget.setFocusProxy(widget.table)
+
+        vbox.addWidget(title)
+        vbox.addWidget(intro)
+        vbox.addWidget(widget.table)
+        vbox.addWidget(widget.instructions)
+        vbox.addStretch(50)
+        widget.setLayout(vbox)
+
+        return widget
+
+    def build_pec_adm_typ(self, page):
+
+        widget = NUTWidget(self)
+        vbox = QtGui.QVBoxLayout()
+
+        title = PageTitle(_(u"Rapport Statistique Mensuel - Traitement de la malnutrition aiguë") % self.report.period)
+        intro = PageIntro(_(u"%(period)s – PRISE EN CHARGE: Type d'admissions") % {'period': self.report.period})
+
+        widget.table = PECADMTYPReportTable(widget, self.report, page)
+        widget.instructions = PECADMTYPInstructions(self, widget.table, self.report, page)
+
+        vbox.addWidget(title)
+        vbox.addWidget(intro)
+        vbox.addWidget(widget.table)
+        vbox.addWidget(widget.instructions)
+        vbox.addStretch(50)
+        widget.setLayout(vbox)
+
+        return widget
+
+    def build_pec_out(self, page):
+        widget = NUTWidget(self)
+        vbox = QtGui.QVBoxLayout()
+
+        title = PageTitle(_(u"Rapport Statistique Mensuel - Traitement de la malnutrition aiguë") % self.report.period)
+        intro = PageIntro(_(u"%(period)s – PRISE EN CHARGE: Type d'admissions") % {'period': self.report.period})
+
+        widget.table = PECOUTReportTable(widget, self.report, page)
+        widget.instructions = PECOUTInstructions(self, widget.table, self.report, page)
+
+        vbox.addWidget(title)
+        vbox.addWidget(intro)
+        vbox.addWidget(widget.table)
+        vbox.addWidget(widget.instructions)
+        vbox.addStretch(50)
+        widget.setLayout(vbox)
+        return widget
+
+    def build_pec_recap(self, page):
+        widget = NUTWidget(self)
+        vbox = QtGui.QVBoxLayout()
+        widget.setLayout(vbox)
+        return widget
+
+    def build_cons_order(self, page):
+        widget = NUTWidget(self)
+        vbox = QtGui.QVBoxLayout()
+        widget.setLayout(vbox)
+        return widget
 
     def setup_report_ui(self):
 
@@ -373,9 +320,8 @@ class ReportWidget(NUTWidget):
         # setup default page
         self.current_page = self.PEC_ADM_CRIT
 
-
         # What do we display now?
-        self.build_ui(self.current_page)
+        self.build_ui()
 
 
     @property

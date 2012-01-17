@@ -19,3 +19,13 @@ CONSUMPTION_TABLE = {
         DEFAULT_VERSION: {'f75', 'f100', 'plumpy'},
     }
 }
+
+CAPS = {
+    MODERATE: u"MAM",
+    SEVERE: u"MAS",
+    SEVERE_COMP: u"NI"}
+
+HC_CAPS = {
+    MODERATE: u"URENAM",
+    SEVERE: u"URENAS",
+    SEVERE_COMP: u"URENI"}

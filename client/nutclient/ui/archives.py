@@ -16,7 +16,7 @@ class PECTable(FlexibleReadOnlyTable):
         super(PECTable, self).__init__(parent)
 
         self.data.append((report.all_total_beginning,
-                          report.all_total_admitted,
+                          report.all_admitted,
                           report.all_total_out,
                           report.all_total_end))
         self.hheaders = [u"Début mois", u"Admissions",

@@ -46,6 +46,9 @@ class NUTWidget(QtGui.QWidget):
             if hasattr(w, '_parent'):
                 w = w._parent
                 continue
+            elif hasattr(w, 'parentWidget'):
+                w = w.parentWidget()
+                continue
             else:
                 return None
         return None
@@ -58,11 +61,11 @@ class NUTWidget(QtGui.QWidget):
         pass
 
     def change_main_context(self, context_widget, *args, **kwargs):
-        return self.parentWidget()\
+        return self.main_window\
                           .change_context(context_widget, *args, **kwargs)
 
     def open_dialog(self, dialog, modal=False, *args, **kwargs):
-        return self.parentWidget().open_dialog(dialog, \
+        return self.main_window.open_dialog(dialog, \
                                                modal=modal, *args, **kwargs)
 
     def default_focus(self):
@@ -140,3 +143,28 @@ class LinkButton(QtGui.QPushButton):
 
     def on_command(self):
         self.handler(self.ident)
+
+
+class BoldLabel(QtGui.QLabel):
+
+    def __init__(self, text, parent=None):
+        super(BoldLabel, self).__init__(text, parent)
+        font = QtGui.QFont()
+        font.setBold(True)
+        self.setFont(font)
+        self.setAlignment(Qt.AlignLeft | Qt.AlignVCenter)
+
+class ErrorLabel(QtGui.QLabel):
+
+    def __init__(self, text, parent=None):
+        super(ErrorLabel, self).__init__('', parent)
+        self.setText(text)
+        self.setAlignment(Qt.AlignLeft | Qt.AlignVCenter)
+
+
+class IconLabel(QtGui.QLabel):
+
+    def __init__(self, icon, parent=None):
+        super(IconLabel, self).__init__('', parent)
+        self.setAlignment(Qt.AlignLeft | Qt.AlignVCenter)
+        self.setPixmap(icon)

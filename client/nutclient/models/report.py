@@ -50,7 +50,7 @@ class Report(BaseModel):
 
     def caps(self):
         caps = []
-        for cap in ['mam', 'sam', 'samp']:
+        for cap in ['samp', 'sam', 'mam']:
             if getattr(self, 'hc_is%s' % cap):
                 caps.append(cap)
         return caps

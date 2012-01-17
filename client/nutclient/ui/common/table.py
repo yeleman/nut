@@ -310,11 +310,6 @@ class FlexibleTable(QtGui.QTableWidget):
                 #if not isinstance(self.item(rowid, colid), QtGui.QTableWidgetItem) and not rowid in rows_with_widgets:
                 if isinstance(self.item(rowid, colid), (QtGui.QPushButton, None.__class__)) and not rowid in rows_with_widgets:
                     rows_with_widgets.append(rowid)
-                print('%d %s' % (colid, self.item(rowid, colid)))
-                try:
-                    print('%d %s' % (colid, self.item(rowid, colid)._field))
-                except:
-                    pass
 
         print('rows_with_widgets: %s' % rows_with_widgets)
         
