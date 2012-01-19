@@ -155,12 +155,28 @@ class BoldLabel(QtGui.QLabel):
         self.setFont(font)
         self.setAlignment(Qt.AlignLeft | Qt.AlignVCenter)
 
-class ErrorLabel(QtGui.QLabel):
+'''class ErrorLabel(QtGui.QLabel):
 
     def __init__(self, text, parent=None):
         super(ErrorLabel, self).__init__('', parent)
         self.setText(text)
-        self.setAlignment(Qt.AlignLeft | Qt.AlignVCenter)
+        self.setAlignment(Qt.AlignLeft | Qt.AlignVCenter)'''
+
+
+class SuccessLabel(QtGui.QWidget):
+
+    def __init__(self, text, parent=None):
+        super(SuccessLabel, self).__init__(parent)
+
+        hbox = QtGui.QHBoxLayout()
+        iconl = QtGui.QLabel('', self)
+        iconl.setPixmap(QtGui.QPixmap('images/accept.png'))
+        textl = QtGui.QLabel(text, self)
+        textl.setText(text)
+        textl.setAlignment(Qt.AlignLeft | Qt.AlignVCenter)
+        hbox.addWidget(iconl)
+        hbox.addWidget(textl)
+        self.setLayout(hbox)
 
 
 class IconLabel(QtGui.QLabel):

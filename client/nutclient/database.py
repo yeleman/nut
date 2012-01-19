@@ -6,7 +6,7 @@ from datetime import datetime, date
 from models import (config, Report, ReportHistory, ConsumptionReport,
                     InputConsumptionReport, OrderReport, InputOrderReport,
                     PECMAMReport, PECSAMReport, PECSAMPReport,
-                    User, Period, NUTInput, Message, Setting)
+                    User, Period, NUTInput, Message, Setting, Options)
 
 def load_default_settings():
     for key, value in {'SRV_NUM': '73120896',
@@ -28,6 +28,8 @@ def load_default_inputs():
         if NUTInput.filter(slug=key).count() == 0:
             i = NUTInput(slug=key, name=value)
             i.save()
+
+options = Options()
 
 def setup():
     """ create tables if not exist """

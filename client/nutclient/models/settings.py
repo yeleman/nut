@@ -23,6 +23,18 @@ class Options(dict, object):
         dict.__init__(self, **kwargs)
 
     def __getattribute__(self, name):
+        def update(slug, value):
+            print(slug)
+            print(value)
+            if Setting.filter(slug=name).count():
+                sett = Setting.filter(slug=name).get()
+            else:
+                sett = Setting(slug=name)
+            sett.value = value
+            sett.save()
+            return sett.value
+        if name == 'update':
+            return update
         try:
             return Setting.select().get(slug=name).value
         except:
