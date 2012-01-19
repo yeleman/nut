@@ -23,7 +23,7 @@ class ReportFlexibleTable(FlexibleTable):
         deleg = ReportItemEditorFactory()
         self.setItemDelegate(deleg)
 
-    def get_field(self, field, cap):
+    def get_field(self, field, cap, *args):
         for rowid in self.rows_for_cap(cap):
             for colid in xrange(0, self.columnCount()):
                 cell = self.item(rowid, colid)
@@ -41,6 +41,12 @@ class ReportFlexibleTable(FlexibleTable):
         return self.report.caps()
 
     def get_report_for(self, row, column):
+        return self.item(row, column)._report
+
+    def get_field_for(self, row, column):
+        return self.item(row, column)._field
+
+    '''def get_report_for(self, row, column):
         if self.type in ('pec_adm_crit', 'pec_adm_typ', 'pec_out', 'pec_recap'):
             ind = row / 4
             cap = self.get_caps_from(self.report)[ind]
@@ -65,10 +71,10 @@ class ReportFlexibleTable(FlexibleTable):
     def get_field_for(self, row, column):
 
         age = self.get_age_for(row, column)
-        return '%s_%s' % (age, self.report_fields[column])
+        return '%s_%s' % (age, self.report_fields[column])'''
 
-    def get_field_value(self, fname, cap):
-        field = self.get_field(fname, cap)
+    def get_field_value(self, fname, cap, *args):
+        field = self.get_field(fname, cap, *args)
         if not field:
             return 0
         try:
@@ -140,7 +146,6 @@ class ReportField(FlexibleWidget):
         try:
             return int(self.data(QtCore.Qt.EditRole).toPyObject())
         except Exception as e:
-            print(e)
             return 0
 
     def get_flag(self):
@@ -158,7 +163,7 @@ class ReportField(FlexibleWidget):
 
 class ReportAutoField(ReportField, FlexibleReadOnlyWidget):
 
-    def __init__(self, parent, report, age, *args, **kwargs):
+    def __init__(self, parent, report, field, age, *args, **kwargs):
         super(ReportAutoField, self).__init__("2000")
         
         self.setTextAlignment(Qt.AlignCenter | Qt.AlignVCenter)
@@ -175,6 +180,7 @@ class ReportAutoField(ReportField, FlexibleReadOnlyWidget):
 
         self.parent_table = parent
         self.report = report
+        self.field = field
         self.age = age
 
         # calculate content
@@ -185,7 +191,7 @@ class ReportAutoField(ReportField, FlexibleReadOnlyWidget):
         return int(self.data(QtCore.Qt.EditRole).toPyObject())
 
     def get_flag(self):
-        if self.value > 20:
+        if compare_expected_value(self.report, self.field, self.value):
             return self.WARNING
         return None
 
@@ -243,6 +249,13 @@ class ReportAutoOutTotal(ReportAutoField):
             return None
 
 
+class ReportAutoValueRO(ReportAutoField):
+
+    @property
+    def value(self):
+        return getattr(self.report, self.field, 0)
+
+
 class ReportAutoAdmissionTotal(ReportAutoField):
 
     @property
@@ -253,6 +266,33 @@ class ReportAutoAdmissionTotal(ReportAutoField):
                                   'muac_u11_muac_u18',
                                   'oedema',
                                   'other')])
+
+
+class ReportAutoQuantitiesLeft(ReportAutoField):
+
+    @property
+    def possessed(self):
+        return sum([self.parent_table.get_field_value(fname, self.report.CAP, self.report.nut_input.slug)
+                    for fname in ('initial', 'received')])
+    @property
+    def consumed(self):
+        return sum([self.parent_table.get_field_value(fname, self.report.CAP, self.report.nut_input.slug)
+                    for fname in ('used', 'lost')])
+
+    @property
+    def value(self):
+        return self.possessed - self.consumed
+
+    @property
+    def is_invalid(self):
+        return self.value < 0
+
+    def get_flag(self):
+        if self.is_invalid:
+            return self.ERROR
+        else:
+            return None
+
 
 class ReportMultipleAutoAdmissionTotal(ReportAutoField):
 
@@ -310,7 +350,7 @@ class ReportMultipleAutoAdmissionTotal(ReportAutoField):
 class ColumnSumItem(ReportAutoField):
 
     def __init__(self, parent, report, age, *args, **kwargs):
-        super(ColumnSumItem, self).__init__(parent, report, age, *args, **kwargs)
+        super(ColumnSumItem, self).__init__(parent, report, None, age, *args, **kwargs)
 
         self.live_refresh()
 
@@ -319,7 +359,11 @@ class ColumnSumItem(ReportAutoField):
         value = 0
         # loop on all rows but last (this one supposedly)
         for rowid in range(0, self.parent_table.rowCount() - 1):
-            value += self.parent_table.item(rowid, self.column()).value
+            try:
+                value += self.parent_table.item(rowid, self.column()).value
+            except AttributeError:
+                # might be a BlankCell
+                pass
         return value
 
 
@@ -382,10 +426,10 @@ class ReportValueEdit(QtGui.QLineEdit):
 
         value = str(getattr(self._report, self._field))
         
-        if self._report.status == self._report.STATUS_CREATED:
-            self.setPlaceholderText(value)
-        else:
-            self.setText(value)
+        #if self._report.status == self._report.STATUS_CREATED:
+        #    self.setPlaceholderText(value)
+        #else:
+        self.setText(value)
 
         self.setValidator(QtGui.QIntValidator(0, 9999, self))
 
@@ -399,7 +443,6 @@ class ReportValueEdit(QtGui.QLineEdit):
         return int(v)
 
     def notify_parent(self):
-        print('notify_parent: ' % self)
         if not self.text():
             self.setText(0)
         self._table.cell_updated(self)
@@ -407,12 +450,13 @@ class ReportValueEdit(QtGui.QLineEdit):
 
 class ReportValueEditItem(QtGui.QTableWidgetItem):
 
-    def __init__(self, parent, report, field):
+    def __init__(self, parent, report, field, age):
         QtGui.QTableWidgetItem.__init__(self, "?", 0)
         
         self._parent = parent
         self._report = report
         self._field = field
+        self._age = age
         self._must_valid = True
 
         self.setTextAlignment(Qt.AlignCenter | Qt.AlignVCenter)

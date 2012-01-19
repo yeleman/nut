@@ -7,12 +7,12 @@ from PyQt4 import QtGui, QtCore
 from PyQt4.QtCore import Qt
 
 
-MAIN_WIDGET_SIZE = 900
+MAIN_WIDGET_SIZE = 1020
 
 
 class NUTWidget(QtGui.QWidget):
 
-    title = "?"
+    title = None
 
     def __init__(self, parent, *args, **kwargs):
 
@@ -22,7 +22,8 @@ class NUTWidget(QtGui.QWidget):
 
         self.setMaximumWidth(MAIN_WIDGET_SIZE)
 
-        self.main_window.setWindowTitle(self.title)
+        if self.title:
+            self.main_window.setWindowTitle(self.title)
 
     def refresh(self):
         pass

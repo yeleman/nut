@@ -25,7 +25,7 @@ class ConsumptionReport(BaseModel):
 
     def __unicode__(self):
         cap = self.nut_type.upper()
-        return ugettext(u"%(cap)s/%(period)s") \
+        return u"%(cap)s/%(period)s" \
                         % {'period': self.report.period,
                            'cap': cap}
 
@@ -95,6 +95,10 @@ class ConsumptionReport(BaseModel):
     def status(self):
         return self.report.status
 
+    @property
+    def CAP(self):
+        return self.nut_type
+
 class InputConsumptionReport(BaseModel):
 
     """ Consumption Quantities for a NUTInput and a ConsumptionReport """
@@ -142,3 +146,7 @@ class InputConsumptionReport(BaseModel):
     @property
     def status(self):
         return self.cons_report.report.status
+
+    @property
+    def CAP(self):
+        return self.cons_report.nut_type

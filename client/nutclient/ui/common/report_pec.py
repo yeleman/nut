@@ -13,11 +13,54 @@ from elements import *
 
 class PECReportTable(ReportFlexibleTable):
 
+    report_type = 'pec'
+
     def __init__(self, parent, report, page):
         super(PECReportTable, self).__init__(parent, report, page)
 
-        self.report_fields = []
+        #self.report_fields = []
+        self.report_field_dict = []
         self.vheaders = self.build_vheaders()
+
+    @property
+    def report_fields(self):
+        return [fd.get('n') for fd in self.report_field_dict]
+
+    def load_data(self, readonly=False):
+        self.data = []
+        cols = len(self.hheaders)
+        def blank_line():
+            return [BlankCell(self) for x in range(0, cols)]
+
+        for cap in self.report.caps():
+            
+            # add a blank line for the section header
+            self.data.append(blank_line())
+
+            cap_report = getattr(self.report, 'get_%s_report' % self.report_type.lower())(cap)
+
+            for age in POPULATIONS_CAP[cap_report.CAP]:
+                cells = []
+                for fdata in self.report_field_dict:
+                    fname = fdata.get('n')
+                    field = fdata.get('f')
+                    readonly = fdata.get('ro')
+
+                    # auto-column, always displayed
+                    if not fname:
+                        cells.append(field(self, cap_report, None, age))
+                    else:
+                        afname = '%s_%s' % (age, fname)
+                        # report doesn't have this field
+                        if not hasattr(cap_report, afname):
+                            cells.append(BlankCell(self))
+                        else:
+                            if not field:
+                                field = ReportValueEditItem
+                            cells.append(field(self, cap_report, afname, age))
+                self.data.append(cells)
+        # add total line
+        self.data.append([ColumnSumItem(self, None, None) for x in range(0, cols)])
 
     def focus_on_data(self):
         for rowid in xrange(0, self.rowCount()):
@@ -56,9 +99,11 @@ class PECReportTable(ReportFlexibleTable):
                 # no report for that cap.
                 continue
             for age, agestr in report.CATEGORIES:
-                for fname in self.report_fields:
-                    # skip None fields (delimiters)
-                    if not fname:
+                for fdata in self.report_field_dict:
+                    fname = fdata.get('n')
+                    readonly = fdata.get('ro')
+                    # skip None fields (delimiters) or read-only ones
+                    if not fname or readonly:
                         continue
                     # skip fields not on that age cat
                     if not hasattr(report, '%s_%s' % (age, fname)):
@@ -79,118 +124,23 @@ class PECADMCRITReportTable(PECReportTable):
                          u"P/T<70%\nou\nIMC<16",
                          u"PB<11cm\nou\nPB<18cm",
                          u"Œdeme", u"Autre", "TOTAL\nADMIS"]
-        self.report_fields = [None,
-                              'total_beginning_m',
-                              'total_beginning_f',
-                              'hw_b7080_bmi_u18',
-                              'muac_u120',
-                              'hw_u70_bmi_u16',
-                              'muac_u11_muac_u18',
-                              'oedema',
-                              'other',
-                              None]
 
-    def load_data(self, readonly=False):
-
-        self.data = []
-        cols = len(self.hheaders)
-        def blank_line():
-            return [BlankCell(self) for x in range(0, cols)]
-        # Add SAMP section
-        if self.report.is_samp:
-            # add blank line for SAM section header
-            self.data.append(blank_line())
-            # retrieve sam report
-            sampr = self.report.pec_samp_report
-            for age in POPULATIONS_CAP[sampr.CAP]:
-                cells = []
-                cells.append(ReportAutoBeginingTotal(self, samr, age))
-                cells.append(ReportValueEditItem(self, 
-                                             samr, '%s_total_beginning_m' % age))
-                cells.append(ReportValueEditItem(self,
-                                             samr, '%s_total_beginning_f' % age))
-                cells.append(BlankCell(self))
-                cells.append(BlankCell(self))
-                for fname in ('hw_u70_bmi_u16', 'muac_u11_muac_u18',
-                              'oedema', 'other'):
-                    cells.append(ReportValueEditItem(self, 
-                                                 samr, '%s_%s' % (age, fname)))
-                cells.append(ReportAutoAdmissionTotal(self, samr, age))
-                
-                self.data.append(cells)
-
-        # Add SAM section
-        if self.report.is_sam:
-            # add blank line for SAM section header
-            self.data.append(blank_line())
-
-            # retrieve sam report
-            samr = self.report.pec_sam_report
-
-            for age in POPULATIONS_CAP[samr.CAP]:
-
-                cells = []
-                cells.append(ReportAutoBeginingTotal(self, samr, age))
-                cells.append(ReportValueEditItem(self, 
-                                             samr, '%s_total_beginning_m' % age))
-                cells.append(ReportValueEditItem(self,
-                                             samr, '%s_total_beginning_f' % age))
-                cells.append(BlankCell(self))
-                cells.append(BlankCell(self))
-                for fname in ('hw_u70_bmi_u16', 'muac_u11_muac_u18',
-                              'oedema', 'other'):
-                    cells.append(ReportValueEditItem(self, 
-                                                 samr, '%s_%s' % (age, fname)))
-                cells.append(ReportAutoAdmissionTotal(self, samr, age))
-                
-                self.data.append(cells)
-
-        # Add MAM section
-        if self.report.is_mam:
-            # add blank line for SAM section header
-            self.data.append(blank_line())
-
-            # retrieve sam report
-            mamr = self.report.pec_mam_report
-
-            for age in POPULATIONS_CAP[mamr.CAP]:
-
-                cells = []
-                cells.append(ReportAutoBeginingTotal(self, mamr, age))
-                if age == 'pw':
-                    cells.append(BlankCell(self))
-                else:
-                    cells.append(ReportValueEditItem(self, 
-                                             mamr, '%s_total_beginning_m' % age))
-                cells.append(ReportValueEditItem(self,
-                                             mamr, '%s_total_beginning_f' % age))
-
-                cells.append(ReportValueEditItem(self, 
-                                                 mamr, '%s_%s' % (age, 'hw_b7080_bmi_u18')))
-
-                cells.append(ReportValueEditItem(self, 
-                                                 mamr, '%s_%s' % (age, 'muac_u120')))
-
-                cells.append(BlankCell(self))
-                cells.append(BlankCell(self))
-                cells.append(BlankCell(self))
-
-                cells.append(ReportValueEditItem(self, 
-                                                 mamr, '%s_%s' % (age, 'other')))
-
-                cells.append(ReportAutoAdmissionTotal(self, mamr, age))
-                
-                self.data.append(cells)
-
-        # add total line
-        self.data.append([ColumnSumItem(self, None, None) for x in range(0, cols)])
+        self.report_field_dict = [{'f': ReportAutoBeginingTotal},
+                                  {'n': 'total_beginning_m'},
+                                  {'n': 'total_beginning_f'},
+                                  {'n': 'hw_b7080_bmi_u18'},
+                                  {'n': 'muac_u120'},
+                                  {'n': 'hw_u70_bmi_u16'},
+                                  {'n': 'muac_u11_muac_u18'},
+                                  {'n': 'oedema'},
+                                  {'n': 'other'},
+                                  {'f': ReportAutoAdmissionTotal}]
 
     def validate(self):
 
         # nothing to validate. All by-criteria admitted must be equal to
         # the total on next stage though.
         return True
-
 
 
 class PECADMTYPReportTable(PECReportTable):
@@ -208,141 +158,17 @@ class PECADMTYPReportTable(PECReportTable):
                          u"TOTAL\nADMIS",
                          u"Dont\nSexe\nM", u"Dont\nSexe\nF"]
 
-        self.report_fields = [None, None, None,
-                              'new_case',
-                              'relapse',
-                              'returned',
-                              'nut_transfered_in',
-                              'nut_referred_in',
-                               None,
-                              'admitted_m',
-                              'admitted_f']
-
-    def load_data(self, readonly=False):
-
-        self.data = []
-        cols = len(self.hheaders)
-        def blank_line():
-            return [BlankCell(self) for x in range(0, cols)]
-
-        # Add SAMP section
-        if self.report.is_samp:
-            # add blank line for SAM section header
-            self.data.append(blank_line())
-
-            # retrieve sam report
-            sampr = self.report.pec_samp_report
-
-            for age in POPULATIONS_CAP[sampr.CAP]:
-
-                cells = []
-                cells.append(ReportAutoBeginingTotal(self, sampr, age))
-                cells.append(ReportAutoCustomField(self, 
-                                     sampr, '%s_total_beginning_m' % age, age))
-                cells.append(ReportAutoCustomField(self,
-                                     sampr, '%s_total_beginning_f' % age, age))
-
-                for fname in ('new_case', 'relapse',
-                              'returned', 'nut_transfered_in'):
-                              
-                    cells.append(ReportValueEditItem(self, 
-                                                 sampr, '%s_%s' % (age, fname)))
-
-                cells.append(BlankCell(self))
-
-                cells.append(ReportMultipleAutoAdmissionTotal(self, sampr, age))
-
-                cells.append(ReportValueEditItem(self, 
-                                           sampr, '%s_%s' % (age, 'admitted_m')))
-
-                cells.append(ReportValueEditItem(self, 
-                                           sampr, '%s_%s' % (age, 'admitted_f')))
-                
-                self.data.append(cells)
-                #self.data.append(blank_line())
-
-        # Add SAM section
-        if self.report.is_sam:
-            # add blank line for SAM section header
-            self.data.append(blank_line())
-
-            # retrieve sam report
-            samr = self.report.pec_sam_report
-
-            for age in POPULATIONS_CAP[samr.CAP]:
-
-                cells = []
-                cells.append(ReportAutoBeginingTotal(self, samr, age))
-                cells.append(ReportAutoCustomField(self, 
-                                      samr, '%s_total_beginning_m' % age, age))
-                cells.append(ReportAutoCustomField(self,
-                                      samr, '%s_total_beginning_f' % age, age))
-
-                for fname in ('new_case', 'relapse',
-                              'returned', 'nut_transfered_in',
-                              'nut_referred_in'):
-                    cells.append(ReportValueEditItem(self, 
-                                                 samr, '%s_%s' % (age, fname)))
-
-                cells.append(ReportMultipleAutoAdmissionTotal(self, samr, age))
-
-                cells.append(ReportValueEditItem(self, 
-                                           samr, '%s_%s' % (age, 'admitted_m')))
-
-                cells.append(ReportValueEditItem(self, 
-                                           samr, '%s_%s' % (age, 'admitted_f')))
-                
-                self.data.append(cells)
-
-        # Add MAM section
-        if self.report.is_mam:
-            # add blank line for SAM section header
-            self.data.append(blank_line())
-
-            # retrieve sam report
-            mamr = self.report.pec_mam_report
-
-            for age in POPULATIONS_CAP[mamr.CAP]:
-
-                cells = []
-                cells.append(ReportAutoBeginingTotal(self, mamr, age))
-
-                if age == 'pw':
-                    cells.append(BlankCell(self))
-                else:
-                    cells.append(ReportAutoCustomField(self, 
-                                       mamr, '%s_total_beginning_m' % age, age))
-                cells.append(ReportAutoCustomField(self,
-                                       mamr, '%s_total_beginning_f' % age, age))
-
-                for fname in ('new_case', 'relapse',
-                              'returned'):
-                    if age == 'fu12':
-                        cells.append(BlankCell(self))
-                    else:
-                        cells.append(ReportValueEditItem(self, 
-                                                 mamr, '%s_%s' % (age, fname)))
-                cells.append(BlankCell(self))
-
-                cells.append(ReportValueEditItem(self, 
-                                     mamr, '%s_%s' % (age, 'nut_referred_in')))
-
-                
-                cells.append(ReportMultipleAutoAdmissionTotal(self, mamr, age))
-                if age == 'pw':
-                    cells.append(BlankCell(self))
-                else:
-                    cells.append(ReportValueEditItem(self, 
-                                           mamr, '%s_%s' % (age, 'admitted_m')))
-
-                cells.append(ReportValueEditItem(self, 
-                                           mamr, '%s_%s' % (age, 'admitted_f')))
-                
-                self.data.append(cells)
-                #self.data.append(blank_line())
-
-        # add total line
-        self.data.append([ColumnSumItem(self, None, None) for x in range(0, cols)])
+        self.report_field_dict = [{'f': ReportAutoBeginingTotal},
+                                  {'n': 'total_beginning_m', 'f': ReportAutoCustomField, 'ro': True},
+                                  {'n': 'total_beginning_f', 'f': ReportAutoCustomField, 'ro': True},
+                                  {'n': 'new_case'},
+                                  {'n': 'relapse'},
+                                  {'n': 'returned'},
+                                  {'n': 'nut_transfered_in'},
+                                  {'n': 'nut_referred_in'},
+                                  {'f': ReportMultipleAutoAdmissionTotal},
+                                  {'n': 'admitted_m'},
+                                  {'n': 'admitted_f'}]
 
     def validate(self):
 
@@ -399,162 +225,64 @@ class PECOUTReportTable(PECReportTable):
                          u"TOTAL\nSORTIS",
                          u"Dont\nSexe\nM", u"Dont\nSexe\nF"]
 
-        self.report_fields = ['healed',
-                              'referred_out',
-                              'deceased',
-                              'aborted',
-                              'non_respondant',
-                              'medic_transfered_out',
-                              'nut_transfered_out',
-                               None,
-                              'total_out_m',
-                              'total_out_m']
-
-    def load_data(self, readonly=False):
-
-        self.data = []
-        cols = len(self.hheaders)
-        def blank_line():
-            return [BlankCell(self) for x in range(0, cols)]
-
-        # Add SAMP section
-        if self.report.is_samp:
-            # add blank line for SAM section header
-            self.data.append(blank_line())
-
-            # retrieve sam report
-            sampr = self.report.pec_samp_report
-
-            for age in POPULATIONS_CAP[sampr.CAP]:
-
-                cells = []
-
-                for fname in ('healed', 'referred_out',
-                              'deceased',
-                              'aborted',
-                              'non_respondant',
-                              'medic_transfered_out',
-                              'nut_transfered_out'):
-                              
-                    cells.append(ReportValueEditItem(self, 
-                                                 sampr, '%s_%s' % (age, fname)))
-
-                cells.append(ReportAutoOutTotal(self, sampr, age))
-
-                cells.append(ReportValueEditItem(self, 
-                                           sampr, '%s_%s' % (age, 'total_out_m')))
-
-                cells.append(ReportValueEditItem(self, 
-                                           sampr, '%s_%s' % (age, 'total_out_f')))
-                
-                self.data.append(cells)
-
-        # Add SAM section
-        if self.report.is_sam:
-            # add blank line for SAM section header
-            self.data.append(blank_line())
-
-            # retrieve sam report
-            samr = self.report.pec_sam_report
-
-            for age in POPULATIONS_CAP[samr.CAP]:
-
-                cells = []
-                for fname in ('healed', 'referred_out',
-                              'deceased',
-                              'aborted',
-                              'non_respondant',
-                              'medic_transfered_out',
-                              'nut_transfered_out'):
-                              
-                    cells.append(ReportValueEditItem(self, 
-                                                 samr, '%s_%s' % (age, fname)))
-
-                cells.append(ReportAutoOutTotal(self, samr, age))
-
-                cells.append(ReportValueEditItem(self, 
-                                           samr, '%s_%s' % (age, 'total_out_m')))
-
-                cells.append(ReportValueEditItem(self, 
-                                           samr, '%s_%s' % (age, 'total_out_f')))
-                
-                self.data.append(cells)
-
-        # Add MAM section
-        if self.report.is_mam:
-            # add blank line for SAM section header
-            self.data.append(blank_line())
-
-            # retrieve sam report
-            mamr = self.report.pec_mam_report
-
-            for age in POPULATIONS_CAP[mamr.CAP]:
-
-                cells = []
-                for fname in ('healed', 'referred_out',
-                              'deceased',
-                              'aborted',
-                              'non_respondant',
-                              'medic_transfered_out'):
-                              
-                    cells.append(ReportValueEditItem(self, 
-                                                 mamr, '%s_%s' % (age, fname)))
-
-                cells.append(BlankCell(self))
-
-                cells.append(ReportAutoOutTotal(self, mamr, age))
-
-                if age == 'pw':
-                    cells.append(BlankCell(self))
-                else:
-                    cells.append(ReportValueEditItem(self, 
-                                           mamr, '%s_%s' % (age, 'total_out_m')))
-
-                cells.append(ReportValueEditItem(self, 
-                                           mamr, '%s_%s' % (age, 'total_out_f')))
-                
-                self.data.append(cells)
-
-        # add total line
-        self.data.append([ColumnSumItem(self, None, None) for x in range(0, cols)])
+        self.report_field_dict = [{'n': 'healed'},
+                                  {'n': 'referred_out'},
+                                  {'n': 'deceased'},
+                                  {'n': 'aborted'},
+                                  {'n': 'non_respondant'},
+                                  {'n': 'medic_transfered_out'},
+                                  {'n': 'nut_transfered_out'},
+                                  {'f': ReportAutoOutTotal},
+                                  {'n': 'total_out_m'},
+                                  {'n': 'total_out_f'}]
 
     def validate(self):
 
         # sum of all criterias must equal the (read only) total admissions
         # AND the sum of admitted Male/Female
 
-        def type_value(cap, age):
-            return sum([self.get_field_value('%s_%s' % (age, fname), cap)
-                    for fname in ('new_case',
-                                  'relapse',
-                                  'returned',
-                                  'nut_transfered_in',
-                                  'nut_referred_in')])
-
-
-        def criteria_value(cap, age):
-            return sum([getattr(self.report.get_pec_report(cap), '%s_%s' % (age, fname), 0)
-                        for fname in ('hw_b7080_bmi_u18',
-                                      'muac_u120',
-                                      'hw_u70_bmi_u16',
-                                      'muac_u11_muac_u18',
-                                      'oedema',
-                                      'other')])
-
-        def gender_value(cap, age):
-            return sum([self.get_field_value('%s_%s' % (age, fname), cap)
-                        for fname in ('admitted_m',
-                                      'admitted_f')])
-
+        total_out_colid = 7
         for cap in self.report.caps():
-            for age in POPULATIONS_CAP[cap]:
-        
-                tv = type_value(cap, age)
-                cv = criteria_value(cap, age)
-                gv = gender_value(cap, age)
-                
-                if not tv == cv or not tv == gv:
+            for rowid in self.rows_for_cap(cap):
+                total_out = self.item(rowid, total_out_colid)
+                if isinstance(total_out, BlankCell):
+                    continue
+                if total_out.is_global_invalid() \
+                   or total_out.is_gender_mismatch():
                     return False
+
+        return True
+
+
+class PECRECAPReportTable(PECReportTable):
+
+    def __init__(self, parent, report, page):
+        super(PECRECAPReportTable, self).__init__(parent, report, page)
+
+        self.hheaders = [u"Total au\ndébut du\nmois",
+                         u"Dont\nSexe\nM", u"Dont\nSexe\nF",
+                         u"TOTAL\nADMIS",
+                         u"Dont\nSexe\nM", u"Dont\nSexe\nF",
+                         u"TOTAL\nSORTIS",
+                         u"Dont\nSexe\nM", u"Dont\nSexe\nF",
+                         u"TOTAL\nRESTANTS",
+                         u"Dont\nSexe\nM", u"Dont\nSexe\nF"]
+
+        self.report_field_dict = [{'n': 'total_beginning', 'f': ReportAutoValueRO, 'ro': True},
+                                  {'n': 'total_beginning_m', 'f': ReportAutoValueRO, 'ro': True},
+                                  {'n': 'total_beginning_f', 'f': ReportAutoValueRO, 'ro': True},
+                                  {'n': 'admitted', 'f': ReportAutoValueRO, 'ro': True},
+                                  {'n': 'admitted_m', 'f': ReportAutoValueRO, 'ro': True},
+                                  {'n': 'admitted_f', 'f': ReportAutoValueRO, 'ro': True},
+                                  {'n': 'total_out', 'f': ReportAutoValueRO, 'ro': True},
+                                  {'n': 'total_out_m', 'f': ReportAutoValueRO, 'ro': True},
+                                  {'n': 'total_out_f', 'f': ReportAutoValueRO, 'ro': True},
+                                  {'n': 'total_end', 'f': ReportAutoValueRO, 'ro': True},
+                                  {'n': 'total_end_m', 'f': ReportAutoValueRO, 'ro': True},
+                                  {'n': 'total_end_f', 'f': ReportAutoValueRO, 'ro': True}]
+
+    def validate(self):
+        # RECAP does not validate (yet)
         return True
 
 
@@ -577,8 +305,14 @@ class PECInstructions(QtGui.QGroupBox):
 
         self.vbox = QtGui.QVBoxLayout(self)
         self.setLayout(self.vbox)
+        self.timer = None
 
-        self.startTimer(1000)
+    def start(self):
+        self.timer = self.startTimer(1000)
+
+    def stop(self):
+        if self.timer:
+            self.killTimer(self.timer)
 
     def elems():
         def fget(self):
@@ -603,7 +337,7 @@ class PECInstructions(QtGui.QGroupBox):
     def refresh(self):
         self.clear()
         nb_errors = len(self.elems)
-        max_rows = 4
+        max_rows = 3
         for index in range(0, max_rows):
             try:
                 self.vbox.addWidget(self.elems[index])
@@ -624,8 +358,6 @@ class PECInstructions(QtGui.QGroupBox):
             self.live_refresh()
         except Exception as e:
             pass
-            #self.killTimer(event.timerId())
-        
 
 
 class PECADMCRITInstructions(PECInstructions):
@@ -706,3 +438,10 @@ class PECOUTInstructions(PECInstructions):
                     self.elems.append(wbox)
 
         self.refresh()
+
+
+class PECRECAPInstructions(PECInstructions):
+
+    def timerEvent(self, event):
+        self.live_refresh()
+        self.killTimer(event.timerId())

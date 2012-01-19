@@ -101,7 +101,7 @@ class ReportPeriodWidget(QtGui.QDialog, NUTWidget):
 
 class ReportWidget(NUTWidget):
 
-    title = u"Nutrition Monthly Report"
+    title = u"Rapport Statistique Mensuel"
     report = None
 
     # Report U.I pages. Switch with next() previous()
@@ -137,10 +137,14 @@ class ReportWidget(NUTWidget):
 
         print('changing from %s to %s' % (self.current_page, new_page))
         
+        # close previous properly
+        self.instructions.stop()
+
         index = self.PAGES.index(new_page)
         self.stacked_table.setCurrentIndex(index)
         self.table.load_data(self.readonly)
         self.table.refresh()
+        self.instructions.start()
 
         # set current page pointer
         self.current_page = new_page
@@ -176,6 +180,7 @@ class ReportWidget(NUTWidget):
         self.current_page = self.PAGES[0]
         self.table.load_data(self.readonly)
         self.table.refresh()
+        self.instructions.start()
 
         self.continue_button = ContinueWidget(self)
         #self.continue_button.clicked.connect(self.next)
@@ -191,7 +196,9 @@ class ReportWidget(NUTWidget):
 
     def save_and_validate_current_page(self):
         
-        if self.current_page in (self.PEC_ADM_CRIT, self.PEC_ADM_TYP):
+        if self.current_page in (self.PEC_ADM_CRIT, 
+                                 self.PEC_ADM_TYP,
+                                 self.PEC_OUT, self.PEC_RECAP, self.CONS_ORDER):
             if self.table.validate():
                 self.table.save()
                 return True
@@ -216,17 +223,30 @@ class ReportWidget(NUTWidget):
 
         self.setLayout(self.vbox)
 
-    def build_pec_adm_crit(self, page):
+    def build_default_layout(self, page):
+
+        titles = {self.PEC_ADM_CRIT: u"Critère d'admissions",
+                  self.PEC_ADM_TYP: u"Type d'admissions",
+                  self.PEC_OUT: u"Sorties",
+                  self.PEC_RECAP: u"Récapitulatif",
+                  self.CONS_ORDER: u"Consommation/commande d'intrants"}
+        pname = page.upper().replace('_', '')
+        table_widget = eval('%sReportTable' % pname)
+        instr_widget = eval('%sInstructions' % pname)
 
         widget = NUTWidget(self)
         vbox = QtGui.QVBoxLayout()
-        title = PageTitle(_(u"Rapport Statistique Mensuel - Traitement de la malnutrition aiguë") % self.report.period)
-        intro = PageIntro(_(u"%(period)s – PRISE EN CHARGE: Critère d'admissions") % {'period': self.report.period})
-
+        title = PageSection(u"Rapport Statistique Mensuel: %d/%d" % (self.PAGES.index(page) + 1, len(self.PAGES)))
+        if page == self.CONS_ORDER:
+            introstr = u"%(period)s – %(title)s"
+        else:
+            introstr = u"%(period)s – PRISE EN CHARGE: %(title)s"
+        intro = PageIntro(introstr % {'period': self.report.period,
+                                      'title': titles[page]})
         # Table
-        widget.table = PECADMCRITReportTable(widget, self.report, page)
+        widget.table = table_widget(widget, self.report, page)
         
-        widget.instructions = PECADMCRITInstructions(self, widget.table, self.report, page)
+        widget.instructions = instr_widget(self, widget.table, self.report, page)
 
         widget.setFocusProxy(widget.table)
 
@@ -238,56 +258,22 @@ class ReportWidget(NUTWidget):
         widget.setLayout(vbox)
 
         return widget
+        
+
+    def build_pec_adm_crit(self, page):
+        return self.build_default_layout(page)
 
     def build_pec_adm_typ(self, page):
-
-        widget = NUTWidget(self)
-        vbox = QtGui.QVBoxLayout()
-
-        title = PageTitle(_(u"Rapport Statistique Mensuel - Traitement de la malnutrition aiguë") % self.report.period)
-        intro = PageIntro(_(u"%(period)s – PRISE EN CHARGE: Type d'admissions") % {'period': self.report.period})
-
-        widget.table = PECADMTYPReportTable(widget, self.report, page)
-        widget.instructions = PECADMTYPInstructions(self, widget.table, self.report, page)
-
-        vbox.addWidget(title)
-        vbox.addWidget(intro)
-        vbox.addWidget(widget.table)
-        vbox.addWidget(widget.instructions)
-        vbox.addStretch(50)
-        widget.setLayout(vbox)
-
-        return widget
+        return self.build_default_layout(page)
 
     def build_pec_out(self, page):
-        widget = NUTWidget(self)
-        vbox = QtGui.QVBoxLayout()
-
-        title = PageTitle(_(u"Rapport Statistique Mensuel - Traitement de la malnutrition aiguë") % self.report.period)
-        intro = PageIntro(_(u"%(period)s – PRISE EN CHARGE: Type d'admissions") % {'period': self.report.period})
-
-        widget.table = PECOUTReportTable(widget, self.report, page)
-        widget.instructions = PECOUTInstructions(self, widget.table, self.report, page)
-
-        vbox.addWidget(title)
-        vbox.addWidget(intro)
-        vbox.addWidget(widget.table)
-        vbox.addWidget(widget.instructions)
-        vbox.addStretch(50)
-        widget.setLayout(vbox)
-        return widget
+        return self.build_default_layout(page)
 
     def build_pec_recap(self, page):
-        widget = NUTWidget(self)
-        vbox = QtGui.QVBoxLayout()
-        widget.setLayout(vbox)
-        return widget
+        return self.build_default_layout(page)
 
     def build_cons_order(self, page):
-        widget = NUTWidget(self)
-        vbox = QtGui.QVBoxLayout()
-        widget.setLayout(vbox)
-        return widget
+        return self.build_default_layout(page)
 
     def setup_report_ui(self):
 
@@ -301,10 +287,6 @@ class ReportWidget(NUTWidget):
             QtGui.QMessageBox.warning(self, u"pas de periode", u"boo")
             self.change_main_context(DashboardWidget)
             return
-
-        print(self.report.is_mam)
-        print(self.report.is_sam)
-        print(self.report.is_samp)
 
         # we now have a report, setup shortcuts
         self.pec_mam_report = self.report.pec_mam_report

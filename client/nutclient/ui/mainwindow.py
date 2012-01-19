@@ -73,7 +73,7 @@ class MainWindow(QtGui.QMainWindow):
         # store User in session
         self._user = None
 
-        self.resize(900, 650)
+        self.resize(1024, 600)
         self.setWindowTitle(_(u"NUT Client"))
         self.setWindowIcon(QtGui.QIcon('images/icon32.png'))
 

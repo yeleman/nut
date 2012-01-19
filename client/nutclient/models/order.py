@@ -88,6 +88,10 @@ class OrderReport(BaseModel):
     def status(self):
         return self.report.status
 
+    @property
+    def CAP(self):
+        return self.nut_type
+
 class InputOrderReport(BaseModel):
 
     """ Order Quantities for a NUTInput and an OrderReport """
@@ -121,3 +125,7 @@ class InputOrderReport(BaseModel):
     @property
     def status(self):
         return self.order_report.report.status
+
+    @property
+    def CAP(self):
+        return self.order_report.nut_type
