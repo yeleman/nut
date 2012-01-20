@@ -7,6 +7,7 @@ import gc
 from datetime import date, datetime
 
 from PyQt4 import QtGui, QtCore
+from PyQt4.QtCore import Qt
 
 from common import *
 from nutclient.exceptions import *
@@ -200,6 +201,7 @@ class ReportWidget(NUTWidget):
                                  self.PEC_ADM_TYP,
                                  self.PEC_OUT, self.PEC_RECAP, self.CONS_ORDER):
             if self.table.validate():
+                self.report.touch()
                 self.table.save()
                 return True
             else:
@@ -223,12 +225,33 @@ class ReportWidget(NUTWidget):
 
         self.setLayout(self.vbox)
 
+    def transmit(self):
+
+        def is_ready():
+            if self.table.validate():
+                self.report.touch()
+                self.table.save()
+                if self.report.is_valid():
+                    return True
+            return False
+        
+        if not is_ready():
+            QtGui.QMessageBox.warning(self, u"Impossible de transmettre.",
+                              u"Impossible de transmettre "
+                              u"le rapport. Les données ne sont pas correctes."
+                              u"\nVous devez les corriger pour re-essayer."),
+            return False
+        
+        QtGui.QMessageBox.info(self, u"Transmission en cours...",
+                                     u"Le rapport est en cours de Transmission.")
+        return True
+
     def build_default_layout(self, page):
 
-        titles = {self.PEC_ADM_CRIT: u"Critère d'admissions",
-                  self.PEC_ADM_TYP: u"Type d'admissions",
-                  self.PEC_OUT: u"Sorties",
-                  self.PEC_RECAP: u"Récapitulatif",
+        titles = {self.PEC_ADM_CRIT: u"PRISE EN CHARGE: Critère d'admissions",
+                  self.PEC_ADM_TYP: u"PRISE EN CHARGE: Type d'admissions",
+                  self.PEC_OUT: u"PRISE EN CHARGE: Sorties",
+                  self.PEC_RECAP: u"PRISE EN CHARGE: Récapitulatif",
                   self.CONS_ORDER: u"Consommation/commande d'intrants"}
         pname = page.upper().replace('_', '')
         table_widget = eval('%sReportTable' % pname)
@@ -236,13 +259,14 @@ class ReportWidget(NUTWidget):
 
         widget = NUTWidget(self)
         vbox = QtGui.QVBoxLayout()
-        title = PageSection(u"Rapport Statistique Mensuel: %d/%d" % (self.PAGES.index(page) + 1, len(self.PAGES)))
-        if page == self.CONS_ORDER:
-            introstr = u"%(period)s – %(title)s"
-        else:
-            introstr = u"%(period)s – PRISE EN CHARGE: %(title)s"
-        intro = PageIntro(introstr % {'period': self.report.period,
-                                      'title': titles[page]})
+       
+        title = PageIntro(u"<b>Rapport de %(period)s</b>. %(title)s – "
+                          u"<b>%(cur)d/%(tot)d</b>" 
+                          % {'period': self.report.period,
+                             'title': titles[page],
+                             'cur': self.PAGES.index(page) + 1,
+                             'tot': len(self.PAGES)})
+
         # Table
         widget.table = table_widget(widget, self.report, page)
         
@@ -250,8 +274,19 @@ class ReportWidget(NUTWidget):
 
         widget.setFocusProxy(widget.table)
 
-        vbox.addWidget(title)
-        vbox.addWidget(intro)
+        if page == self.PAGES[-1]:
+            head_box = QtGui.QHBoxLayout()
+            transmit_button = TransmitButton()
+            transmit_button.clicked.connect(self.transmit)
+            head_line = QtGui.QWidget()
+            head_box.addWidget(title)
+            head_box.addStretch()
+            head_box.addWidget(transmit_button)
+            head_line.setLayout(head_box)
+            vbox.addWidget(head_line)
+        else:
+            vbox.addWidget(title)
+
         vbox.addWidget(widget.table)
         vbox.addWidget(widget.instructions)
         vbox.addStretch(50)
@@ -284,7 +319,6 @@ class ReportWidget(NUTWidget):
         # report *should* be set by dialog.
         # if not, go back to Dashboard.
         if not self.report:
-            QtGui.QMessageBox.warning(self, u"pas de periode", u"boo")
             self.change_main_context(DashboardWidget)
             return
 

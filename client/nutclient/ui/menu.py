@@ -106,7 +106,8 @@ class MainMenu(NUTMenu):
         self.parent.change_context(ArchivesWidget)
 
     def help(self):
-        self.parent.change_context(HelpWidget, 
+        #self.parent.change_context(HelpWidget, 
+        self.parentWidget().open_dialog(HelpWidget,
                                    topic=self.parent.view_widget \
                                              .__class__.__name__ \
                                              .lower().replace('widget', ''))

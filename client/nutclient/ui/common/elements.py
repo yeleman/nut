@@ -154,14 +154,7 @@ class BoldLabel(QtGui.QLabel):
         font.setBold(True)
         self.setFont(font)
         self.setAlignment(Qt.AlignLeft | Qt.AlignVCenter)
-
-'''class ErrorLabel(QtGui.QLabel):
-
-    def __init__(self, text, parent=None):
-        super(ErrorLabel, self).__init__('', parent)
-        self.setText(text)
-        self.setAlignment(Qt.AlignLeft | Qt.AlignVCenter)'''
-
+        
 
 class SuccessLabel(QtGui.QWidget):
 
@@ -185,3 +178,11 @@ class IconLabel(QtGui.QLabel):
         super(IconLabel, self).__init__('', parent)
         self.setAlignment(Qt.AlignLeft | Qt.AlignVCenter)
         self.setPixmap(icon)
+
+
+class TransmitButton(QtGui.QPushButton):
+
+    def __init__(self, parent=None):
+        super(TransmitButton, self).__init__(QtGui.QIcon('images/phone.png'), u"&Transmettre le rapport", parent)
+
+        #self.setAlignment(Qt.AlignLeft | Qt.AlignVCenter)

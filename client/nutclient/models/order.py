@@ -92,6 +92,13 @@ class OrderReport(BaseModel):
     def CAP(self):
         return self.nut_type
 
+    def is_valid(self):
+        # simply check that all of them exist.
+        for report in self.nutinput_reports:
+            if not report.is_valid():
+                return False
+        return self.is_complete()
+
 class InputOrderReport(BaseModel):
 
     """ Order Quantities for a NUTInput and an OrderReport """
@@ -129,3 +136,7 @@ class InputOrderReport(BaseModel):
     @property
     def CAP(self):
         return self.order_report.nut_type
+    
+    def is_valid(self):
+        # always valid.
+        return True

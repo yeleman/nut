@@ -98,6 +98,14 @@ class ConsumptionReport(BaseModel):
     @property
     def CAP(self):
         return self.nut_type
+    
+    def is_valid(self):
+        # check that all Nut reports are valid
+        for report in self.nutinput_reports:
+            if not report.is_valid():
+                return False
+        # make sure all of them exist
+        return self.is_complete()
 
 class InputConsumptionReport(BaseModel):
 
@@ -150,3 +158,6 @@ class InputConsumptionReport(BaseModel):
     @property
     def CAP(self):
         return self.cons_report.nut_type
+    
+    def valid(self):
+        return self.consumed <= self.possessed

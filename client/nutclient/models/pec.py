@@ -311,6 +311,91 @@ class PECReport(object):
     @property
     def all_total_end_f(self):
         return self.all_for_field(inspect.stack()[0][3][4:])
+    
+    @property
+    def sum_begining(self):
+        return self.get_sum_beginning('all')
+    
+    def get_sum_begining(self, age):
+        return getattr(self, '%s_total_beginning' % age)
+
+    @property
+    def sum_admitted_crit(self):
+        return self.get_sum_admitted_details('all')
+
+    def get_sum_admitted_crit(self, age):
+        return sum([getattr(self, '%s_hw_b7080_bmi_u18' % age, 0),
+                    getattr(self, '%s_muac_u120' % age, 0),
+                    getattr(self, '%s_other' % age, 0),
+                    getattr(self, '%s_hw_u70_bmi_u16' % age, 0),
+                    getattr(self, '%s_muac_u11_muac_u18' % age, 0),
+                    getattr(self, '%s_oedema' % age, 0)])
+
+    @property
+    def sum_admitted_typ(self):
+        return self.get_sum_admitted_details('all')
+    
+    def get_sum_admitted_typ(self, age):
+        return sum([getattr(self, '%s_new_case' % age, 0),
+                    getattr(self, '%s_relapse' % age, 0),
+                    getattr(self, '%s_returned' % age, 0),
+                    getattr(self, '%s_nut_transfered_in' % age, 0),
+                    getattr(self, '%s_nut_referred_in' % age, 0)])
+
+    @property
+    def sum_admitted_gender(self):
+        return self.get_sum_admitted_gender('all')
+
+    def get_sum_admitted_gender(self, age):
+        return getattr(self, '%s_admitted' % age, 0)
+
+    @property
+    def sum_out_details(self):
+        return self.get_sum_out_details('all')
+
+    def get_sum_out_details(self, age):
+        return sum([getattr(self, '%s_healed' % age, 0),
+                    getattr(self, '%s_referred_out' % age, 0),
+                    getattr(self, '%s_deceased' % age, 0),
+                    getattr(self, '%s_aborted' % age, 0),
+                    getattr(self, '%s_non_respondant' % age, 0),
+                    getattr(self, '%s_medic_transfered_out' % age, 0),
+                    getattr(self, '%s_nut_transfered_out' % age, 0)])
+
+    @property
+    def sum_out_gender(self):
+        return self.get_sum_out_gender('all')
+
+
+    def get_sum_out_gender(self, age):
+        return getattr(self, '%s_total_out' % age)
+
+    
+    def is_valid(self):
+        for age, age_name in self.CATEGORIES:
+            # PEC ADM
+            print('\tchecking PEC ADM %s' % age)
+            if (self.get_sum_admitted_crit(age) 
+                != self.get_sum_admitted_typ(age) 
+                or self.get_sum_admitted_crit(age)
+                != self.get_sum_admitted_gender(age)):
+                
+                return False
+
+            print('\tchecking PEC OUT %s' % age)
+            # PEC OUT
+            if (self.get_sum_out_details(age)
+                != self.get_sum_out_gender(age)):
+
+                return False
+
+            print('\tchecking PEC BEG+ADM<OUT %s' % age)
+            # Begining + ADM <= out
+            if (self.get_sum_begining(age) + self.get_sum_admitted_gender(age)
+                < self.get_sum_out_gender(age)):
+                return False
+         
+        return False
 
 class PECMAMReport(BaseModel, PECReport):
 
@@ -386,7 +471,6 @@ class PECMAMReport(BaseModel, PECReport):
     fu12_medic_transfered_out = peewee.IntegerField(default=0)
     fu12_total_out_m = peewee.IntegerField(default=0)
     fu12_total_out_f = peewee.IntegerField(default=0)
-
 
 class PECSAMReport(BaseModel, PECReport):
 
