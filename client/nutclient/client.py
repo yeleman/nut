@@ -12,7 +12,11 @@ from ui.mainwindow import MainWindow
 from ui.window import NUTWindow
 
 
-def main():
+def main(args):
+
+    fullscreen = False
+    if 'fullscreen' in [arg.replace('-', '').lower() for arg in args]:
+        fullscreen = True
 
     #gettext_windows.setup_env()
 
@@ -23,11 +27,14 @@ def main():
     app = QtGui.QApplication(sys.argv)
     window = MainWindow(app)
     setattr(NUTWindow, 'window', window)
-    window.show()
+    if fullscreen:
+        window.showFullScreen()
+    else:
+        window.show()
     #window.showMaximized()
     #window.showNormal()
     #window.showFullScreen()
     sys.exit(app.exec_())
 
 if __name__ == "__main__":
-    main()
+    main(sys.argv)
