@@ -28,7 +28,7 @@ def main(args):
     window = MainWindow(app)
     setattr(NUTWindow, 'window', window)
     if fullscreen:
-        window.showFullScreen()
+        window.showMaximized()
     else:
         window.show()
     #window.showMaximized()
