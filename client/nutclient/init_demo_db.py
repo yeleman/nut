@@ -18,7 +18,7 @@ def main(args):
 
     # add demo users:
     reg = User.create(username='rgaudin',
-               pwhash='4663950500290933446',
+               pwhash='-1355030878',
                active=True,
                hc_code=u"ntil",
                hc_name=u"N'Tillit",
@@ -27,7 +27,7 @@ def main(args):
                hc_isamp=False)
 
     anne = User.create(username='anne',
-               pwhash='4788589492570640862',
+               pwhash='108506770',
                active=True,
                hc_code=u"lobo",
                hc_name=u"Lobou",
