@@ -1,5 +1,5 @@
 Packages:
-    python-qt4 acpi python-dev
+    python-qt4 acpi [python-dev uuid-dev buildessential make]
 
 PIP:
     pip install -r pip-reqs.txt
