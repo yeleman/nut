@@ -40,7 +40,7 @@ urlpatterns = patterns('',
         views.validation.validation_list, name='validation-list'),
 
     # for districts and regions
-    url(r'^validation/(?P<entity>\d+)/(?:(?P<slug>[a-z0-9_\-]+/))?(?P<year>\d{4})/(?P<month>\d{1,2})$',
+    url(r'^validation/(?P<entity>\d+)/(?:(?P<slug>[a-z0-9_\-]+/))?(?P<year>\d{4})/(?P<month>\d{1,2})/$',
         views.validation.report_validation, name='validation'),
 
 

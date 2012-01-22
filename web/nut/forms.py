@@ -8,8 +8,8 @@ from django import forms
 from django.forms.models import inlineformset_factory
 
 from models import (PECSAMPReport, PECSAMReport, PECMAMReport, PECOthersReport,
-                    InputConsumptionReport, ConsumptionReport)
-
+                    InputConsumptionReport, ConsumptionReport, OrderReport,
+                    InputOrderReport)
 
 
 class BasePECForm(object):
@@ -43,6 +43,8 @@ class BasePECForm(object):
                       'nut_transfered_out',
                       'total_out_m',
                       'total_out_f')
+
+    exclude = ('_status', 'type', 'created_by', 'entity', 'period')
 
 
     def field_names_matrix(self, prefixes=None, suffixes=None):
@@ -170,6 +172,7 @@ class PECSAMPReportForm(forms.ModelForm, BasePECForm):
 
     class Meta:
         model = PECSAMPReport
+        exclude = BasePECForm.exclude
 
 
 class PECSAMReportForm(forms.ModelForm, BasePECForm):
@@ -178,6 +181,7 @@ class PECSAMReportForm(forms.ModelForm, BasePECForm):
 
     class Meta:
         model = PECSAMReport
+        exclude = BasePECForm.exclude
 
 
 class PECMAMReportReportForm(forms.ModelForm, BasePECForm):
@@ -186,16 +190,25 @@ class PECMAMReportReportForm(forms.ModelForm, BasePECForm):
 
     class Meta:
         model = PECMAMReport
+        exclude = BasePECForm.exclude
 
 
 class PECOthersReportForm(forms.ModelForm):
 
     class Meta:
         model = PECOthersReport
-        fields = ('other_hiv', 'other_tb', 'other_lwb')
+        fields = ('other_hiv', 'other_tb', 'other_lwb', 'id')
+
 
 
 InputConsumptionReportFormSet = inlineformset_factory(ConsumptionReport,
                                                       InputConsumptionReport,
+                                                      exclude=('nut_input', 'id'),
                                                       extra=0)
+
+
+InputOrderReportFormSet = inlineformset_factory(OrderReport,
+                                                InputOrderReport,
+                                                exclude=('nut_input', 'id'),
+                                                extra=0)
 

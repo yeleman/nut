@@ -32,6 +32,8 @@ class NUTReport(models.Model):
 
     def __unicode__(self):
         cap = self.cap_from_class()
+        if not getattr(self, 'id', None):
+            return cap
         return ugettext(u"%(entity)s/%(cap)s/%(period)s") \
                         % {'entity': self.entity, \
                            'period': self.period,
@@ -137,8 +139,8 @@ class NUTReport(models.Model):
         """ returns sum of all ages for a field """
         sum_ = 0
         for cat, cat_name in self.CATEGORIES:
-            if hasattr(self, '%s_%s' % (cat, field)):
-                sum_ += getattr(self, '%s_%s' % (cat, field))
+            val = getattr(self, '%s_%s' % (cat, field), None)
+            sum_ += val if val is not None else 0
         return sum_
 
     def total_end_for(self, age, sex):
