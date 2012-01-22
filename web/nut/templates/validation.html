@@ -11,7 +11,35 @@
 
 {% block content %}
 
-<form action='.' method='get'>
+<form action='.' method='post' class="validation">
+
+{% comment %} Print all the hidden fields {% endcomment %}
+
+{% for name, form in forms.iteritems %}
+  {% if 'pec' in name %}
+    {% for field in form %}
+        {% if field.is_hidden %}
+            {{ field }}
+        {% endif %}
+    {% endfor %}
+  {% else %}
+       {% for subform in form %}
+          {% for field in subform %}
+              {% if field.is_hidden %}
+                  {{ field }}
+              {% endif %}
+          {% endfor %}
+       {% endfor %}
+  {% endif %}
+{% endfor %}
+
+{% comment %} Print errors {% endcomment %}
+
+<ul>
+{% for name, form in forms_with_instances.iteritems %}
+      <li>{{ form.errors }}</li>
+{% endfor %}
+</ul>
 
 <table>
 
@@ -699,9 +727,13 @@
     </p>
 {% endif %}
 
-{% if cons_samp_report %}
 
-<table border="1" cellpadding="2" cellspacing="2">
+{{ cons_samp_form.management_form }}
+{{ order_samp_form.management_form }}
+
+<table border="1" cellpadding="2" cellspacing="2"
+{% if not cons_samp_report %}class='hide'{% endif %}
+>
   <caption>SAMP consumption report</caption>
   <thead>
     <tr>
@@ -739,6 +771,11 @@
           {{ line.lost }}
           </td>
           <td>
+          {% for input_form in order_samp_form %}
+              {% if input_form.instance.nut_input == line.instance.nut_input %}
+                  {{ input_form.quantity }}
+              {% endif %}
+          {% endfor %}
           </td>
         </tr>
 
@@ -746,11 +783,12 @@
   </tbody>
 </table>
 
-{% endif %}
+{{ cons_sam_form.management_form }}
+{{ order_sam_form.management_form }}
 
-{% if cons_sam_report %}
-
-<table border="1" cellpadding="2" cellspacing="2">
+<table border="1" cellpadding="2" cellspacing="2"
+{% if not cons_sam_report %}class='hide'{% endif %}
+>
   <caption>SAM consumption report</caption>
   <thead>
     <tr>
@@ -788,6 +826,11 @@
           {{ line.lost }}
           </td>
           <td>
+          {% for input_form in order_sam_form %}
+              {% if input_form.instance.nut_input == line.instance.nut_input %}
+                  {{ input_form.quantity }}
+              {% endif %}
+          {% endfor %}
           </td>
         </tr>
 
@@ -795,11 +838,12 @@
   </tbody>
 </table>
 
-{% endif %}
+{{ cons_mam_form.management_form }}
+{{ order_mam_form.management_form }}
 
-{% if cons_mam_report %}
-
-<table border="1" cellpadding="2" cellspacing="2">
+<table border="1" cellpadding="2" cellspacing="2"
+{% if not cons_mam_report %}class='hide'{% endif %}
+>
   <caption>MAM consumption report</caption>
   <thead>
     <tr>
@@ -837,14 +881,17 @@
           {{ line.lost }}
           </td>
           <td>
+          {% for input_form in order_mam_form %}
+              {% if input_form.instance.nut_input == line.instance.nut_input %}
+                  {{ input_form.quantity }}
+              {% endif %}
+          {% endfor %}
           </td>
         </tr>
 
     {% endfor %}
   </tbody>
 </table>
-
-{% endif %}
 
 {% csrf_token %}
 <input type="submit">
