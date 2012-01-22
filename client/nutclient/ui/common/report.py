@@ -217,29 +217,42 @@ class ReportAutoOutTotal(ReportAutoField):
                                   'medic_transfered_out',
                                   'nut_transfered_out')])
 
-    @property
-    def begining_value(self):
+    def begining_value(self, sex=None):
+        if sex:
+            return getattr(self.report, '%s_total_beginning_%s' % (self.age, sex), 0)
         return self.report.male_female_sum('%s_total_beginning' % self.age)
 
-    @property
-    def admitted_value(self):
+    def admitted_value(self, sex=None):
+        if sex:
+            return getattr(self.report, '%s_admitted_%s' % (self.age, sex), 0)
         return self.report.male_female_sum('%s_admitted' % self.age)
 
-    @property
-    def max_value(self):
-        return self.begining_value + self.admitted_value
+    def max_value(self, sex=None):
+        return self.begining_value(sex) + self.admitted_value(sex)
 
-    @property
-    def gender_value(self):
+    def gender_value(self, sex=None):
         m = self.parent_table.get_field_value('%s_total_out_m' % self.age, self.report.CAP)
         f = self.parent_table.get_field_value('%s_total_out_f' % self.age, self.report.CAP)
+        if sex:
+            if sex.lower() == 'm':
+                return m
+            if sex.lower() == 'f':
+                return f
         return m + f
 
     def is_gender_mismatch(self):
-        return self.value != self.gender_value
+        return self.value != self.gender_value()
 
     def is_global_invalid(self):
+        return (self.is_global_invalid_number()
+                or self.is_global_invalid_gender('m')
+                or self.is_global_invalid_gender('f'))
+    
+    def is_global_invalid_number(self):
         return self.value > self.max_value
+
+    def is_global_invalid_gender(self, sex):
+        return self.gender_value(sex) > self.max_value(sex)
 
     def get_flag(self):
         if self.is_gender_mismatch() \

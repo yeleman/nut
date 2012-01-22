@@ -238,9 +238,8 @@ class PECOUTReportTable(PECReportTable):
 
     def validate(self):
 
-        # sum of all criterias must equal the (read only) total admissions
-        # AND the sum of admitted Male/Female
-
+        # sum of all out must equal gender BK.
+        # sum of outs must not exceed BEG + ADM
         total_out_colid = 7
         for cap in self.report.caps():
             for rowid in self.rows_for_cap(cap):
@@ -416,20 +415,34 @@ class PECOUTInstructions(PECInstructions):
                     box.addWidget(IconLabel(QtGui.QPixmap('images/error.png')))
 
                     if total_out.is_global_invalid():
-                        errstr = (u"<b>%s Admissions %s</b>: <b>%d</b>"
+                        if total_out.is_global_invalid_gender('f'):
+                            errstr = (u"<b>%s Admissions %s</b>: <b>%d femmes</b>"
+                                  u" supérieur au "
+                                  u"Total début femme + Total Admis femme: <b>%d</b>.") \
+                               % (HC_CAPS[cap], 
+                                  POPULATIONS[total_out.age], total_out.gender_value('f'),
+                                  total_out.max_value('f'))
+                        elif total_out.is_global_invalid_gender('m'):
+                            errstr = (u"<b>%s Admissions %s</b>: <b>%d hommes</b>"
+                                  u" supérieur au "
+                                  u"Total début homme + Total Admis homme: <b>%d</b>.") \
+                               % (HC_CAPS[cap], 
+                                  POPULATIONS[total_out.age], total_out.gender_value('m'),
+                                  total_out.max_value('m'))
+                        else:
+                            errstr = (u"<b>%s Admissions %s</b>: <b>%d</b>"
                                   u" supérieur au "
                                   u"Total début + Total Admis: <b>%d</b>.") \
-                             % (HC_CAPS[cap], 
-                                POPULATIONS[total_out.age], total_out.value,
-                                total_out.max_value)
-
+                               % (HC_CAPS[cap], 
+                                  POPULATIONS[total_out.age], total_out.value,
+                                  total_out.max_value())
                     if total_out.is_gender_mismatch():
                         errstr = (u"<b>%s Admissions %s</b>: <b>%d</b> "
                                   u"différent de la répartition par " 
                                   u" sexe: <b>%d</b>.") \
                              % (HC_CAPS[cap], 
                                 POPULATIONS[total_out.age], total_out.value,
-                                total_out.gender_value)
+                                total_out.gender_value())
 
                     box.addWidget(ErrorLabel(errstr))
                     box.addStretch(50)
