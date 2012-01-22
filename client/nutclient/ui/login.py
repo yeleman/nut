@@ -19,12 +19,12 @@ class LoginWidget(NUTWidget):
         super(LoginWidget, self).__init__(parent=parent, *args, **kwargs)
 
         
-        self.title = PageTitle(_(u"Log-in to the system"))
-        self.intro = PageIntro(_(u"You need to log into the system before " \
-                                 u"you are allowed to access it.\n" \
-                                 u"If you never logged-in, you will have to " \
-                                 u"do a remote login which will take about " \
-                                 u"3mn."))
+        self.title = PageTitle(u"Identifiez vous!")
+        self.intro = PageIntro(u"Vous devez vous identifier pour pouvoir "
+                               u"utiliser le système.\n"
+                               u"Si vous ne vous êtes jamais identifié, vous "
+                               u"devrez procéder à une identification distante "
+                               u"qui prendra environ 3mn.")
 
         vbox = QtGui.QVBoxLayout()
         gridbox = QtGui.QGridLayout()
@@ -47,9 +47,9 @@ class LoginWidget(NUTWidget):
         self.password_error = ErrorLabel(u"")
 
         # login button
-        self.login_buttun = QtGui.QPushButton(_(u"&Log in"))
-        self.login_buttun.setAutoDefault(True)
-        self.login_buttun.clicked.connect(self.do_login)
+        self.login_button = QtGui.QPushButton(_(u"&Log in"))
+        self.login_button.setAutoDefault(True)
+        self.login_button.clicked.connect(self.do_login)
 
         # login error
         self.login_error = ErrorLabel("")
@@ -61,7 +61,7 @@ class LoginWidget(NUTWidget):
         gridbox.addWidget(self.password_label, 1, 0)
         gridbox.addWidget(self.password_field, 1, 1)
         gridbox.addWidget(self.password_error, 1, 2)
-        gridbox.addWidget(self.login_buttun, 2, 0)
+        gridbox.addWidget(self.login_button, 2, 0)
         gridbox.addWidget(self.login_error, 3, 1)
 
         # adds stretched column + row at end to fill-up space

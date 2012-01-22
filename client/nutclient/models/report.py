@@ -50,7 +50,7 @@ class Report(BaseModel):
 
     def caps(self):
         caps = []
-        for cap in ['mam', 'sam', 'samp']:
+        for cap in ['samp', 'sam', 'mam']:
             if getattr(self, 'hc_is%s' % cap):
                 caps.append(cap)
         return caps
@@ -123,11 +123,44 @@ class Report(BaseModel):
                                self.STATUS_REMOTE_MODIFIED,
                                self.STATUS_LOCAL_MODIFIED)
 
+    def touch(self):
+        """ mark report as changed (change status according to previous one) """
+        # can't touch such a report
+        if self.status in (self.STATUS_SENT, self.STATUS_VALIDATED):
+        
+            return False
+        
+        if self.status <= self.STATUS_COMPLETE:
+            self.status = self.STATUS_DRAFT
+        else:
+            self.status = self.STATUS_LOCAL_MODIFIED
+
     def verbose_status(self):
         for status, name in self.STATUSES:
             if status == self.status:
                 return name
         return self.status
+
+    def tied_reports(self):
+
+        for type_ in ('pec', 'cons', 'order'):
+            for report in self.get_reports(type_):
+                yield report
+
+    def is_valid(self):
+        # launch checks on all sub-reports then change status.
+        for report in self.tied_reports():
+            print('checking %s' % report)
+            if not report.is_valid():
+                return False
+        
+        # check the Other values
+        pec_reports_others = sum([report.all_other for report in self.pec_reports()])
+        print('pec_reports_others: %d' % pec_reports_others)
+        if self.all_others != pec_reports_others:
+            return False
+        
+        return True
 
     @property
     def is_mam(self):
@@ -140,6 +173,23 @@ class Report(BaseModel):
     @property
     def is_samp(self):
         return self.hc_issamp
+
+    def get_reports(self, type_):
+        reports = []
+        for cap in self.caps():
+            report = getattr(self, 'get_%s_report' % type_)(cap)
+            if report:
+                reports.append(report)
+        return reports
+
+    def pec_reports(self):
+        return self.get_reports('pec')
+
+    def cons_reports(self):
+        return self.get_reports('cons')
+
+    def order_reports(self):
+        return self.get_reports('order')
 
     def get_pec_report(self, cap):
         try:
@@ -218,6 +268,10 @@ class Report(BaseModel):
             if hasattr(rep, field):
                 total += getattr(rep, field)
         return total
+    
+    @property
+    def all_others(self):
+        return sum([self.others_lwb, self.others_hiv, self.others_tb])
 
 
 class ReportHistory(BaseModel):

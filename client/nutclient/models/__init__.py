@@ -6,7 +6,9 @@ from datetime import date, datetime
 
 import peewee
 
-dbh = peewee.SqliteDatabase('/home/reg/src/nut/client/client.db')
+import local_config
+
+dbh = peewee.SqliteDatabase(local_config.SQLITE_PATH)
 
 
 def _(text):

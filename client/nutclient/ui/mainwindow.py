@@ -59,7 +59,7 @@ class ZmqServer(threading.Thread):
 
 class MainWindow(QtGui.QMainWindow):
     def __init__(self, app):
-        QtGui.QMainWindow.__init__(self)
+        super(MainWindow, self).__init__()
 
         # QApplication
         self.app = app
@@ -73,7 +73,7 @@ class MainWindow(QtGui.QMainWindow):
         # store User in session
         self._user = None
 
-        self.resize(900, 650)
+        self.resize(1024, 600)
         self.setWindowTitle(_(u"NUT Client"))
         self.setWindowIcon(QtGui.QIcon('images/icon32.png'))
 

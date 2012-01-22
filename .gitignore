@@ -16,3 +16,4 @@ local_settings.py
 *.swp
 *.tmp
 *.orig
+local_config.py

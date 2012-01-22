@@ -6,7 +6,7 @@ from datetime import datetime, date
 from models import (config, Report, ReportHistory, ConsumptionReport,
                     InputConsumptionReport, OrderReport, InputOrderReport,
                     PECMAMReport, PECSAMReport, PECSAMPReport,
-                    User, Period, NUTInput, Message, Setting)
+                    User, Period, NUTInput, Message, Setting, Options)
 
 def load_default_settings():
     for key, value in {'SRV_NUM': '73120896',
@@ -29,7 +29,9 @@ def load_default_inputs():
             i = NUTInput(slug=key, name=value)
             i.save()
 
-def setup():
+options = Options()
+
+def setup(drop_tables=False):
     """ create tables if not exist """
 
     did_create = False
@@ -39,6 +41,8 @@ def setup():
                  NUTInput, ConsumptionReport, InputConsumptionReport,
                  OrderReport, InputOrderReport,
                  PECMAMReport, PECSAMReport, PECSAMPReport, Message]:
+        if drop_tables:
+            model.drop_table()
         if not model.table_exists():
             model.create_table()
             did_create = True

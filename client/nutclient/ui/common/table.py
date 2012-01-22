@@ -32,13 +32,14 @@ class FlexibleTable(QtGui.QTableWidget):
         self.setAlternatingRowColors(True)
         self.setShowGrid(True)
         self.setWordWrap(True)
+        self.display_fixed = False
 
         #self.horizontalHeader().setFont(QtGui.QFont("Courier New", 10))
         self.horizontalHeader().setHighlightSections(True)
         self.verticalHeader().setHighlightSections(True)
         #self.verticalHeader().setFont(QtGui.QFont("Courier New", 10))
         self.setSelectionMode(QtGui.QAbstractItemView.SingleSelection)
-        self.setSelectionBehavior(QtGui.QAbstractItemView.SelectRows)
+        #self.setSelectionBehavior(QtGui.QAbstractItemView.SelectRows)
 
         # vHeaders to Content (default)
         self.verticalHeader().setResizeMode(QtGui.QHeaderView.ResizeToContents)
@@ -206,7 +207,9 @@ class FlexibleTable(QtGui.QTableWidget):
         self.live_refresh()
 
     def apply_resize_rules(self):
-        print('begin')
+
+        if self.display_fixed:
+            return
 
         # set headers visibility according to our prop
         self.verticalHeader().setVisible(self.display_vheaders)
@@ -232,7 +235,8 @@ class FlexibleTable(QtGui.QTableWidget):
         # get width once resized to content
         contented_width = 0 ##self.width()
         for ind in range(0, self.horizontalHeader().count()):
-            contented_width += self.horizontalHeader().sectionSize(ind)
+            #contented_width += self.horizontalHeader().sectionSize(ind)
+            contented_width += self.columnWidth(ind)
 
         self.verticalHeader().adjustSize()
         # get content-sized with of header
@@ -240,12 +244,10 @@ class FlexibleTable(QtGui.QTableWidget):
             vheader_width = self.verticalHeader().width()
         else:
             vheader_width = 0
-        print('vheader_width: %d' % vheader_width)
         extra_width = self.max_width - contented_width ## - vheader_width
 
         # space filled-up.
         if extra_width:
-            print('extra_width: %d' % extra_width)
             remaining_width = extra_width - vheader_width
             try:
                 to_stretch = self.stretch_columns
@@ -265,9 +267,7 @@ class FlexibleTable(QtGui.QTableWidget):
 
         # don't update size if not data
         new_width = self.size().width()
-        print('new_width: %d' % new_width)
 
-        print('height')
         ### HEIGHT
         # table height stops at last row.
         # if max_row/max_height specified and rows above it,
@@ -310,13 +310,6 @@ class FlexibleTable(QtGui.QTableWidget):
                 #if not isinstance(self.item(rowid, colid), QtGui.QTableWidgetItem) and not rowid in rows_with_widgets:
                 if isinstance(self.item(rowid, colid), (QtGui.QPushButton, None.__class__)) and not rowid in rows_with_widgets:
                     rows_with_widgets.append(rowid)
-                print('%d %s' % (colid, self.item(rowid, colid)))
-                try:
-                    print('%d %s' % (colid, self.item(rowid, colid)._field))
-                except:
-                    pass
-
-        print('rows_with_widgets: %s' % rows_with_widgets)
         
         if len(rows_with_widgets) >= 1:
             if len(rows_with_widgets) <= 2:
@@ -347,7 +340,6 @@ class FlexibleTable(QtGui.QTableWidget):
                     self.horizontalHeader().resizeSection(colid, self.horizontalHeader().sectionSize(colid) - share)
 
 
-        print((new_width, new_height))
         self.horizontalHeader().setStretchLastSection(True)
         self.verticalHeader().setStretchLastSection(True)
         self.resize(new_width, new_height)
@@ -356,7 +348,7 @@ class FlexibleTable(QtGui.QTableWidget):
 
         self.verticalHeader().update()
         self.update()
-        print('done')
+        self.display_fixed = True
 
 
 class FlexibleWidget(QtGui.QTableWidgetItem):
@@ -371,7 +363,6 @@ class FlexibleWidget(QtGui.QTableWidgetItem):
                       QtCore.Qt.ItemIsEditable)
 
     def live_refresh(self):
-        print('live refreshing editable %s' % self)
         pass
 
 
@@ -420,7 +411,6 @@ class FlexibleReadOnlyWidget(FlexibleWidget):
         self.setFlags(QtCore.Qt.ItemIsEnabled | QtCore.Qt.ItemIsSelectable)
 
     def live_refresh(self):
-        print('live refreshing %s' % self)
         pass
 
 
