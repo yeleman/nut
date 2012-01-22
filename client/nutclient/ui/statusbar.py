@@ -14,7 +14,7 @@ class NUTStatusBar(QtGui.QStatusBar):
 
         QtGui.QStatusBar.__init__(self, parent)
 
-        self.showMessage(u"Welcome!", 2000)
+        self.showMessage(u"السلام عليكم", 2000)
         self.batt = BatteryIndicator(self)
         self.addPermanentWidget(self.batt)
 
@@ -26,7 +26,7 @@ class BatteryIndicator(QtGui.QWidget):
         QtGui.QWidget.__init__(self, parent)
 
         self.hbox = QtGui.QHBoxLayout()
-        self.batt_label = QtGui.QLabel(u"Power Status:")
+        self.batt_label = QtGui.QLabel(u"Alimentation:")
         self.batt_icon = QtGui.QLabel()
         self.batt_icon.setPixmap(QtGui.QPixmap())
         self.batt_text = QtGui.QLabel()
@@ -58,16 +58,16 @@ class BatteryIndicator(QtGui.QWidget):
 
     def status_text(self, status, percent):
         if status == ACPIBatteryStatus.DESKTOP:
-            return u"On-Line"
+            return u"Secteur"
         if status == ACPIBatteryStatus.UNKNOWN:
             if percent != ACPIBatteryStatus.P_UNKNOWN:
-                return u"Unknown (%d%%)" % percent
+                return u"Inconnu (%d%%)" % percent
             else:
-                return u"Unknown"
+                return u"Inconnu"
         if status == ACPIBatteryStatus.ONLINE:
-            return u"On-Line (%d%%)" % percent
+            return u"Secteur (%d%%)" % percent
         if status == ACPIBatteryStatus.OFFLINE:
-            return u"Off-Line (%d%%)" % percent
+            return u"Batterie (%d%%)" % percent
 
     def timerEvent(self, event):
         self.update()

@@ -23,14 +23,14 @@ class ReportPeriodWidget(QtGui.QDialog, NUTWidget):
 
         self.parent = parent
 
-        self.setWindowTitle(_(u"Période des données"))
+        self.setWindowTitle(u"Période des données")
 
-        self.title = PageTitle(_(u"Indiquez la période correspondante."))
-        self.intro = PageIntro(_(u"Indiquez ci-dessous la période (mois et " \
+        self.title = PageTitle(u"Indiquez la période correspondante.")
+        self.intro = PageIntro(u"Indiquez ci-dessous la période (mois et " \
                                  u"année qui correspond aux données.\n" \
                                  u"Cela doit être le mois passé.\n\n" \
                                  u"Vous ne pouvez pas saisir les données du " \
-                                 u"rapport sans renseigner la période."))
+                                 u"rapport sans renseigner la période.")
 
         vbox = QtGui.QVBoxLayout()
         gridbox = QtGui.QGridLayout()
