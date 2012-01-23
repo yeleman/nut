@@ -113,6 +113,18 @@ class ReportWidget(NUTWidget):
     CONS_ORDER = 'cons_order'
     PAGES = [PEC_ADM_CRIT, PEC_ADM_TYP, PEC_OUT, PEC_RECAP, CONS_ORDER]
 
+    def prevent_close(self):
+        return True
+    
+    def attempt_close(self):
+        resp = QtGui.QMessageBox.question(self, u"Voulez-vous quitter ?",
+                            u"Si vous quitter l'édition du rapport maintenant,"
+                            u" vos modfications sur cette page seront perdues."
+                            u"\n\nQuitter le rapport ?",
+                            QtGui.QMessageBox.Ok|QtGui.QMessageBox.Cancel,
+                            QtGui.QMessageBox.Cancel)
+        return resp == QtGui.QMessageBox.Ok
+
     def next(self):
         # can't go next if on last page
         if self.current_page == self.PAGES[-1]:

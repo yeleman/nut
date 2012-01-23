@@ -77,8 +77,6 @@ class MainWindow(QtGui.QMainWindow):
         self.setWindowTitle(_(u"NUT Client"))
         self.setWindowIcon(QtGui.QIcon('images/icon32.png'))
 
-        QtGui.QShortcut(QtGui.QKeySequence(QtCore.QCoreApplication.translate('', "Ctrl+q")), self, self.close)
-
         self.menu = MainMenu(self)
         self.menu.build()
         self.addToolBar(self.menu)
@@ -96,7 +94,9 @@ class MainWindow(QtGui.QMainWindow):
         self.timer = None
 
     def change_context(self, context_widget, *args, **kwargs):
-        #print(u'change_context: %s || %s' % (args, kwargs))
+        if self.view_widget.prevent_close():
+            if not self.view_widget.attempt_close():
+                return
 
         # check permissions
         if context_widget.require_logged_user() and not self.is_logged():
@@ -119,10 +119,6 @@ class MainWindow(QtGui.QMainWindow):
         focus = self.view_widget.default_focus()
         if focus:
             focus.setFocus()
-
-    """def change_context_id(self, context_id, *args, **kwargs):
-        contexts = {'help': {'widget': DashboardWidget, 'menu': None}}
-        self.change_context(contexts[context_id]['widget'], args, kwargs)"""
 
     def open_dialog(self, dialog, modal=False, *args, **kwargs):
         self.dialog = dialog(parent=self, *args, **kwargs)

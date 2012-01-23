@@ -79,6 +79,13 @@ class NUTWidget(QtGui.QWidget):
     def has_pagination(cls):
         return False
 
+    def prevent_close(self):
+        ''' whether or not exit should be blocked '''
+        return False
+
+    def attempt_close(self):
+        ''' override to add logic on widget leave.return True if OK to leave '''
+        return True
 
 class PageTitle(QtGui.QLabel):
     """ Formatage du titre de page """

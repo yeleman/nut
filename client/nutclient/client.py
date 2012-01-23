@@ -14,9 +14,14 @@ from ui.window import NUTWindow
 
 def main(args):
 
+    halt_on_quit = False
     fullscreen = False
-    if 'fullscreen' in [arg.replace('-', '').lower() for arg in args]:
+
+    if 'fullscreen' in args:
         fullscreen = True
+    
+    if 'halt_on_quit' in args:
+        halt_on_quit = True
 
     #gettext_windows.setup_env()
 
@@ -26,7 +31,10 @@ def main(args):
 
     app = QtGui.QApplication(sys.argv)
     window = MainWindow(app)
+
     setattr(NUTWindow, 'window', window)
+    setattr(NUTWindow, 'halt_on_quit', halt_on_quit)
+
     if fullscreen:
         window.showMaximized()
     else:
@@ -34,7 +42,12 @@ def main(args):
     #window.showMaximized()
     #window.showNormal()
     #window.showFullScreen()
-    sys.exit(app.exec_())
+    
+    ret = app.exec_()
+    if halt_on_quit:
+        import subprocess
+        subprocess.call(' '.join(['/usr/bin/sudo', '/sbin/halt']), shell=True)
+    sys.exit(ret)
 
 if __name__ == "__main__":
-    main(sys.argv)
+    main([arg.replace('-', '').lower() for arg in sys.argv])

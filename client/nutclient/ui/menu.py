@@ -80,6 +80,7 @@ class MainMenu(NUTMenu):
 
     def __init__(self, parent):
         NUTMenu.__init__(self, parent)
+        QtGui.QShortcut(QtGui.QKeySequence(QtCore.QCoreApplication.translate('', "Ctrl+q")), self, self.quit)
 
     def ident(self):
         return 'main'
@@ -133,8 +134,11 @@ class MainMenu(NUTMenu):
         self.parent.change_context(SendWidget)
 
     def quit(self):
-        self.parent.close()
-        pass
+        if self.parent.view_widget.prevent_close():
+            if self.parent.view_widget.attempt_close():
+                self.parent.close()
+        else:
+            self.parent.close()
 
     def whatis(self):
         if QtGui.QWhatsThis.inWhatsThisMode():
