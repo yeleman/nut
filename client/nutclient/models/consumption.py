@@ -4,8 +4,7 @@
 
 import peewee
 
-from nutrsc import constants as NUT
-from nutrsc import mali
+from nutrsc.mali import *
 from . import BaseModel, Report, NUTInput
 
 
@@ -13,15 +12,15 @@ class ConsumptionReport(BaseModel):
 
     """ Agregates InputConsumption Reports for a CAP and a Report """
 
-    MAM = NUT.MODERATE
-    SAM = NUT.SEVERE
-    SAMP = NUT.SEVERE_COMP
+    MAM = MODERATE
+    SAM = SEVERE
+    SAMP = SEVERE_COMP
 
     # unique_together = ('report', 'nut_type')
 
     report = peewee.ForeignKeyField(Report, related_name='cons_reports')
     nut_type = peewee.CharField(max_length=20)
-    version = peewee.CharField(max_length=2, default=NUT.DEFAULT_VERSION)
+    version = peewee.CharField(max_length=2, default=DEFAULT_VERSION)
 
     def __unicode__(self):
         cap = self.nut_type.upper()
@@ -65,7 +64,7 @@ class ConsumptionReport(BaseModel):
         self.delete_instance()
 
     @classmethod
-    def create_safe(cls, report, nut_type, version=NUT.DEFAULT_VERSION):
+    def create_safe(cls, report, nut_type, version=DEFAULT_VERSION):
 
         # return existing row if applicable
         if cls.filter(report=report,
@@ -80,7 +79,7 @@ class ConsumptionReport(BaseModel):
         # create input-related reports
         try:
             for input_code \
-            in mali.CONSUMPTION_TABLE[r.nut_type][NUT.DEFAULT_VERSION]:
+            in CONSUMPTION_TABLE[r.nut_type][DEFAULT_VERSION]:
                 ninput = NUTInput.filter(slug=input_code).get()
                 ir = InputConsumptionReport.create_safe(cons_report=r,
                                                         nut_input=ninput)
@@ -159,5 +158,5 @@ class InputConsumptionReport(BaseModel):
     def CAP(self):
         return self.cons_report.nut_type
     
-    def valid(self):
+    def is_valid(self):
         return self.consumed <= self.possessed

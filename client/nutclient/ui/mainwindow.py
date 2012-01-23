@@ -96,7 +96,7 @@ class MainWindow(QtGui.QMainWindow):
         self.timer = None
 
     def change_context(self, context_widget, *args, **kwargs):
-        print('change_context: %s || %s' % (args, kwargs))
+        #print(u'change_context: %s || %s' % (args, kwargs))
 
         # check permissions
         if context_widget.require_logged_user() and not self.is_logged():

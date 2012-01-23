@@ -4,8 +4,7 @@
 
 import peewee
 
-from nutrsc import constants as NUT
-from nutrsc import mali
+from nutrsc.mali import *
 from . import BaseModel, Report, NUTInput
 
 
@@ -13,9 +12,9 @@ class OrderReport(BaseModel):
 
     """ Aggregates InputOrderReport for a report """
 
-    MAM = NUT.MODERATE
-    SAM = NUT.SEVERE
-    SAMP = NUT.SEVERE_COMP
+    MAM = MODERATE
+    SAM = SEVERE
+    SAMP = SEVERE_COMP
 
     # unique_together = ('period', 'entity', 'type', 'nut_type')
 
@@ -59,7 +58,7 @@ class OrderReport(BaseModel):
         self.delete_instance()
 
     @classmethod
-    def create_safe(cls, report, nut_type, version=NUT.DEFAULT_VERSION):
+    def create_safe(cls, report, nut_type, version=DEFAULT_VERSION):
         
         # return existing row if applicable
         if cls.filter(report=report,
@@ -74,7 +73,7 @@ class OrderReport(BaseModel):
         # create input-related reports
         try:
             for input_code \
-            in mali.CONSUMPTION_TABLE[r.nut_type][NUT.DEFAULT_VERSION]:
+            in CONSUMPTION_TABLE[r.nut_type][DEFAULT_VERSION]:
                 ninput = NUTInput.filter(slug=input_code).get()
                 ir = InputOrderReport.create_safe(order_report=r, 
                                                   nut_input=ninput)

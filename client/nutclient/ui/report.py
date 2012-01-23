@@ -203,10 +203,16 @@ class ReportWidget(NUTWidget):
             if self.table.validate():
                 self.report.touch()
                 self.table.save()
+                # check completeness on last page
+                if self.current_page == self.PAGES[-1]:
+                    if self.report.is_valid():
+                        self.report.mark_as_complete()
+                        return True
+                    else:
+                        return False
                 return True
             else:
                 return False
-
         # don't know where we at
         return False
             
@@ -226,24 +232,17 @@ class ReportWidget(NUTWidget):
         self.setLayout(self.vbox)
 
     def transmit(self):
-
-        def is_ready():
-            if self.table.validate():
-                self.report.touch()
-                self.table.save()
-                if self.report.is_valid():
-                    return True
-            return False
         
-        if not is_ready():
+        if not self.save_and_validate_current_page():
             QtGui.QMessageBox.warning(self, u"Impossible de transmettre.",
                               u"Impossible de transmettre "
                               u"le rapport. Les données ne sont pas correctes."
                               u"\nVous devez les corriger pour re-essayer."),
             return False
         
-        QtGui.QMessageBox.info(self, u"Transmission en cours...",
-                                     u"Le rapport est en cours de Transmission.")
+        QtGui.QMessageBox.information(self, u"Transmission en cours...",
+                                            u"Le rapport est en cours de "
+                                            u"Transmission.")
         return True
 
     def build_default_layout(self, page):
@@ -288,6 +287,37 @@ class ReportWidget(NUTWidget):
             vbox.addWidget(title)
 
         vbox.addWidget(widget.table)
+
+        if page == self.PEC_RECAP:
+            others_box = QtGui.QHBoxLayout()
+
+            others_label = BoldLabel(u"Spécifier Autres:")
+
+            widget.others_tb_field = ReportValueEdit(widget, None, self.report, 'others_tb')
+            others_tb_label = BoldLabel(u"Tuberculeux")
+            others_tb_label.setBuddy(widget.others_tb_field)
+
+            widget.others_hiv_field = ReportValueEdit(widget, None, self.report, 'others_hiv')
+            others_hiv_label = BoldLabel(u"PV VIH")
+            others_hiv_label.setBuddy(widget.others_hiv_field)
+
+            widget.others_lwb_field = ReportValueEdit(widget, None, self.report, 'others_lwb')
+            others_lwb_label = BoldLabel(u"Petits poids de naissance")
+            others_lwb_label.setBuddy(widget.others_lwb_field)
+
+            others_line = QtGui.QWidget()
+            others_box.addWidget(others_label)
+            others_box.addWidget(others_tb_label)
+            others_box.addWidget(widget.others_tb_field)
+            others_box.addWidget(others_hiv_label)
+            others_box.addWidget(widget.others_hiv_field)
+            others_box.addWidget(others_lwb_label)
+            others_box.addWidget(widget.others_lwb_field)
+            others_box.addStretch()
+            others_line.setLayout(others_box)
+
+            vbox.addWidget(others_line)
+
         vbox.addWidget(widget.instructions)
         vbox.addStretch(50)
         widget.setLayout(vbox)

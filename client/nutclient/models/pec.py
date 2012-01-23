@@ -395,7 +395,13 @@ class PECReport(object):
                 < self.get_sum_out_gender(age)):
                 return False
          
-        return False
+        return True
+
+    def previous(self):
+        prev_parent = self.report.previous()
+        if prev_parent:
+            return prev_parent.get_pec_report(self.CAP)
+        return None
 
 class PECMAMReport(BaseModel, PECReport):
 

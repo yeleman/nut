@@ -47,6 +47,9 @@ class Report(BaseModel):
 
     def __unicode__(self):
         return self.period.__unicode__()
+    
+    def __str__(self):
+        return '%d/%d' % (self.period.month, self.period.year)
 
     def caps(self):
         caps = []
@@ -127,13 +130,14 @@ class Report(BaseModel):
         """ mark report as changed (change status according to previous one) """
         # can't touch such a report
         if self.status in (self.STATUS_SENT, self.STATUS_VALIDATED):
-        
             return False
         
         if self.status <= self.STATUS_COMPLETE:
             self.status = self.STATUS_DRAFT
         else:
             self.status = self.STATUS_LOCAL_MODIFIED
+        self.save()
+        return True
 
     def verbose_status(self):
         for status, name in self.STATUSES:
@@ -156,7 +160,6 @@ class Report(BaseModel):
         
         # check the Other values
         pec_reports_others = sum([report.all_other for report in self.pec_reports()])
-        print('pec_reports_others: %d' % pec_reports_others)
         if self.all_others != pec_reports_others:
             return False
         
@@ -272,6 +275,26 @@ class Report(BaseModel):
     @property
     def all_others(self):
         return sum([self.others_lwb, self.others_hiv, self.others_tb])
+    
+    @property
+    def sum_all_others(self):
+        ''' sum of all others field from linked reports '''
+        return sum([report.all_other for report in self.pec_reports()])
+
+    def has_previous_validated(self):
+        return Report.filter(period=self.period.previous(),
+                             status=self.STATUS_VALIDATED).count()
+
+    def previous(self):
+        if self.has_previous_validated():
+            return Report.filter(period=self.period.previous(),
+                                 status=self.STATUS_VALIDATED).get()
+        return None
+
+    def mark_as_complete(self):
+        if self.status < self.STATUS_COMPLETE:
+            self.status = self.STATUS_COMPLETE
+            self.save()
 
 
 class ReportHistory(BaseModel):

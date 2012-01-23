@@ -125,16 +125,24 @@ class PECADMCRITReportTable(PECReportTable):
                          u"PB<11cm\nou\nPB<18cm",
                          u"Œdeme", u"Autre", "TOTAL\nADMIS"]
 
-        self.report_field_dict = [{'f': ReportAutoBeginingTotal},
-                                  {'n': 'total_beginning_m'},
-                                  {'n': 'total_beginning_f'},
-                                  {'n': 'hw_b7080_bmi_u18'},
-                                  {'n': 'muac_u120'},
-                                  {'n': 'hw_u70_bmi_u16'},
-                                  {'n': 'muac_u11_muac_u18'},
-                                  {'n': 'oedema'},
-                                  {'n': 'other'},
-                                  {'f': ReportAutoAdmissionTotal}]
+        self.report_field_dict = [{'f': ReportAutoBeginingTotal}]
+
+        if self.report.has_previous_validated():
+            self.report_field_dict += [{'n': 'total_beginning_m',
+                                        'f': ReportAutoPrevious},
+                                       {'n': 'total_beginning_f',
+                                        'f': ReportAutoPrevious}]
+        else:
+            self.report_field_dict += [{'n': 'total_beginning_m',},
+                                       {'n': 'total_beginning_f'}]
+
+        self.report_field_dict += [{'n': 'hw_b7080_bmi_u18'},
+                                   {'n': 'muac_u120'},
+                                   {'n': 'hw_u70_bmi_u16'},
+                                   {'n': 'muac_u11_muac_u18'},
+                                   {'n': 'oedema'},
+                                   {'n': 'other'},
+                                   {'f': ReportAutoAdmissionTotal}]
 
     def validate(self):
 
@@ -281,7 +289,25 @@ class PECRECAPReportTable(PECReportTable):
                                   {'n': 'total_end_f', 'f': ReportAutoValueRO, 'ro': True}]
 
     def validate(self):
-        # RECAP does not validate (yet)
+        # retrieve LWB, TB, HIV from outer widget and check those against
+        # all Others PEC values
+        hiv_field = self.parentWidget().others_hiv_field
+        tb_field = self.parentWidget().others_tb_field
+        lwb_field = self.parentWidget().others_lwb_field
+
+        return (sum([hiv_field.value, tb_field.value, lwb_field.value])
+               == self.report.sum_all_others)
+
+    def save(self):
+        if not self.validate():
+            return False
+    
+        # nothing to save on that table (it's a recap)
+        # we'll save the Others fields (not on table though)
+        for other_field in ('hiv', 'tb', 'lwb'):
+            field = getattr(self.parentWidget(), 'others_%s_field' % other_field)
+            setattr(self.report, 'others_%s' % other_field, field.value)
+        self.report.save()
         return True
 
 
@@ -455,6 +481,27 @@ class PECOUTInstructions(PECInstructions):
 
 class PECRECAPInstructions(PECInstructions):
 
-    def timerEvent(self, event):
-        self.live_refresh()
-        self.killTimer(event.timerId())
+    def live_refresh(self):
+        self.reset()
+
+        # retrieve LWB, TB, HIV from outer widget and check those against
+        # all Others PEC values
+        hiv_field = self.table.parentWidget().others_hiv_field
+        tb_field = self.table.parentWidget().others_tb_field
+        lwb_field = self.table.parentWidget().others_lwb_field
+        sum_filled = sum([hiv_field.value, tb_field.value, lwb_field.value])
+
+        if (sum_filled != self.table.report.sum_all_others):
+            box = QtGui.QHBoxLayout()
+            box.addWidget(IconLabel(QtGui.QPixmap('images/error.png')))
+            errstr = (u"La répartition des <i>Autres</i>: <b>%d</b> "
+                      u"ne correspond pas à la somme des admissions "
+                      u"<i>autres</i>: <b>%d</b>.") \
+                 % (sum_filled, self.table.report.sum_all_others)
+
+            box.addWidget(ErrorLabel(errstr))
+            box.addStretch(50)
+            wbox = QtGui.QWidget()
+            wbox.setLayout(box)
+            self.elems.append(wbox)
+        self.refresh()

@@ -97,6 +97,24 @@ class Period(BaseModel):
         else:
             return cls.select().get(datestr=datestr)
 
+    def next(self):
+        if self.month < 12:
+            nmonth = self.month + 1
+            nyear = self.year
+        else:
+            nmonth = 1
+            nyear = self.year + 1
+        return Period.from_date(date(nyear, nmonth, 1))
+
+    def previous(self):
+        if self.month > 1:
+            nmonth = self.month - 1
+            nyear = self.year
+        else:
+            nmonth = 12
+            nyear = self.year - 1
+        return Period.from_date(date(nyear, nmonth, 1))
+
 
 class NUTInput(BaseModel):
 

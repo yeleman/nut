@@ -204,6 +204,17 @@ class ReportAutoBeginingTotal(ReportAutoField):
         return m + f
 
 
+class ReportAutoPrevious(ReportAutoField):
+
+    @property
+    def value(self):
+        return getattr(self.report.previous(), self.field, 0)
+
+    @property
+    def _field(self):
+        return self.field
+
+
 class ReportAutoOutTotal(ReportAutoField):
 
     @property
