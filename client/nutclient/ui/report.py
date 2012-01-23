@@ -142,11 +142,13 @@ class ReportWidget(NUTWidget):
         return self.change_page(self.PAGES[ind - 1])
 
     def change_page(self, new_page):
-        if not self.can_change_page():
-            QtGui.QMessageBox.warning(self, u"Impossible de changer de page.",
-                              u"Les données en cours ne sont pas correctes." \
-                              u"\nVous devez les corriger pour continuer."),
-            return False
+        if (self.PAGES.index(new_page)
+            >= self.PAGES.index(self.current_page)):
+            if not self.can_change_page():
+                QtGui.QMessageBox.warning(self, u"Impossible de changer de page.",
+                                u"Les données en cours ne sont pas correctes."
+                                u"\nVous devez les corriger pour continuer.")
+                return False
 
         print('changing from %s to %s' % (self.current_page, new_page))
         
@@ -188,7 +190,8 @@ class ReportWidget(NUTWidget):
         self.stacked_table = QtGui.QStackedWidget()
 
         for lpage in self.PAGES:
-            self.stacked_table.addWidget(getattr(self, 'build_%s' % lpage.lower())(lpage))
+            self.stacked_table.addWidget(getattr(self, 'build_%s' 
+                                                       % lpage.lower())(lpage))
 
         self.current_page = self.PAGES[0]
         self.table.load_data(self.readonly)
