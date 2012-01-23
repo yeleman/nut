@@ -48,7 +48,7 @@ class Report(BaseModel):
     def __unicode__(self):
         return self.period.__unicode__()
     
-    def __str__(self):
+    def __repr__(self):
         return '%d/%d' % (self.period.month, self.period.year)
 
     def caps(self):

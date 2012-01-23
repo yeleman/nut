@@ -20,8 +20,8 @@ def main(args):
     reg = User.create(username='rgaudin',
                pwhash='-1355030878',
                active=True,
-               hc_code=u"ntil",
-               hc_name=u"N'Tillit",
+               hc_code=u"bazi",
+               hc_name=u"Bazi-Houssa",
                hc_ismam=True,
                hc_issam=True,
                hc_isamp=False)

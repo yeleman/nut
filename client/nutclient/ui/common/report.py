@@ -191,8 +191,6 @@ class ReportAutoField(ReportField, FlexibleReadOnlyWidget):
         return int(self.data(QtCore.Qt.EditRole).toPyObject())
 
     def get_flag(self):
-        if compare_expected_value(self.report, self.field, self.value):
-            return self.WARNING
         return None
 
 class ReportAutoBeginingTotal(ReportAutoField):
@@ -290,6 +288,12 @@ class ReportAutoAdmissionTotal(ReportAutoField):
                                   'muac_u11_muac_u18',
                                   'oedema',
                                   'other')])
+
+    def get_flag(self):
+
+        if compare_expected_value(self.report, '%s_admitted'% self.age, self.value):
+            return self.WARNING
+        return None
 
 
 class ReportAutoQuantitiesLeft(ReportAutoField):
