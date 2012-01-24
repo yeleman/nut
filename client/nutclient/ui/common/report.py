@@ -512,14 +512,27 @@ class ReportValueEditItem(ReportField):
 class ReportConsUsedValueEditItem(ReportValueEditItem):
 
     def get_flag(self):
-        print('ReportConsUsedValueEditItem')
-        if compare_expected_conso_value(self._report.cons_report.report.period,
+        comp = compare_expected_conso_value(self._report.cons_report.report.period,
                                         self._report.cons_report.report.hc_code,
                                         self._report.CAP,
                                         self._report.nut_input,
-                                        self.value):
-            print('\tYES')
-        #if compare_expected_cons_value(self.report, '%s_admitted'% self.age, self.value):
+                                        self.value)
+        print('ReportOrderValueEditItem get_flag  %s' % comp)
+        if comp:
+            return self.WARNING
+        return None
+
+
+class ReportOrderValueEditItem(ReportValueEditItem):
+
+    def get_flag(self):
+        comp = compare_expected_order_value(self._report.order_report.report.period,
+                                        self._report.order_report.report.hc_code,
+                                        self._report.CAP,
+                                        self._report.nut_input,
+                                        self.value)
+        print('ReportOrderValueEditItem get_flag  %s' % comp)
+        if comp:
             return self.WARNING
         return None
 

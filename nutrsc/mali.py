@@ -44,7 +44,8 @@ HC_CAPS = {
     SEVERE: u"URENAS",
     SEVERE_COMP: u"URENI"}
 
-# percentage from which expected and real data differing should raise warning
+# percentage from which expected 
+# and real data differing should raise warning
 WARNING_DIFF_RATE = 15
 AVG_GROWTH_RATE = 2.63
 
@@ -73,6 +74,12 @@ def compare_expected_conso_value(period, hc_code, cap, nut_input, value):
 
     diff = (WARNING_DIFF_RATE / 100.0) * exp_value
     return value > (exp_value + diff) or value < (exp_value - diff)
+
+
+def compare_expected_order_value(period, hc_code, cap, nut_input, value):
+    # order are consumption reports based on period + 2months
+    period = period.next().next()
+    return compare_expected_conso_value(period, hc_code, cap, nut_input, value)
 
 
 def get_expected_adm_value(report, field):
@@ -141,19 +148,17 @@ def get_total_adm_for(hc_code, cap, age, period=None, year=None, month=None):
         # retrieve value from flat data
         try:
             if period.year in (2009, 2010, 2011):
-                return get_avg_adm_for(hc_code, period.month, cap, age)
-            else:
                 return gao_data.PEC_ADM[hc_code][period.year][period.month][cap][age]
-        except IndexError:
-            return None
+            else:
+                return get_avg_adm_for(hc_code, period.month, cap, age)
+        except KeyError:
+            return None  # TODO
 
 def get_avg_adm_for(hc_code, month, cap, age):
     years = gao_data.PEC_ADM[hc_code].keys()
     total = sum([gao_data.PEC_ADM[hc_code][year][month][cap][age] 
                   for year in years])
     return float(total) / len(years)
-
-
 
 
 def sum_dicts(*dicts):
@@ -168,6 +173,7 @@ def sum_dicts(*dicts):
 
 def pick_mam_ration_type(csb, niebe):
     import random
+    return csb
     return [csb, niebe][random.randint(0, 1)]
 
 class DataAccessor(object):
@@ -198,11 +204,15 @@ class DataAccessor(object):
         # no data for split-up
         da.CAP = cap
         da.others_tb = 0
-        da.others_lwb = 0
+        da.others_lwb = 0 
         da.others_hiv = 0
 
         for age in POPULATIONS_CAP[cap]:
-            setattr(da, '%s_admitted' % age, get_total_adm_for(hc_code, cap, age, period=period))
+            admitted = get_total_adm_for(hc_code, cap, age, period=period)
+            print('calculated admitted for %s %s %s: %s' % (period, hc_code, cap, admitted))
+            if not admitted:
+                admitted = 0
+            setattr(da, '%s_admitted' % age, admitted)
             setattr(da, '%s_other' % age, 0)
         
         return da
@@ -219,9 +229,7 @@ class DataAccessor(object):
 
 
 def get_expected_conso_value(period, hc_code, cap, nut_input):
-
     data = DataAccessor.from_period(period, hc_code, cap)
-    print(data)
     if not data.CAP:
         return None
 

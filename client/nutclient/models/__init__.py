@@ -124,6 +124,9 @@ class NUTInput(BaseModel):
     def __unicode__(self):
         return self.name
 
+    def __repr__(self):
+        return self.slug
+
 
 class Message(BaseModel):
 

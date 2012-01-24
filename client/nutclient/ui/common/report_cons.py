@@ -91,7 +91,7 @@ class CONSORDERReportTable(ReportFlexibleTable):
                 cells.append(ReportConsUsedValueEditItem(self, icr, 'used', None))
                 cells.append(ReportValueEditItem(self, icr, 'lost', None))
                 cells.append(ReportAutoQuantitiesLeft(self, icr, 'left', None))
-                cells.append(ReportValueEditItem(self, ior, 'quantity', None))
+                cells.append(ReportOrderValueEditItem(self, ior, 'quantity', None))
 
                 self.data.append(cells)
         # add total line
