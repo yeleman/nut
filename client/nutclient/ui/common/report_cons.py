@@ -88,7 +88,7 @@ class CONSORDERReportTable(ReportFlexibleTable):
                 cells = []
                 cells.append(ReportValueEditItem(self, icr, 'initial', None))
                 cells.append(ReportValueEditItem(self, icr, 'received', None))
-                cells.append(ReportValueEditItem(self, icr, 'used', None))
+                cells.append(ReportConsUsedValueEditItem(self, icr, 'used', None))
                 cells.append(ReportValueEditItem(self, icr, 'lost', None))
                 cells.append(ReportAutoQuantitiesLeft(self, icr, 'left', None))
                 cells.append(ReportValueEditItem(self, ior, 'quantity', None))

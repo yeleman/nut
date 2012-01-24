@@ -291,7 +291,7 @@ class ReportAutoAdmissionTotal(ReportAutoField):
 
     def get_flag(self):
 
-        if compare_expected_value(self.report, '%s_admitted'% self.age, self.value):
+        if compare_expected_adm_value(self.report, '%s_admitted'% self.age, self.value):
             return self.WARNING
         return None
 
@@ -476,10 +476,11 @@ class ReportValueEdit(QtGui.QLineEdit):
         self._table.cell_updated(self)
 
 
-class ReportValueEditItem(QtGui.QTableWidgetItem):
+class ReportValueEditItem(ReportField):
 
     def __init__(self, parent, report, field, age):
-        QtGui.QTableWidgetItem.__init__(self, "?", 0)
+        super(ReportValueEditItem, self).__init__("?", 0)
+        #QtGui.QTableWidgetItem.__init__(self, "?", 0)
         
         self._parent = parent
         self._report = report
@@ -494,9 +495,10 @@ class ReportValueEditItem(QtGui.QTableWidgetItem):
 
         self.live_refresh()
 
-    def live_refresh(self):
+    '''def live_refresh(self):
         self.setData(QtCore.Qt.EditRole, str(self.value))
         self.setData(QtCore.Qt.DisplayRole, str(self.value))
+    '''
 
     @property
     def value(self):
@@ -505,6 +507,21 @@ class ReportValueEditItem(QtGui.QTableWidgetItem):
         except:
             return getattr(self._report, self._field)
         
+
+
+class ReportConsUsedValueEditItem(ReportValueEditItem):
+
+    def get_flag(self):
+        print('ReportConsUsedValueEditItem')
+        if compare_expected_conso_value(self._report.cons_report.report.period,
+                                        self._report.cons_report.report.hc_code,
+                                        self._report.CAP,
+                                        self._report.nut_input,
+                                        self.value):
+            print('\tYES')
+        #if compare_expected_cons_value(self.report, '%s_admitted'% self.age, self.value):
+            return self.WARNING
+        return None
 
 
 class ReportItemEditorFactory(QtGui.QItemDelegate):
