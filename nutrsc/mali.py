@@ -362,7 +362,7 @@ def ration_samp(age, other_type=None):
         else:
             ration = {}
 
-        if under_59:
+        if age in ('u6', 'u59'):
             extra = {PPN: nb_extra_ppn_child * nb_days}
         else:
             extra = {PPN: nb_extra_ppn_adult * nb_days}
