@@ -10,8 +10,8 @@ from django.conf import settings
 
 from nutrsc.constants import *
 from nutrsc.errors import REPORT_ERRORS
-from nutrsc.data import CONSMAMDataHolder, CONSSAMDataHolder,
-                        CONSSAMPDataHolder, CONSInputDataHolder
+from nutrsc.data import (CONSMAMDataHolder, CONSSAMDataHolder,
+                         CONSSAMPDataHolder, CONSInputDataHolder)
 from nutrsc.validators import CONSReportValidator
 from nut.models import ConsumptionReport, InputConsumptionReport, NUTInput
 from bolibana.models import Report, MonthPeriod
