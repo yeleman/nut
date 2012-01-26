@@ -1,7 +1,6 @@
 # Django settings for pnlp2011 project.
 
 import os
-import sys
 import tempfile
 
 ROOT_DIR = os.path.dirname(os.path.abspath(__file__))
@@ -114,7 +113,7 @@ MIDDLEWARE_CLASSES = (
     'bolibana.web.middleware.Http403Middleware',
 )
 
-ROOT_URLCONF = 'ylmnut.urls'
+ROOT_URLCONF = 'urls'
 
 TEMPLATE_DIRS = (
 )
@@ -227,6 +226,8 @@ TEMPLATE_CONTEXT_PROCESSORS = ("django.contrib.auth.context_processors.auth",
     "bolibana.web.context_processors.add_level")
 
 AUTH_PROFILE_MODULE = 'bolibana.Provider'
+
+DATABASE_ROUTERS = ['nosmsd.django_routers.NoSMSdRouter']
 
 # loads custom settings from a separate file
 try:

@@ -2,27 +2,31 @@
 # encoding: utf-8
 # maintainer: rgaudin
 
-import datetime
 import logging
 import locale
 
 import reversion
-from django.utils.translation import ugettext as _
 from django.conf import settings
 from django.db import transaction
 
-from bolibana.models import Report, Provider, Entity, MonthPeriod
+from bolibana.models import Provider, Entity, MonthPeriod
 from bolibana.tools.utils import provider_can
 from ylmnut.data import current_reporting_period, contact_for
 from nutrsc.errors import REPORT_ERRORS
-from nutrsc.tools import generate_user_hash
 from pec_report import pec_sub_report
 from cons_report import cons_sub_report
 from order_report import order_sub_report
+from other_report import other_sub_report
 from nut.models import NUTEntity
 
 logger = logging.getLogger(__name__)
 locale.setlocale(locale.LC_ALL, settings.DEFAULT_LOCALE)
+
+
+SUB_REPORTS = {'pec': pec_sub_report,
+               'cons': cons_sub_report,
+               'order': order_sub_report,
+               'other': other_sub_report}
 
 
 def nut_report(message, args, sub_cmd, **kwargs):
@@ -39,7 +43,7 @@ def nut_report(message, args, sub_cmd, **kwargs):
     Sub sections for capabilities: &MAM, &SAM &SAMP
     Sub sub sections for age break downs |u6 |u59 |o59 |pw |fu1 |fu12
 
-    > nut report rgaudin renaud 1111
+    > nut report rgaudin 89080392890 1111
     #P&MAM|u59 6817 7162 2164 1033 6527 5715 6749 2174 4201
     3675 8412 2331 4868 4765 1896 2107 3457 6308 6238 6589 2432 5983 3871|pw
     6817 7162 2164 1033 6527 5715 6749 2174 4201 3675 8412 2331 4868 4765
@@ -164,7 +168,7 @@ def nut_report(message, args, sub_cmd, **kwargs):
 
     # split up infos
     try:
-        username, password, date_str = infos.strip().split()
+        username, pwhash, date_str = infos.strip().split()
     except:
         return resp_error('BAD_FORM_INFO', REPORT_ERRORS['BAD_FORM_INFO'])
 
@@ -174,8 +178,8 @@ def nut_report(message, args, sub_cmd, **kwargs):
     except Provider.DoesNotExist:
         return resp_error('NO_ACC', REPORT_ERRORS['NO_ACC'])
 
-    # check that provider password is good
-    if not provider.check_password(password):
+    # check that provider pwhash is good
+    if not provider.check_hash(pwhash):
         return resp_error('BAD_PASS', REPORT_ERRORS['BAD_PASS'])
 
     # check that user is not disabled
@@ -217,7 +221,7 @@ def nut_report(message, args, sub_cmd, **kwargs):
              'year': year,
              'period': period,
              'username': username,
-             'password': password}
+             'pwhash': pwhash}
 
     """
     reports = {
@@ -248,7 +252,7 @@ def nut_report(message, args, sub_cmd, **kwargs):
             return resp_error('BAD_CAP', REPORT_ERRORS['BAD_CAP'])
 
         # call sub-report section handler
-        sec_succ, sec_data = eval('%s_sub_report' % section)(message,
+        sec_succ, sec_data = SUB_REPORTS.get(section)(message,
                                                              sec, infos,
                                                              reports)
         # cancel if sub report failed.

@@ -7,18 +7,17 @@ from django.utils.translation import ugettext as _
 from bolibana.models import Provider, Entity
 from nut.models import NUTEntity
 from nutrsc.errors import LOGIN_ERRORS
-from nutrsc.tools import generate_user_hash
 
 
 def nut_login(message, args, sub_cmd, **kwargs):
     """ Client login handshake
 
     At first use or on request, user identifies itself into the system.
-    He sends his login/password to the server.
+    He sends his login/pwhash to the server.
     The server then sends back either an error code + message or a credential
     with an indication of the HC capabilities: MAM, SAM, SAM+.
 
-    > nut login rgaudin renaud
+    > nut login rgaudin 4663950500290933446
     < nut logged-in 4663950500290933446 mam+sam ntil|N'Tillit
                 hash capabilities HC-code | HC Name
     < nut logged-out 0|Cet identifiant n'existe pas.
@@ -38,11 +37,11 @@ def nut_login(message, args, sub_cmd, **kwargs):
                 caps.append(cap)
         return '+'.join(caps)
 
-    # extract username & password
+    # extract username & pwhash
     try:
-        username, password = args.split()
+        username, pwhash = args.split()
         username = username.strip()
-        password = password.strip()
+        pwhash = pwhash.strip()
     except:
         return resp_error('OTHER', _(u"Malformed login request."))
 
@@ -52,17 +51,14 @@ def nut_login(message, args, sub_cmd, **kwargs):
     except Provider.DoesNotExist:
         return resp_error('NO_ACC', LOGIN_ERRORS['NO_ACC'])
 
-    # check that provider password is good
-    if not provider.check_password(password):
+    # check that provider pwhash is good
+    if not provider.check_hash(pwhash):
         return resp_error('BAD_PASS', LOGIN_ERRORS['BAD_PASS'])
 
     # check that user is not disabled
     if not provider.is_active:
         return resp_error('ACC_DIS', LOGIN_ERRORS['ACC_DIS'])
-
-    # generate hash from username and password
-    user_hash = generate_user_hash(username, password)
-
+    
     # retrieve entity
     try:
         entity = provider.first_target()
@@ -79,7 +75,7 @@ def nut_login(message, args, sub_cmd, **kwargs):
 
     # all good, let's send that SMS back
     msg = u"nut logged-in %(user)s %(hash)s %(nutcap)s %(hcslug)s|%(hcname)s" \
-          % {'hash': user_hash, 'nutcap': nutcap, 'hcslug': entity.slug,
+          % {'hash': pwhash, 'nutcap': nutcap, 'hcslug': entity.slug,
              'hcname': entity.name.title(), 'user': username}
 
     message.respond(msg)
