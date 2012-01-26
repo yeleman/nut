@@ -20,7 +20,7 @@ class Command(BaseCommand):
         # find the ID of the NUTEntity CT
         for ct in ContentType.objects.all():
             if ct.model_class() == NUTEntity:
-                nut_id = ct.id
+                nut_id = ct
                 break
         
         if not nut_id:
@@ -30,7 +30,7 @@ class Command(BaseCommand):
         access = Access.objects.all()
 
         for acc in access:
-            acc.object_id = nut_id
+            acc.content_type = nut_id
             acc.save()
             print(u"\tfixed %s" % acc)
         
