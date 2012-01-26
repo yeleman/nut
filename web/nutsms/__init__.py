@@ -9,9 +9,6 @@ import re
 
 from django.conf import settings
 
-from nosms.models import Message
-from nosms.utils import send_sms
-
 from .login import nut_login
 from .report import nut_report
 
@@ -29,12 +26,13 @@ def nosms_handler(message):
             'test': nut_test,
             'echo': nut_echo}
 
-        if message.text.lower().startswith('nut '):
+        if message.content.lower().startswith('nut '):
             for cmd_id, cmd_target in commands.items():
                 command = '%s %s' % (keyword, cmd_id)
-                if message.text.lower().startswith(command):
+                if message.content.lower().startswith(command):
                     n, args = re.split(r'^%s\s?' \
-                                       % command, message.text.lower().strip())
+                                       % command,
+                                         message.content.lower().strip())
                     return cmd_target(message,
                                       args=args,
                                       sub_cmd=cmd_id,
@@ -43,7 +41,7 @@ def nosms_handler(message):
             return False
 
     if main_nut_handler(message):
-        message.status = Message.STATUS_PROCESSED
+        message.status = message.STATUS_PROCESSED
         message.save()
         logger.info(u"[HANDLED] msg: %s" % message)
         return True

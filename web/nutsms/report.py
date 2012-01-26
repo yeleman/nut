@@ -9,6 +9,7 @@ import reversion
 from django.conf import settings
 from django.db import transaction
 
+from nosmsd.utils import send_sms
 from bolibana.models import Provider, Entity, MonthPeriod
 from bolibana.tools.utils import provider_can
 from ylmnut.data import current_reporting_period, contact_for

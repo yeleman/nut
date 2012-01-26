@@ -2,9 +2,7 @@
 # encoding: utf-8
 # maintainer: rgaudin
 
-from django.utils.translation import ugettext as _
-
-from nosms.utils import send_sms
+from nosmsd.utils import send_sms
 
 
 def nut_service(recipients, flag, text):
@@ -26,7 +24,7 @@ def nut_service(recipients, flag, text):
             if hasattr(recipient, 'phone_number'):
                 ph = recipient.phone_number
             else:
-                logger.error(u"Unable to send SMS to recipient: %s" \
+                print(u"Unable to send SMS to recipient: %s" \
                              % (recipient))
                 continue
         send_sms(ph, msg)
