@@ -10,3 +10,13 @@ REPO:
     https://github.com/yeleman/bolibana
 
     Also symlink nut/web as ylmnut
+
+    copy local_settings.py.example
+
+    copy nosmsd.conf.py.example
+
+    symlink nosmsd.conf.py to /etc/
+
+    ./manage.py loaddata fixtures/*.json
+
+    ./manage.py nut_fixtures
