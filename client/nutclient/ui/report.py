@@ -9,6 +9,7 @@ from datetime import date, datetime
 from PyQt4 import QtGui, QtCore
 from PyQt4.QtCore import Qt
 
+from utils import send_report
 from common import *
 from nutclient.exceptions import *
 from nutclient.utils import offline_login
@@ -254,11 +255,17 @@ class ReportWidget(NUTWidget):
                               u"le rapport. Les données ne sont pas correctes."
                               u"\nVous devez les corriger pour re-essayer."),
             return False
-        
-        QtGui.QMessageBox.information(self, u"Transmission en cours...",
-                                            u"Le rapport est en cours de "
-                                            u"Transmission.")
-        return True
+
+        if send_report(self.report, self.user):
+            self.report.status = self.report.STATUS_SENT
+            self.report.save()
+            QtGui.QMessageBox.information(self, u"Transmission en cours...",
+                                                u"Le rapport est en cours de "
+                                                u"Transmission.\n\n"
+                                                u"Veuillez attendre la "
+                                                u"confirmation du serveur.")
+            return True
+        return False
 
     def build_default_layout(self, page):
 

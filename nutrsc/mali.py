@@ -167,13 +167,16 @@ def sum_dicts(*dicts):
     keys = []
     for dic in dicts: keys += dic.keys()
     keys = list(set(keys))
+    #keys = set(sum((dic.keys() for dic in dicts), []))
     for key in keys:
         d[key] = sum([dic.get(key, 0) for dic in dicts])
     return d
 
 def pick_mam_ration_type(csb, niebe):
-    import random
+    
     return csb
+    
+    import random
     return [csb, niebe][random.randint(0, 1)]
 
 class DataAccessor(object):

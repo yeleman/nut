@@ -9,6 +9,8 @@ from nutclient.exceptions import *
 
 from nosmsd.utils import send_sms
 
+from sms.outgoing import report_sms
+
 
 def offline_login(username, password):
     """ test a username/password couple locally for access """
@@ -42,3 +44,19 @@ def formatted_number(number):
                      .decode(locale.getlocale()[1])
     except:
         return "%s" % number
+
+
+def send_report(report, user):
+    # can only send complete reports (or re-send)
+    if not report.status in (report.STATUS_COMPLETE,
+                             report.STATUS_LOCAL_MODIFIED,
+                             report.STATUS_SENT):
+        return False
+    
+    sms = (u"nut report %(user)s %(pwhash)s %(report)s-EOM-"
+           % {'user': user.username,
+              'pwhash': user.pwhash,
+              'report': report_sms(report)})
+
+    send_sms(config.SRV_NUM, sms)
+    return True

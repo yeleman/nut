@@ -24,8 +24,6 @@ class Options(dict, object):
 
     def __getattribute__(self, name):
         def update(slug, value):
-            print(slug)
-            print(value)
             if Setting.filter(slug=name).count():
                 sett = Setting.filter(slug=name).get()
             else:
