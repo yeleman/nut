@@ -234,12 +234,12 @@ def nut_report(message, args, sub_cmd, **kwargs):
         sec = sub_sections_from_section(eval('%s_sec' % section))
 
         # check that capabilities correspond to entity
-        if not check_capabilities(sec, entity):
+        if sid != 'T' and not check_capabilities(sec, entity):
             return resp_error('BAD_CAP', REPORT_ERRORS['BAD_CAP'])
 
         # call sub-report section handler
         sec_succ, sec_data = SUB_REPORTS.get(section)(message,
-                                                             sec, infos)
+                                                      sec, infos, reports)
         # cancel if sub report failed.
         if not sec_succ:
             logger.warning(u"   FAILED.")

@@ -20,7 +20,7 @@ logger = logging.getLogger(__name__)
 locale.setlocale(locale.LC_ALL, settings.DEFAULT_LOCALE)
 
 
-def cons_sub_report(message, cons, infos):
+def cons_sub_report(message, cons, infos, *args):
     """ PEC Report part of main Report SMS handling """
 
     def resp_error(code, msg):

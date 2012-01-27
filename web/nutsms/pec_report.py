@@ -19,7 +19,7 @@ logger = logging.getLogger(__name__)
 locale.setlocale(locale.LC_ALL, settings.DEFAULT_LOCALE)
 
 
-def pec_sub_report(message, pec, infos):
+def pec_sub_report(message, pec, infos, *args):
     """ PEC Report part of main Report SMS handling """
 
     def resp_error(code, msg):
