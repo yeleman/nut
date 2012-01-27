@@ -37,9 +37,7 @@ class PECReportValidator(DataValidator):
                                    fage('hw_u70_bmi_u16', age),
                                    fage('muac_u11_muac_u18', age),
                                    fage('oedema', age),
-                                   fage('other_hiv', age),
-                                   fage('other_tb', age),
-                                   fage('other_lwb', age)])
+                                   fage('other', age)])
             total_admission2 = sum([fage('new_case', age), fage('relapse', age),
                                    fage('returned', age),
                                    fage('nut_transfered_in', age),
