@@ -224,21 +224,6 @@ def nut_report(message, args, sub_cmd, **kwargs):
              'username': username,
              'pwhash': pwhash}
 
-    """
-    reports = {
-        'P':
-            {'MAM': [pr],
-            'SAM': [pr]},
-        'C':
-            {'MAM': [icr, icr, icr, cr],
-             'SAM': [icr, cr]},
-        'O':
-            {'MAM': [ior, ior, ior, or],
-             'SAM': [ior, or]},
-        'T': 
-            {'ALL': [tr]},
-        } """
-
     # SECTIONS
     for sid, section in {'P': 'pec', 'C': 'cons',
                          'O': 'order', 'T': 'other'}.items():
@@ -254,8 +239,7 @@ def nut_report(message, args, sub_cmd, **kwargs):
 
         # call sub-report section handler
         sec_succ, sec_data = SUB_REPORTS.get(section)(message,
-                                                             sec, infos,
-                                                             reports)
+                                                             sec, infos)
         # cancel if sub report failed.
         if not sec_succ:
             logger.warning(u"   FAILED.")
