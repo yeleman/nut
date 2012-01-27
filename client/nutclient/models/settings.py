@@ -24,10 +24,10 @@ class Options(dict, object):
 
     def __getattribute__(self, name):
         def update(slug, value):
-            if Setting.filter(slug=name).count():
-                sett = Setting.filter(slug=name).get()
+            if Setting.filter(slug=slug).count():
+                sett = Setting.filter(slug=slug).get()
             else:
-                sett = Setting(slug=name)
+                sett = Setting(slug=slug)
             sett.value = value
             sett.save()
             return sett.value
