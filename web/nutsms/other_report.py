@@ -33,7 +33,7 @@ def other_sub_report(message, other, infos, previous_reports, *args):
         lwb, tb, hiv = other.split()
         lwb = int(lwb.strip())
         tb = int(tb.strip())
-        hiv = int(tb.strip())
+        hiv = int(hiv.strip())
     except:
         return resp_error('BAD_FORM_OTHER',
                           REPORT_ERRORS['BAD_FORM_OTHER'])
@@ -42,7 +42,7 @@ def other_sub_report(message, other, infos, previous_reports, *args):
 
     # retrieve previously generated PEC report
     total_pec = []
-    for capid, cap_reports in previous_reports['pec']:
+    for capid, cap_reports in previous_reports['P'].items():
         total_pec.append(cap_reports[0].all_other)
     total_pec_others = sum(total_pec)
           
@@ -58,7 +58,7 @@ def other_sub_report(message, other, infos, previous_reports, *args):
 
     # create the report
     try:
-        report = PECOthers(period=infos['period'],
+        report = PECOthersReport(period=infos['period'],
                            entity=infos['entity'],
                            created_by=infos['provider'], \
                            type=Report.TYPE_SOURCE,
@@ -72,7 +72,7 @@ def other_sub_report(message, other, infos, previous_reports, *args):
     except Exception as e:
         #raise
         logger.error(u"Unable to save report to DB. Message: %s | Exp: %r" \
-                     % (message.text, e))
+                     % (message.content, e))
         return resp_error('SRV', REPORT_ERRORS['SRV'])
 
     return (True, reports)

@@ -51,7 +51,7 @@ def nosms_handler(message):
 
 def nut_test(message, **kwargs):
     try:
-        code, msg = message.text.split('nut test')
+        code, msg = message.content.split('nut test')
     except:
         msg = ''
 

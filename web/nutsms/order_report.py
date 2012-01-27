@@ -147,7 +147,7 @@ def order_sub_report(message, order, infos, *args):
         except Exception as e:
             #raise
             logger.error(u"Unable to save report to DB. Message: %s | Exp: %r" \
-                         % (message.text, e))
+                         % (message.content, e))
             return resp_error('SRV', REPORT_ERRORS['SRV'])
 
     return (True, reports)

@@ -144,7 +144,7 @@ def nut_report(message, args, sub_cmd, **kwargs):
                     except Exception as e:
                         logger.error(u"Unable to save report to DB. " \
                                      u"Message: %s | Exp: %r" \
-                                     % (message.text, e))
+                                     % (message.content, e))
                         transaction.rollback()
                         return False
         transaction.commit()
@@ -231,7 +231,10 @@ def nut_report(message, args, sub_cmd, **kwargs):
         logger.info("Processing %s" % section)
 
         # extract/split sub sections info from string
-        sec = sub_sections_from_section(eval('%s_sec' % section))
+        if sid == 'T':
+            sec = eval('%s_sec' % section)
+        else:
+            sec = sub_sections_from_section(eval('%s_sec' % section))
 
         # check that capabilities correspond to entity
         if sid != 'T' and not check_capabilities(sec, entity):
