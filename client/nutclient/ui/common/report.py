@@ -119,12 +119,17 @@ class ReportField(FlexibleWidget):
         else:
             if isinstance(self.COLORS[flag], basestring):
                 brush = QtGui.QBrush(eval('QtCore.Qt.%s' % self.COLORS[flag]))
-            elif self:
+            elif isinstance(self.COLORS[flag], tuple):
                 brush = QtGui.QBrush(QtGui.QColor(*self.COLORS[flag]))
+            else:
+                brush = self.default_text_brush
+
             if flag == self.ERROR:
                 self.setForeground(brush)
+                self.setBackground(self.default_brush)
             else:
                 self.setBackground(brush)
+                self.setForeground(self.default_text_brush)
 
         if not flag in self.ICONS:
             self.setIcon(QtGui.QIcon())
@@ -278,20 +283,51 @@ class ReportAutoValueRO(ReportAutoField):
         return getattr(self.report, self.field, 0)
 
 
+class ReportAutoAdmisssionValueRO(ReportAutoField):
+
+    def __init__(self, parent, report, field, age, *args, **kwargs):
+        self.expected = get_expected_adm_value(report, '%s_admitted'% age)
+        super(ReportAutoAdmisssionValueRO, self).__init__(parent, report,
+                                                       field, age,
+                                                       *args, **kwargs)
+        if self.expected is not None:
+            self.setToolTip(u"Prévision automatique: %d" % int(self.expected))
+
+    @property
+    def value(self):
+        return getattr(self.report, self.field, 0)
+
+
+    def get_flag(self):
+
+        if compare_expected_value(self.expected, self.value):
+            return self.WARNING
+        return None
+
+
 class ReportAutoAdmissionTotal(ReportAutoField):
+
+    def __init__(self, parent, report, field, age, *args, **kwargs):
+        self.expected = get_expected_adm_value(report, '%s_admitted'% age)
+        super(ReportAutoAdmissionTotal, self).__init__(parent, report,
+                                                       field, age,
+                                                       *args, **kwargs)
+        if self.expected is not None:
+            self.setToolTip(u"Prévision automatique: %d" % int(self.expected))
 
     @property
     def value(self):
         return sum([self.parent_table.get_field_value('%s_%s'
                                                       % (self.age, fname), self.report.CAP)
-                    for fname in ('hw_u70_bmi_u16',
+                    for fname in ('hw_b7080_bmi_u18',
+                                  'muac_u120',
+                                  'hw_u70_bmi_u16',
                                   'muac_u11_muac_u18',
                                   'oedema',
                                   'other')])
 
     def get_flag(self):
-
-        if compare_expected_adm_value(self.report, '%s_admitted'% self.age, self.value):
+        if compare_expected_value(self.expected, self.value):
             return self.WARNING
         return None
 
@@ -328,6 +364,14 @@ class ReportMultipleAutoAdmissionTotal(ReportAutoField):
 
         Values to type sum.
         Displays all data (criteria, type, genders) """
+
+    def __init__(self, parent, report, field, age, *args, **kwargs):
+        self.expected = get_expected_adm_value(report, '%s_admitted'% age)
+        super(ReportMultipleAutoAdmissionTotal, self).__init__(parent, report,
+                                                       field, age,
+                                                       *args, **kwargs)
+        if self.expected is not None:
+            self.setToolTip(u"Prévision automatique: %d" % int(self.expected))
 
     @property
     def value(self):
@@ -371,9 +415,14 @@ class ReportMultipleAutoAdmissionTotal(ReportAutoField):
     def get_flag(self):
         if self.value == self.criteria_value \
            and self.value == self.gender_value:
-            return None
+            if compare_expected_value(self.expected, self.value):
+                return self.WARNING
+            else:
+                return None
         else:
             return self.ERROR
+
+
 
 class ColumnSumItem(ReportAutoField):
 
@@ -489,8 +538,8 @@ class ReportValueEditItem(ReportField):
         self._must_valid = True
 
         self.setTextAlignment(Qt.AlignCenter | Qt.AlignVCenter)
-        self.setToolTip(self._field)
-        self.setWhatsThis(self._field)
+        #self.setToolTip(self._field)
+        #self.setWhatsThis(self._field)
         #self.setStatusTip(self._field)
 
         self.live_refresh()
@@ -511,13 +560,19 @@ class ReportValueEditItem(ReportField):
 
 class ReportConsUsedValueEditItem(ReportValueEditItem):
 
+    def __init__(self, parent, report, field, age, *args, **kwargs):
+        self.expected = get_expected_conso_value(report.cons_report.report.period,
+                                        report.cons_report.report.hc_code,
+                                        report.CAP,
+                                        report.nut_input)
+        super(ReportConsUsedValueEditItem, self).__init__(parent,
+                                                          report, field, age,
+                                                          *args, **kwargs)
+        if self.expected is not None:
+            self.setToolTip(u"Prévision automatique: %d" % int(self.expected))
+
     def get_flag(self):
-        comp = compare_expected_conso_value(self._report.cons_report.report.period,
-                                        self._report.cons_report.report.hc_code,
-                                        self._report.CAP,
-                                        self._report.nut_input,
-                                        self.value)
-        print('ReportOrderValueEditItem get_flag  %s' % comp)
+        comp = compare_expected_value(self.expected, self.value)
         if comp:
             return self.WARNING
         return None
@@ -525,13 +580,19 @@ class ReportConsUsedValueEditItem(ReportValueEditItem):
 
 class ReportOrderValueEditItem(ReportValueEditItem):
 
+    def __init__(self, parent, report, field, age, *args, **kwargs):
+        self.expected = get_expected_order_value(report.order_report.report.period,
+                                        report.order_report.report.hc_code,
+                                        report.CAP,
+                                        report.nut_input)
+        super(ReportOrderValueEditItem, self).__init__(parent,
+                                                          report, field, age,
+                                                          *args, **kwargs)
+        if self.expected is not None:
+            self.setToolTip(u"Prévision automatique: %d" % int(self.expected))
+
     def get_flag(self):
-        comp = compare_expected_order_value(self._report.order_report.report.period,
-                                        self._report.order_report.report.hc_code,
-                                        self._report.CAP,
-                                        self._report.nut_input,
-                                        self.value)
-        print('ReportOrderValueEditItem get_flag  %s' % comp)
+        comp = compare_expected_value(self.expected, self.value)
         if comp:
             return self.WARNING
         return None

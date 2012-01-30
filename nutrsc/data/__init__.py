@@ -42,27 +42,27 @@ class CONSInputDataHolder(DataHolder):
     input_code = ''
     initial = 0
     received = 0
-    consumed = 0
+    used = 0
     lost = 0
 
     def fields(self):
-        return ['initial', 'received', 'consumed', 'lost']
+        return ['initial', 'received', 'used', 'lost']
 
     @property
-    def got(self):
-        return (initial + received)
+    def possessed(self):
+        return (self.initial + self.received)
 
     @property
-    def used(self):
-        return (consomed + lost)
+    def consumed(self):
+        return (self.used + self.lost)
 
     @property
     def left(self):
-        return self.got() - self.used()
+        return self.possessed - self.consumed
 
     @property
     def valid(self):
-        return self.used <= self.left
+        return self.consumed <= self.possessed
 
 
 class CONSDataHolder(DataHolder):

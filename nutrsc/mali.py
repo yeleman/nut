@@ -58,28 +58,33 @@ F100_MEAL_TB_HIV = 400
 F100_MEAL_U59 = 120
 
 
+def compare_expected_value(expected, value, diff_rate=WARNING_DIFF_RATE):
+
+    if not expected:
+        return None
+    
+    diff = (diff_rate / 100.0) * expected
+    return value > (expected + diff) or value < (expected - diff)
+
+
 def compare_expected_adm_value(report, field, value):
     exp_value = get_expected_adm_value(report, field)
-    if not exp_value:
-        return None
-
-    diff = (WARNING_DIFF_RATE / 100.0) * exp_value
-    return value > (exp_value + diff) or value < (exp_value - diff)
+    return compare_expected_value(exp_value, value)
 
 
 def compare_expected_conso_value(period, hc_code, cap, nut_input, value):
     exp_value = get_expected_conso_value(period, hc_code, cap, nut_input)
-    if not exp_value:
-        return None
-
-    diff = (WARNING_DIFF_RATE / 100.0) * exp_value
-    return value > (exp_value + diff) or value < (exp_value - diff)
+    return compare_expected_value(exp_value, value)
 
 
-def compare_expected_order_value(period, hc_code, cap, nut_input, value):
+def get_expected_order_value(period, hc_code, cap, nut_input):
     # order are consumption reports based on period + 2months
     period = period.next().next()
-    return compare_expected_conso_value(period, hc_code, cap, nut_input, value)
+    return get_expected_conso_value(period, hc_code, cap, nut_input)
+
+def compare_expected_order_value(period, hc_code, cap, nut_input, value):
+    exp_value = get_expected_order_value(period, hc_code, cap, nut_input)
+    return compare_expected_value(exp_value, value)
 
 
 def get_expected_adm_value(report, field):

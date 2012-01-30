@@ -278,7 +278,7 @@ class PECRECAPReportTable(PECReportTable):
         self.report_field_dict = [{'n': 'total_beginning', 'f': ReportAutoValueRO, 'ro': True},
                                   {'n': 'total_beginning_m', 'f': ReportAutoValueRO, 'ro': True},
                                   {'n': 'total_beginning_f', 'f': ReportAutoValueRO, 'ro': True},
-                                  {'n': 'admitted', 'f': ReportAutoValueRO, 'ro': True},
+                                  {'n': 'admitted', 'f': ReportAutoAdmisssionValueRO, 'ro': True},
                                   {'n': 'admitted_m', 'f': ReportAutoValueRO, 'ro': True},
                                   {'n': 'admitted_f', 'f': ReportAutoValueRO, 'ro': True},
                                   {'n': 'total_out', 'f': ReportAutoValueRO, 'ro': True},
