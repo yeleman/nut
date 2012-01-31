@@ -204,7 +204,7 @@ class RemoteLogin(QtGui.QDialog, NUTWidget):
         self.progress_bar.setVisible(False)
 
         self.progress_label = QtGui.QLabel(u"En attente de la réponse du " \
-                                             u"server…")
+                                             u"serveur…")
         self.progress_label.setVisible(False)
 
         # continue sends sms

@@ -9,7 +9,7 @@ def nut_service(recipients, flag, text):
     """ Server to client alert, notice messages
 
     Whenever central wants to send a text message to the users.
-    Messages have a flag for INFO, WARN, SUCC, CRITICAL.
+    Messages have a flag for INFO, WARN, SUCC, CRIT.
 
     recipients: Provider
 

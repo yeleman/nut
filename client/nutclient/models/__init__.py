@@ -6,7 +6,7 @@ from datetime import date, datetime
 
 import peewee
 
-import local_config
+from nutclient import local_config
 
 dbh = peewee.SqliteDatabase(local_config.SQLITE_PATH)
 
@@ -130,9 +130,17 @@ class NUTInput(BaseModel):
 
 class Message(BaseModel):
 
+    INFO = 'INFO'
+    WARN = 'WARN'
+    SUCC = 'SUCC'
+    CRIT = 'CRIT'
+
+    FLAGS = (INFO, WARN, SUCC, CRIT)
+
     identity = peewee.CharField(max_length=50)
     date = peewee.DateTimeField()
     text = peewee.TextField()
+    flag = peewee.TextField(default=INFO)
 
     def __unicode__(self):
         return self.date.strftime('%c')

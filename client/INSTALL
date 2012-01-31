@@ -1,5 +1,12 @@
 Packages:
     python-qt4 acpi [python-dev uuid-dev buildessential make]
+    libdbi1 libdbd-sqlite3
 
 PIP:
     pip install -r pip-reqs.txt
+
+
+/etc/sudoers.d/nutclient
+chmod 440 /etc/sudoers.d/nutclient
+reg ALL= NOPASSWD: /usr/bin/gammu-smsd
+reg ALL= NOPASSWD: /etc/init.d/gammu-smsd

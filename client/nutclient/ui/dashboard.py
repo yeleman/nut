@@ -4,7 +4,8 @@
 
 from PyQt4 import QtGui
 
-from common import (NUTWidget, PageTitle, PageIntro, PageSection,
+from nutrsc.mali import display_phone_number
+from common import (NUTWidget, PageTitle, PageSection,
                     LinkButton, FlexibleReadOnlyTable)
 from database import Report, Message
 
@@ -38,12 +39,11 @@ class MessagesTable(FlexibleReadOnlyTable):
     def __init__(self, parent):
         super(MessagesTable, self).__init__(parent)
 
-        date_fmt = '%d %B, %Hh%M'
         for message in Message.select().order_by(('date', 'desc')).limit(10):
             self.data.append((message.date.strftime('%d %B, %Hh%M'),
-                              message.identity,
+                              display_phone_number(message.identity),
                               message.text))
-        self.hheaders = [u"Date", u"From", u"Message"]
+        self.hheaders = [u"Date", u"Expéditeur", u"Message"]
         self.display_vheaders = False
         self.stretch_columns = [2,]
         self.max_rows = 8
@@ -60,7 +60,6 @@ class DashboardWidget(NUTWidget):
         super(DashboardWidget, self).__init__(parent=parent, *args, **kwargs)
 
         vbox = QtGui.QVBoxLayout()
-        self.title = PageTitle(_(u"Résumé"))
         self.title = PageTitle(u"%(user)s de %(hc)s/%(hcc)s (%(hccap)s)" \
                              % {'user': self.user,
                                 'hc': self.user.hc,

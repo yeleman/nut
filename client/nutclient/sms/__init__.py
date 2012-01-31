@@ -8,9 +8,11 @@ import locale
 import re
 
 from nosmsd.utils import send_sms
+from nutclient.models import Message
 
 from .login import nut_logged_in
 #from .report import nut_report
+
 
 logger = logging.getLogger(__name__)
 
@@ -38,7 +40,8 @@ def nosms_handler(message):
                                       sub_cmd=cmd_id,
                                       cmd=command)
         else:
-            return False
+            # use default handler (store in Message)
+            return nut_default(message)
 
     if main_nut_handler(message):
         message.status = message.STATUS_PROCESSED
@@ -49,7 +52,7 @@ def nosms_handler(message):
     return False
 
 
-def nut_test(message, **kwargs):
+def nut_test(message, args, sub_cmd, cmd):
     try:
         code, msg = message.text.split('nut test')
     except:
@@ -60,6 +63,39 @@ def nut_test(message, **kwargs):
     return True
 
 
-def nut_echo(message, **kwargs):
-    message.respond(kwargs['args'])
+def nut_echo(message, args, sub_cmd, cmd):
+    message.respond(args)
     return True
+
+
+def nut_default(message):
+    """ takes arbitrary message to the Message list """
+    return nut_message(message, message.content)
+
+
+def nut_service(message, args, sub_cmd, cmd):
+    """ Free text message or info from Server
+
+    nut service flag|message """
+
+    flag, text = args.split('|')
+    return nut_message(message, text, flag)
+
+
+def nut_message(message, text, flag=Message.INFO):
+    """ [NON-SMS handler] Stores message to Message list """
+
+    flag = flag.upper()
+    if not flag in Message.FLAGS:
+        flag = Message.INFO
+    
+    try:
+        m = Message.create(identity=message.identity,
+                           date=message.date,
+                           text=text,
+                           flag=flag)
+        print(m)
+        return True
+    except Exception as e:
+        print(e)
+        return False

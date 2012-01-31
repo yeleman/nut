@@ -1,6 +1,7 @@
 #!/usr/bin/env python
 # encoding=utf-8
 
+import re
 import math
 from datetime import date
 
@@ -56,6 +57,76 @@ F75_MEAL_U59 = 120
 F100_MEAL_LWB = 70
 F100_MEAL_TB_HIV = 400
 F100_MEAL_U59 = 120
+
+
+def display_phone_number(number):
+    if number.startswith('+223'):
+        number = number.replace('+223', '', 1)
+
+    if len(number) & 1:
+        span = 3
+    else:
+        span = 2
+    return u" ".join([u"".join(number[i:i + span])
+                      for i in range(0, len(number), span)])
+
+
+def parse_orange_topup(out):
+    return parse_ussd(out)
+
+def parse_orange_balance(out):
+    return parse_ussd(out)
+
+def parse_malitel_topup(out):
+    return parse_ussd(out)
+
+def parse_malitel_balance(out):
+    return parse_ussd(out)
+
+def parse_ussd(out):
+    ussd_string = None
+    for line in out.strip().split("\n"):
+        if line.startswith('Service reply'):
+            ussd_string = line
+            break
+    if not ussd_string:
+        ussd_string = out
+    
+    try:
+        ussd_string = re.split(r'^Service reply\s*:\s', ussd_string)[-1]
+    except:
+        pass
+
+    try:
+        if ussd_string[0] == '"':
+            ussd_string = ussd_string[1:]
+    except IndexError:
+        pass
+    
+    try:
+        if ussd_string[-1] == '"':
+            ussd_string = ussd_string[:-1]
+    except IndexError:
+        pass
+    
+    if not ussd_string:
+        ussd_string = u"Aucune réponse."
+    return ussd_string
+
+OPERATORS = [
+    {'slug': 'orange',
+     'name': u"Orange",
+     'ussd_topup': u'*123*%d#',
+     'ussd_balance': u'#123#',
+     'parse_topup': parse_orange_topup,
+     'parse_balance': parse_orange_balance},
+    {'slug': 'malitel',
+     'name': u"Malitel",
+     'ussd_topup': u'*102#%d#',
+     'ussd_balance': u'*101#',
+     'parse_topup': parse_malitel_topup,
+     'parse_balance': parse_malitel_balance}
+]
 
 
 def compare_expected_value(expected, value, diff_rate=WARNING_DIFF_RATE):
