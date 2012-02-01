@@ -2,9 +2,6 @@
 # encoding: utf-8
 # maintainer: rgaudin
 
-def _(text):
-    return text
-
 from nutrsc.errors import LOGIN_ERRORS
 from nutrsc.tools import generate_user_hash
 

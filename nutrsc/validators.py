@@ -13,9 +13,6 @@ from bolibana.reporting.errors import MissingData, IncorrectReportData
 
 from nutrsc.constants import *
 
-def _(text):
-    return text
-
 
 class PECReportValidator(DataValidator):
 

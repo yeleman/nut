@@ -11,10 +11,6 @@ import snakemq.messaging
 import snakemq.message
 
 
-def _(text):
-    return text
-
-
 class Event(object):
 
     LOGIN_SUCCESS = 0
@@ -26,14 +22,14 @@ class Event(object):
     LOW_BATTERY = 6
     SMS_ERROR = 7
 
-    EV_TYPES = ((LOGIN_SUCCESS, u"Remote login successful"),
-                (LOGIN_FAILED, u"Remote login failed"),
-                (SMS_SERVICE, u"Service message received"),
-                (REPORT_SUCCESS, u"Report accepted"),
-                (REPORT_FAILED, u"Report rejected"),
-                (REPORT_UPDATED, u"Report has been updated"),
-                (LOW_BATTERY, u"Low battery"),
-                (SMS_ERROR, u"SMS device error"))
+    EV_TYPES = ((LOGIN_SUCCESS, u"Identification distante réussie"),
+                (LOGIN_FAILED, u"Identification distante infructueuse"),
+                (SMS_SERVICE, u"SMS d'information reçu"),
+                (REPORT_SUCCESS, u"Rapport accepté"),
+                (REPORT_FAILED, u"Report rejeté"),
+                (REPORT_UPDATED, u"Rapport modifié par le niveau supérieur"),
+                (LOW_BATTERY, u"Batterie faible"),
+                (SMS_ERROR, u"Erreur technique SMS"))
 
     def __init__(self, type, detail):
         self.type = type

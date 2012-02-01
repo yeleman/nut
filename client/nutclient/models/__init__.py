@@ -11,10 +11,6 @@ from nutclient import local_config
 dbh = peewee.SqliteDatabase(local_config.SQLITE_PATH)
 
 
-def _(text):
-    return text
-
-
 class BaseModel(peewee.Model):
 
     class Meta:
@@ -68,7 +64,7 @@ class User(BaseModel):
         return caps
 
     def verb_caps(self):
-        return "+".join([_(cap.upper()) for cap in self.caps()])
+        return "+".join([cap.upper() for cap in self.caps()])
 
 
 class Period(BaseModel):
