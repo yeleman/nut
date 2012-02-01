@@ -25,13 +25,13 @@ UNIMIX = 'unimix'
 """
 CONSUMPTION_TABLE = {
     MODERATE: {
-        DEFAULT_VERSION: {CSB, UNIMIX, OIL, SUGAR, MIL, NIEBE},
+        DEFAULT_VERSION: [CSB, UNIMIX, OIL, SUGAR, MIL, NIEBE],
     },
     SEVERE: {
-        DEFAULT_VERSION: {PPN},
+        DEFAULT_VERSION: [PPN],
     },
     SEVERE_COMP: {
-        DEFAULT_VERSION: {F75, F100, PPN},
+        DEFAULT_VERSION: [F75, F100, PPN],
     }
 }
 
@@ -44,6 +44,106 @@ HC_CAPS = {
     MODERATE: u"URENAM",
     SEVERE: u"URENAS",
     SEVERE_COMP: u"URENI"}
+
+PEC_FIELDS = {
+    # ages
+    'u6': '0',
+    'u59': '1',
+    'o59': '2',
+    'pw': '3',
+    'fu1': '4',
+    'fu12': '5',
+
+    # sex break down
+    'm': '6',
+    'f': '7',
+
+    # ADM CRIT
+    'total_beginning': 'a',
+    'hw_b7080_bmi_u18': 'b',
+    'muac_u120': 'c',
+    'hw_u70_bmi_u16': 'd',
+    'muac_u11_muac_u18': 'e',
+    'other': 'f',
+
+    # ADM TYPE
+    'new_case': 'g',
+    'relapse': 'h',
+    'returned': 'i',
+    'nut_transfered_in': 'j',
+    'nut_referred_in': 'k',
+    'admitted': 'l',
+
+    # OUT
+    'healed': 'm',
+    'referred_out': 'n',
+    'deceased': 'o',
+    'aborted': 'p',
+    'non_respondant': 'q',
+    'medic_transfered_out': 'r',
+    'nut_transfered_out': 's',
+    'total_out': 't',
+
+}
+
+CONS_FIELDS = {
+    CSB: 'a',
+    UNIMIX: 'b',
+    OIL: 'c',
+    SUGAR: 'd',
+    MIL: 'e',
+    NIEBE: 'f',
+    PPN: 'g',
+    F75: 'h',
+    F100: 'i',
+    PPN: 'j',
+
+    'initial': '0',
+    'received': '1',
+    'used': '2',
+    'lost': '3',
+    'quantity': '4' # order
+}
+
+def key_from_value(dic, val):
+    return [k for k, v in dic.iteritems() if v == val][0]
+
+def compress_pec_field(field):
+    field = field.lower()
+
+    if field[-2:] in ('_m', '_f'):
+        sex = PEC_FIELDS[field[-1]]
+        field = field[:-2]
+    else:
+        sex = ''
+
+    age, ident = field.split('_', 1)
+
+    return ('%(age)s%(id)s%(sex)s'
+            % {'age': PEC_FIELDS[age],
+               'id': PEC_FIELDS[ident],
+               'sex': sex})
+
+def uncompress_pec_field(code):
+
+    parts = []
+    for letter in code.lower():
+        parts.append(key_from_value(PEC_FIELDS, letter))
+
+    return '_'.join(parts)
+
+def compress_cons_field(input_code, field):
+    return ('%(inp)s%(field)s'
+            % {'inp': CONS_FIELDS[input_code.lower()],
+               'field': CONS_FIELDS[field.lower()]})
+
+def uncompress_cons_field(code):
+    ic, fc = list(code)
+    inp = key_from_value(CONS_FIELDS, ic)
+    field = key_from_value(CONS_FIELDS, fc)
+
+    return (inp, field)
+
 
 # percentage from which expected 
 # and real data differing should raise warning
