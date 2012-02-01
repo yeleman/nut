@@ -1,8 +1,14 @@
 #!/usr/bin/env python
 # encoding=utf-8
 
-import sys
-import zmq
+import time
+import threading
+import pickle
+
+import snakemq.link
+import snakemq.packeter
+import snakemq.messaging
+import snakemq.message
 
 
 def _(text):
@@ -20,14 +26,14 @@ class Event(object):
     LOW_BATTERY = 6
     SMS_ERROR = 7
 
-    EV_TYPES = ((LOGIN_SUCCESS, _(u"Remote login successful")),
-                (LOGIN_FAILED, _(u"Remote login failed")),
-                (SMS_SERVICE, _(u"Service message received")),
-                (REPORT_SUCCESS, _(u"Report accepted")),
-                (REPORT_FAILED, _(u"Report rejected")),
-                (REPORT_UPDATED, _(u"Report has been updated")),
-                (LOW_BATTERY, _(u"Low battery")),
-                (SMS_ERROR, _(u"SMS device error")))
+    EV_TYPES = ((LOGIN_SUCCESS, u"Remote login successful"),
+                (LOGIN_FAILED, u"Remote login failed"),
+                (SMS_SERVICE, u"Service message received"),
+                (REPORT_SUCCESS, u"Report accepted"),
+                (REPORT_FAILED, u"Report rejected"),
+                (REPORT_UPDATED, u"Report has been updated"),
+                (LOW_BATTERY, u"Low battery"),
+                (SMS_ERROR, u"SMS device error"))
 
     def __init__(self, type, detail):
         self.type = type
@@ -53,21 +59,35 @@ class Event(object):
             if k == self.type:
                 return t
         return unicode(self.type)
-
-
-def send_raw_event(event):
-    # Socket to talk to server
-    try:
-        context = zmq.Context()
-        socket = context.socket(zmq.REQ)
-        socket.connect("tcp://localhost:5555")
-        socket.send_pyobj(event)
-        socket.close()
-        return True
-    except Exception as e:
-        return False
+    
+    def to_dict(self):
+        return {'type': self.type,
+                'detail': self.detail,
+                'discarded': self.discarded}
+    
+    @classmethod
+    def from_dict(cls, dic):
+        return cls(dic.get('type', ''), dic.get('detail', u''))
 
 
 def send_event(type_, detail=None):
+    print('send event')
     e = Event(type_, detail)
     return send_raw_event(e)
+
+
+def send_raw_event(event):
+    my_link = snakemq.link.Link()
+    my_packeter = snakemq.packeter.Packeter(my_link)
+    my_messaging = snakemq.messaging.Messaging('client', "",
+                                               my_packeter)
+    my_link.add_connector(("localhost", 4000))
+    message = snakemq.message.Message(pickle.dumps(event.to_dict()),
+                                      ttl=5)
+                                        
+    thread = threading.Thread(target=my_link.loop)
+    thread.start()
+
+    my_messaging.send_message('server', message)
+    time.sleep(2)
+    my_link.stop()

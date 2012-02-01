@@ -1,5 +1,4 @@
 peewee
 nosmsd
-pyzmq-static
-
+snakeMQ==0.5.10
 envoy

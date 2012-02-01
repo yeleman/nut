@@ -2,12 +2,18 @@
 # encoding=utf-8
 # maintainer: rgaudin
 
-import sys
+import pickle
 import threading
 import Queue
+import time
 
+import snakemq.link
+import snakemq.packeter
+import snakemq.messaging
+import snakemq.message
 from PyQt4 import QtGui, QtCore
 
+from nutclient.event import Event
 from dashboard import DashboardWidget
 from common import NUTWidget
 from login import LoginWidget
@@ -15,47 +21,42 @@ from menu import *
 from statusbar import NUTStatusBar
 from nutclient.exceptions import UnableToCompleteWidget
 
-import zmq
-import random
-import time
 
-class ZmqServer(threading.Thread):
-
-    """ ZeroMQ server (REQ) receiving incoming events (events.Event objects) """
+class SnakeMQServer():
 
     def __init__(self, target):
         self._target = target
-        self.is_running = True
+        self.is_running = False
 
-        threading.Thread.__init__ ( self )
+        self.my_link = snakemq.link.Link()
+        self.my_packeter = snakemq.packeter.Packeter(self.my_link)
+        self.my_messaging = snakemq.messaging.Messaging('server', "",
+                                                        self.my_packeter)
+
+        self.my_link.add_listener(("", 4000))
+
+        def on_recv(conn, ident, message):
+            event = Event.from_dict(pickle.loads(message.data))
+            self._target.add_event(event)
+
+        self.my_messaging.on_message_recv.add(on_recv)
+
+        self.thread = None
+
+    def start(self, *args, **kwargs):
+        if not self.is_running:
+            self.run()
 
     def run(self):
-        # setup zmq server
-        try:
-            context = zmq.Context()
-            socket = context.socket(zmq.REP)
-            socket.bind("tcp://*:5555")
-        except:
-            # something went wrong, better drop event support than
-            # freeze the UI.
-            self.is_running = False
-
-        while self.is_running:
-            try:
-                # grab event or dismiss
-                event = socket.recv_pyobj(zmq.NOBLOCK)
-            except zmq.ZMQError:
-                # raises on no-message to poll
-                time.sleep(2)
-                continue
-            if event:
-                # send event to main window
-                self._target.add_event(event)
-                #socket.send('200')
-            time.sleep(2)
-
+        self.thread = threading.Thread(target=self.my_link.loop)
+        self.thread.start()
+    
     def stop(self):
         self.is_running = False
+        if self.thread:
+            self.my_link.stop()
+            self.thread.join()
+
 
 class MainWindow(QtGui.QMainWindow):
     def __init__(self, app):
@@ -88,7 +89,7 @@ class MainWindow(QtGui.QMainWindow):
 
         self.change_context(LoginWidget)
 
-        self.thread = ZmqServer(self)
+        self.thread = SnakeMQServer(self)
         self.thread.start()
 
         self.timer = None

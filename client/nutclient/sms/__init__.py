@@ -8,6 +8,7 @@ import locale
 import re
 
 from nosmsd.utils import send_sms
+from nutclient.event import send_event, Event
 from nutclient.models import Message
 
 from .login import nut_logged_in
@@ -90,11 +91,11 @@ def nut_message(message, text, flag=Message.INFO):
         flag = Message.INFO
     
     try:
-        m = Message.create(identity=message.identity,
+        Message.create(identity=message.identity,
                            date=message.date,
                            text=text,
                            flag=flag)
-        print(m)
+        send_event(Event.SMS_SERVICE, u"SMS reçu: %s" % text[:50])
         return True
     except Exception as e:
         print(e)

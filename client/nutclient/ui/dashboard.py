@@ -40,7 +40,7 @@ class MessagesTable(FlexibleReadOnlyTable):
         super(MessagesTable, self).__init__(parent)
 
         for message in Message.select().order_by(('date', 'desc')).limit(10):
-            self.data.append((message.date.strftime('%d %B, %Hh%M'),
+            self.data.append((message.display_date,
                               display_phone_number(message.identity),
                               message.text))
         self.hheaders = [u"Date", u"Expéditeur", u"Message"]

@@ -144,6 +144,10 @@ class Message(BaseModel):
 
     def __unicode__(self):
         return self.date.strftime('%c')
+    
+    @property
+    def display_date(self):
+        return unicode(self.date.strftime('%d %B, %Hh%M').decode('utf-8'))
 
 
 from report import Report, ReportHistory
