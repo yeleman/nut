@@ -52,6 +52,8 @@ def nut_logged_in(message, args, sub_cmd, **kwargs):
     user.save()
 
     # send event to GUI
-    send_event(Event.LOGIN_SUCCESS, u"%s from %s logged in successfully." % (username, hc_name.title()))
+    send_event(Event.LOGIN_SUCCESS,
+               u"%s from %s logged in successfully." 
+               % (username, hc_name.title()))
 
     return True

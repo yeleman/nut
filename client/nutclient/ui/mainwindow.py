@@ -75,7 +75,7 @@ class MainWindow(QtGui.QMainWindow):
         self._user = None
 
         self.resize(1024, 600)
-        self.setWindowTitle(_(u"NUT Client"))
+        self.setWindowTitle(u"Malnutrition Aigüe au Mali")
         self.setWindowIcon(QtGui.QIcon('images/icon32.png'))
 
         self.menu = MainMenu(self)

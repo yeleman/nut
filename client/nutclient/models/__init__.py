@@ -57,7 +57,7 @@ class User(BaseModel):
         return self.hc_name.title()
 
     def hc_full(self):
-        return _(u"%(name)s (%(code)s)") \
+        return u"%(name)s (%(code)s)" \
                % {'name': self.hc, 'code': self.hc_code}
 
     def caps(self):

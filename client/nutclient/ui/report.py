@@ -50,12 +50,12 @@ class ReportPeriodWidget(QtGui.QDialog, NUTWidget):
         self.date_label.setBuddy(self.date_field)
 
         # confirm button
-        self.confirm_button = QtGui.QPushButton(_(u"&Continuer"))
+        self.confirm_button = QtGui.QPushButton(u"&Continuer")
         self.confirm_button.setAutoDefault(True)
         self.confirm_button.clicked.connect(self.confirm)
 
         # cancel closes window
-        self.cancel_button = QtGui.QPushButton(_(u"&Annuler"))
+        self.cancel_button = QtGui.QPushButton(u"&Annuler")
         self.cancel_button.clicked.connect(self.cancel)
 
         # login error
@@ -247,6 +247,15 @@ class ReportWidget(NUTWidget):
 
         self.setLayout(self.vbox)
 
+    def save(self):
+        if not self.save_and_validate_current_page():
+            QtGui.QMessageBox.warning(self, u"Impossible d'enregistrer.",
+                              u"Impossible d'enregistrer "
+                              u"les données. Les données ne sont pas correctes."
+                              u"\nVous devez les corriger pour re-essayer."),
+            return False
+        return True
+
     def transmit(self):
         
         if not self.save_and_validate_current_page():
@@ -295,18 +304,31 @@ class ReportWidget(NUTWidget):
 
         widget.setFocusProxy(widget.table)
 
+        head_box = QtGui.QHBoxLayout()
         if page == self.PAGES[-1]:
-            head_box = QtGui.QHBoxLayout()
             transmit_button = TransmitButton()
             transmit_button.clicked.connect(self.transmit)
-            head_line = QtGui.QWidget()
-            head_box.addWidget(title)
-            head_box.addStretch()
-            head_box.addWidget(transmit_button)
-            head_line.setLayout(head_box)
-            vbox.addWidget(head_line)
         else:
-            vbox.addWidget(title)
+            transmit_button = SaveButton()
+            transmit_button.clicked.connect(self.save)
+        head_line = QtGui.QWidget()
+        head_box.addWidget(title)
+        head_box.addStretch()
+        head_box.addWidget(transmit_button)
+        head_line.setLayout(head_box)
+        vbox.addWidget(head_line)
+        # if page == self.PAGES[-1]:
+        #     head_box = QtGui.QHBoxLayout()
+        #     transmit_button = TransmitButton()
+        #     transmit_button.clicked.connect(self.transmit)
+        #     head_line = QtGui.QWidget()
+        #     head_box.addWidget(title)
+        #     head_box.addStretch()
+        #     head_box.addWidget(transmit_button)
+        #     head_line.setLayout(head_box)
+        #     vbox.addWidget(head_line)
+        # else:
+        #     vbox.addWidget(title)
 
         vbox.addWidget(widget.table)
 
@@ -366,7 +388,7 @@ class ReportWidget(NUTWidget):
 
         # ask User to select a period
         if not self.report:
-            period_widget = self.open_dialog(ReportPeriodWidget)
+            self.open_dialog(ReportPeriodWidget)
 
         # report *should* be set by dialog.
         # if not, go back to Dashboard.
@@ -396,10 +418,9 @@ class ReportWidget(NUTWidget):
     def readonly(self):
         return not self.report.can_edit()
 
-    # TODO: Return True
     @classmethod
     def require_logged_user(self):
-        return False
+        return True
 
     @classmethod
     def has_pagination(cls):

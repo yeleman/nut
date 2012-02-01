@@ -192,4 +192,9 @@ class TransmitButton(QtGui.QPushButton):
     def __init__(self, parent=None):
         super(TransmitButton, self).__init__(QtGui.QIcon('images/phone.png'), u"&Transmettre le rapport", parent)
 
-        #self.setAlignment(Qt.AlignLeft | Qt.AlignVCenter)
+
+class SaveButton(QtGui.QPushButton):
+
+    def __init__(self, parent=None):
+        super(SaveButton, self).__init__(QtGui.QIcon('images/table_save.png'), 
+                                             u"&Enregistrer", parent)
