@@ -1,9 +1,7 @@
 #!/usr/bin/env python
 # encoding=utf-8
 
-from datetime import datetime, date
-
-from models import (config, Report, ReportHistory, ConsumptionReport,
+from models import (Revision, Report, ReportHistory, ConsumptionReport,
                     InputConsumptionReport, OrderReport, InputOrderReport,
                     PECMAMReport, PECSAMReport, PECSAMPReport,
                     User, Period, NUTInput, Message, Setting, Options)
@@ -36,7 +34,7 @@ def setup(drop_tables=False):
 
     did_create = False
 
-    for model in [User, Setting, Period,
+    for model in [Revision, User, Setting, Period,
                  Report, ReportHistory,
                  NUTInput, ConsumptionReport, InputConsumptionReport,
                  OrderReport, InputOrderReport,

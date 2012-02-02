@@ -2,6 +2,7 @@
 # -*- coding: utf-8 -*-
 # vim: ai ts=4 sts=4 et sw=4 nu
 
+import pickle
 from datetime import date, datetime
 
 import peewee
@@ -25,6 +26,96 @@ class BaseModel(peewee.Model):
 
     def delete_safe(self):
         self.delete_instance()
+
+    def dump(self):
+        return pickle.dumps(self.get_field_dict())
+
+    def create_revision(self):
+        return Revision.create(model_ref=self.model_ref,
+                               datetime=datetime.now(),
+                               content=self.dump())
+
+    @property
+    def revisions(self, limit=0):
+        return [r.load()
+                for r 
+                in Revision.filter(model_ref=self.model_ref) \
+                           .order_by(('datetime', 'desc')).limit(limit)]
+
+    @property
+    def last_revision(self):
+        try:
+            return self.revisions[-1]
+        except IndexError:
+            return self.dump()
+
+    def diff(self, revision):
+        return Revision.diff(revision, self.get_field_dict())
+
+    @property
+    def model_ref(self):
+        return '%(table)s#%(id)d' % {'table': self._meta.model_name,
+                                     'id': self.id}
+
+class Revision(peewee.Model):
+
+    class Meta:
+        database = dbh
+
+    model_ref = peewee.CharField()
+    datetime = peewee.DateTimeField()
+    content = peewee.TextField()
+
+    def load(self):
+        d = pickle.loads(bytearray(self.content, 'utf-8'))
+        d.update({'_revision_date': self.datetime,
+                  '_revision_model': self.model})
+        return d
+
+    @property
+    def model(self):
+        mname, mid = self.model_ref.rsplit('#', 1)
+        cls = eval(mname)
+        return cls.get(id=mid)
+
+    @classmethod
+    def diff(cls, previous, last):
+        d = {}
+        keys = []
+        for dic in (previous, last): keys += dic.keys()
+        keys = list(set(keys))
+        for key in keys:
+            if key.startswith('_revision'):
+                continue
+
+            npv = False
+            nlv = False
+
+            try:
+                pv = previous.get(key)
+            except KeyError:
+                npv = True
+
+            try:
+                lv = last.get(key)
+            except KeyError:
+                nlv = True
+
+            # key missing on previous dict
+            if npv:
+                d[key] = lv
+                continue
+            # key missing on last dict
+            if nlv:
+                d[key] = pv
+                continue
+
+            # only add if value is different.
+            # set value as the one of last dict
+            if pv != lv:
+                d[key] = lv
+        return d
+
 
 class User(BaseModel):
 
