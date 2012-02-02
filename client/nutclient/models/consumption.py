@@ -81,8 +81,8 @@ class ConsumptionReport(BaseModel):
             for input_code \
             in CONSUMPTION_TABLE[r.nut_type][DEFAULT_VERSION]:
                 ninput = NUTInput.filter(slug=input_code).get()
-                ir = InputConsumptionReport.create_safe(cons_report=r,
-                                                        nut_input=ninput)
+                InputConsumptionReport.create_safe(cons_report=r,
+                                                   nut_input=ninput)
         except:
             # something went wrong. let's chain delete everybody
             r.delete_safe()
@@ -112,7 +112,8 @@ class InputConsumptionReport(BaseModel):
 
     #unique_together = ('cons_report', 'nut_input')
 
-    cons_report = peewee.ForeignKeyField(ConsumptionReport, related_name='nutinput_reports')
+    cons_report = peewee.ForeignKeyField(ConsumptionReport,
+                                         related_name='nutinput_reports')
     nut_input = peewee.ForeignKeyField(NUTInput,
                                        related_name='cons_reports')
 
