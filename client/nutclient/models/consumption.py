@@ -90,6 +90,11 @@ class ConsumptionReport(BaseModel):
 
         return r
 
+    def create_revision_safe(self):
+        for ir in InputConsumptionReport.filter(cons_report=self):
+            ir.create_revision_safe()
+        self.create_revision()
+
     @property
     def status(self):
         return self.report.status
@@ -150,6 +155,12 @@ class InputConsumptionReport(BaseModel):
         r = cls(cons_report=cons_report, nut_input=nut_input)
         r.save()
         return r
+
+    def delete_safe(self):
+        self.delete_instance()
+
+    def create_revision_safe(self):
+        return self.create_revision()
 
     @property
     def status(self):

@@ -47,10 +47,14 @@ class BaseModel(peewee.Model):
         try:
             return self.revisions[-1]
         except IndexError:
-            return self.dump()
+            return self.get_field_dict()
 
     def diff(self, revision):
         return Revision.diff(revision, self.get_field_dict())
+
+    @property
+    def dirty_fields(self):
+        return self.diff(self.last_revision)
 
     @property
     def model_ref(self):
@@ -81,8 +85,7 @@ class Revision(peewee.Model):
     @classmethod
     def diff(cls, previous, last):
         d = {}
-        keys = []
-        for dic in (previous, last): keys += dic.keys()
+        keys = previous.keys() + last.keys()
         keys = list(set(keys))
         for key in keys:
             if key.startswith('_revision'):

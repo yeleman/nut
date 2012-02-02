@@ -84,6 +84,9 @@ PEC_FIELDS = {
     'nut_transfered_out': 's',
     'total_out': 't',
 
+    'others_tb': 'u',
+    'others_hiv': 'v',
+    'others_lwb': 'w',
 }
 
 CONS_FIELDS = {
@@ -117,11 +120,19 @@ def compress_pec_field(field):
     else:
         sex = ''
 
-    age, ident = field.split('_', 1)
+    # special case for others
+    if field.startswith('others_'):
+        age = ''
+        ident = field
+    else:
+        age, ident = field.split('_', 1)
+        age = PEC_FIELDS[age]
+
+    ident = PEC_FIELDS[ident]
 
     return ('%(age)s%(id)s%(sex)s'
-            % {'age': PEC_FIELDS[age],
-               'id': PEC_FIELDS[ident],
+            % {'age': age,
+               'id': ident,
                'sex': sex})
 
 def uncompress_pec_field(code):

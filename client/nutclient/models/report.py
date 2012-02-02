@@ -25,7 +25,6 @@ class Report(BaseModel):
                 (STATUS_LOCAL_MODIFIED, u"Corrigé (non envoyé)"),
                 (STATUS_VALIDATED, u"Validé"))
     
-    #report_id = peewee.PrimaryKeyField()
     created_by = peewee.ForeignKeyField(User, related_name='reports')
     created_on = peewee.DateTimeField()
     modified_on = peewee.DateTimeField(null=True)
@@ -59,7 +58,7 @@ class Report(BaseModel):
         return caps
 
     def verbose_caps(self):
-        return "+".join([_(cap.upper()) for cap in self.caps()])
+        return "+".join([cap.upper() for cap in self.caps()])
 
     @classmethod
     def opened(cls):
@@ -92,33 +91,47 @@ class Report(BaseModel):
             pec_mam = PECMAMReport(report=r)
             pec_mam.save()
             
-            cons_mam = ConsumptionReport.create_safe(report=r, 
-                                                 nut_type=ConsumptionReport.MAM)
+            ConsumptionReport.create_safe(report=r, 
+                                          nut_type=ConsumptionReport.MAM)
 
-            order_mam = OrderReport.create_safe(report=r, 
-                                                nut_type=OrderReport.MAM)
+            OrderReport.create_safe(report=r, 
+                                    nut_type=OrderReport.MAM)
 
         if r.is_sam:
             sam = PECSAMReport(report=r)
             sam.save()
 
-            cons_sam = ConsumptionReport.create_safe(report=r, 
-                                                 nut_type=ConsumptionReport.SAM)
+            ConsumptionReport.create_safe(report=r, 
+                                          nut_type=ConsumptionReport.SAM)
 
-            order_sam = OrderReport.create_safe(report=r, 
-                                                nut_type=OrderReport.SAM)
+            OrderReport.create_safe(report=r, 
+                                    nut_type=OrderReport.SAM)
 
         if r.is_samp:
             samp = PECSAMPReport(report=r)
             samp.save()
 
-            cons_samp = ConsumptionReport.create_safe(report=r, 
-                                                nut_type=ConsumptionReport.SAMP)
+            ConsumptionReport.create_safe(report=r, 
+                                          nut_type=ConsumptionReport.SAMP)
 
-            order_samp = OrderReport.create_safe(report=r, 
-                                                 nut_type=OrderReport.SAMP)
+            OrderReport.create_safe(report=r, 
+                                    nut_type=OrderReport.SAMP)
 
         return r
+
+    def create_revision_safe(self):
+
+        for report in self.tied_reports():
+            report.create_revision_safe()
+
+        self.create_revision()
+
+    def delete_safe(self):
+
+        for report in self.tied_reports():
+            report.delete_safe()
+
+        self.create_instance()
 
     def can_edit(self):
         """ Only if report has not been sent or has been modified remotely """

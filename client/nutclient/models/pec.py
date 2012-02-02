@@ -403,6 +403,12 @@ class PECReport(object):
             return prev_parent.get_pec_report(self.CAP)
         return None
 
+    def create_revision_safe(self):
+        return self.create_revision()
+
+    def delete_safe(self):
+        return self.delete_instance()
+
 class PECMAMReport(BaseModel, PECReport):
 
     CATEGORIES = (('u59', u"6 to 59 months old"),

@@ -83,6 +83,11 @@ class OrderReport(BaseModel):
  
         return r
 
+    def create_revision_safe(self):
+        for ir in InputOrderReport.filter(order_report=self):
+            ir.create_revision_safe()
+        self.create_revision()
+
     @property
     def status(self):
         return self.report.status
@@ -127,6 +132,12 @@ class InputOrderReport(BaseModel):
         r = cls(order_report=order_report, nut_input=nut_input)
         r.save()
         return r
+
+    def delete_safe(self):
+        self.delete_instance()
+
+    def create_revision_safe(self):
+        return self.create_revision()
 
     @property
     def status(self):
