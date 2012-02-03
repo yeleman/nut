@@ -6,7 +6,6 @@ from PyQt4 import QtGui, QtCore, Qt
 
 from dashboard import DashboardWidget
 from report import ReportWidget
-from send import SendWidget
 from help import HelpWidget
 from sim_management import SIMManagementWidget
 from preferences import PreferencesWidget
