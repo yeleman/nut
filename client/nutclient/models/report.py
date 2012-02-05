@@ -342,6 +342,129 @@ class Report(BaseModel):
             self.status = self.STATUS_COMPLETE
             self.save()
 
+    def sum_pec_fields(self, field):
+        return sum([getattr(r, field, 0) for r in self.pec_reports()])
+
+    @property
+    def sum_all_other(self):
+        return self.sum_pec_fields('all_other')
+
+    @property
+    def sum_all_total_out(self):
+        return self.sum_pec_fields('all_total_out')
+
+    @property
+    def sum_all_healed(self):
+        return self.sum_pec_fields('all_healed')
+
+    @property
+    def sum_all_aborted(self):
+        return self.sum_pec_fields('all_aborted')
+
+    @property
+    def sum_all_deceased(self):
+        return self.sum_pec_fields('all_deceased')
+
+    @property
+    def sum_all_non_respondant(self):
+        return self.sum_pec_fields('all_non_respondant')
+
+    @property
+    def sum_all_total_beginning(self):
+        return self.sum_pec_fields('all_total_beginning')
+
+    @property
+    def sum_all_total_beginning_m(self):
+        return self.sum_pec_fields('all_total_beginning_m')
+
+    @property
+    def sum_all_total_beginning_f(self):
+        return self.sum_pec_fields('all_total_beginning_f')
+
+    @property
+    def sum_all_total_admitted(self):
+        return self.sum_pec_fields('all_total_admitted')
+
+    @property
+    def sum_all_hw_b7080_bmi_u18(self):
+        return self.sum_pec_fields('all_hw_b7080_bmi_u18')
+
+    @property
+    def sum_all_muac_u120(self):
+        return self.sum_pec_fields('all_muac_u120')
+
+    @property
+    def sum_all_hw_u70_bmi_u16(self):
+        return self.sum_pec_fields('all_hw_u70_bmi_u16')
+
+    @property
+    def sum_all_muac_u11_muac_u18(self):
+        return self.sum_pec_fields('all_muac_u11_muac_u18')
+
+    @property
+    def sum_all_oedema(self):
+        return self.sum_pec_fields('all_oedema')
+
+    @property
+    def sum_all_new_case(self):
+        return self.sum_pec_fields('all_new_case')
+
+    @property
+    def sum_all_relapse(self):
+        return self.sum_pec_fields('all_relapse')
+
+    @property
+    def sum_all_returned(self):
+        return self.sum_pec_fields('all_returned')
+
+    @property
+    def sum_all_nut_transfered_in(self):
+        return self.sum_pec_fields('all_nut_transfered_in')
+
+    @property
+    def sum_all_nut_referred_in(self):
+        return self.sum_pec_fields('all_nut_referred_in')
+
+    @property
+    def sum_all_total_admitted_m(self):
+        return self.sum_pec_fields('all_total_admitted_m')
+
+    @property
+    def sum_all_total_admitted_f(self):
+        return self.sum_pec_fields('all_total_admitted_f')
+
+    @property
+    def sum_all_refered_out(self):
+        return self.sum_pec_fields('all_refered_out')
+
+    @property
+    def sum_all_medic_transfered_out(self):
+        return self.sum_pec_fields('all_total_medic_transfered_out')
+
+    @property
+    def sum_all_nut_transfered_out(self):
+        return self.sum_pec_fields('all_total_nut_transfered_out')
+
+    @property
+    def sum_all_total_out_m(self):
+        return self.sum_pec_fields('all_total_out_m')
+
+    @property
+    def sum_all_total_out_f(self):
+        return self.sum_pec_fields('all_total_out_f')
+
+    @property
+    def sum_all_total_end(self):
+        return self.sum_pec_fields('all_total_end')
+
+    @property
+    def sum_all_total_end_m(self):
+        return self.sum_pec_fields('all_total_end_m')
+
+    @property
+    def sum_all_total_end_f(self):
+        return self.sum_pec_fields('all_total_end_f')
+
 
 class ReportHistory(BaseModel):
 
