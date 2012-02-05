@@ -67,7 +67,7 @@ class PECReport(NutritionSubReport):
     def total_end_for(self, age, sex):
         """ calculates remaining people for an age and sex """
         initial = getattr(self, '%s_total_beginning_%s' % (age, sex))
-        admitted = getattr(self, '%s_total_admitted_%s' % (age, sex))
+        admitted = getattr(self, '%s_admitted_%s' % (age, sex))
         out = getattr(self, '%s_total_out_%s' % (age, sex))
         return (initial + admitted) - out
 
@@ -175,6 +175,54 @@ class PECReport(NutritionSubReport):
     def o59_total_end(self):
         return self.male_female_sum('o59_total_end')
 
+    @property
+    def fu1_total_beginning(self):
+        return self.male_female_sum('fu1_total_beginning')
+
+    @property
+    def fu1_admitted(self):
+        return self.male_female_sum('fu1_admitted')
+
+    @property
+    def fu1_total_out(self):
+        return self.male_female_sum('fu1_total_out')
+
+    @property
+    def fu1_total_end(self):
+        return self.male_female_sum('fu1_total_end')
+
+    @property
+    def pw_total_beginning(self):
+        return self.male_female_sum('pw_total_beginning')
+
+    @property
+    def pw_admitted(self):
+        return self.male_female_sum('pw_admitted')
+
+    @property
+    def pw_total_out(self):
+        return self.male_female_sum('pw_total_out')
+
+    @property
+    def pw_total_end(self):
+        return self.male_female_sum('pw_total_end')
+
+    @property
+    def fu12_total_beginning(self):
+        return self.male_female_sum('fu12_total_beginning')
+
+    @property
+    def fu12_admitted(self):
+        return self.male_female_sum('fu12_admitted')
+
+    @property
+    def fu12_total_out(self):
+        return self.male_female_sum('fu12_total_out')
+
+    @property
+    def fu12_total_end(self):
+        return self.male_female_sum('fu12_total_end')
+
     # ALL AGE TOTALS
     @property
     def all_total_beginning(self):
@@ -190,7 +238,7 @@ class PECReport(NutritionSubReport):
 
     @property
     def all_hw_b7080_bmi_u18(self):
-        return self.all_for_field('total_beginning_f')
+        return self.all_for_field('hw_b7080_bmi_u18')
 
     @property
     def all_muac_u120(self):
@@ -234,15 +282,15 @@ class PECReport(NutritionSubReport):
 
     @property
     def all_total_admitted(self):
-        return self.all_for_field('total_admitted')
+        return self.all_for_field('admitted')
 
     @property
     def all_total_admitted_m(self):
-        return self.all_for_field('total_admitted_m')
+        return self.all_for_field('admitted_m')
 
     @property
     def all_total_admitted_f(self):
-        return self.all_for_field('total_admitted_f')
+        return self.all_for_field('admitted_f')
 
     @property
     def all_healed(self):

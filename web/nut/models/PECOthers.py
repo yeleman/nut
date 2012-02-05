@@ -18,10 +18,10 @@ class PECOthersReport(models.Model, NutritionSubReport):
         verbose_name = _(u"PEC Others Report")
         verbose_name_plural = _(u"PEC Others Reports")
 
-    other_hiv = models.PositiveIntegerField(_(u"Others living with HIV"))
-    other_tb = models.PositiveIntegerField(_(u"Others having TB"))
-    other_lwb = models.PositiveIntegerField(_(u"Others with Low Weight " \
-                                              u"at Birth"))
+    other_hiv = models.PositiveIntegerField(u"Autres - PVVIH")
+    other_tb = models.PositiveIntegerField(u"Autres - Tuberculose")
+    other_lwb = models.PositiveIntegerField(u"Autres - Petits poids "
+                                            u"de naissance")
 
     nut_report = models.ForeignKey(NutritionReport,
                                    related_name='pec_other_reports',

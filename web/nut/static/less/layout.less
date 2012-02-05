@@ -509,7 +509,7 @@ html * .center {
 }
 
 html * .left {
-    text-align: left;
+    text-align: left !important;
 }
 
 html * .right {
@@ -839,4 +839,28 @@ td.warning {
 
 input.hidden {
     display: block;
+}
+
+/****************
+Validation
+***************/
+
+form.validation input[type=text]{
+  width:5ex;
+  vertical-align: middle;
+  text-align: right;
+}
+
+form.validation td, form.validation th {
+    text-align:center;
+    vertical-align: middle;
+}
+
+td.autovalue {
+    text-align: center;
+}
+
+#content.validation form {
+    margin-left: -15px;
+    margin-right: -15px;
 }

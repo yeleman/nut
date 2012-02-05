@@ -5,7 +5,7 @@
 import os
 
 from django.contrib import admin
-from django.conf.urls.defaults import patterns, include, url
+from django.conf.urls.defaults import patterns, url
 from django.views.generic.simple import direct_to_template
 
 from nut import views
@@ -21,7 +21,6 @@ RGXP_SECTION = 'section(?P<section_index>[0-9]{1,2}[ab]{0,1})'
 RGXP_SUBSECTION = '(?P<sub_section>[a-z\_]+)'
 
 urlpatterns = patterns('',
-    #(r'^nosms/', include('nosms.urls')),
 
     url(r'^/?$', views.dashboard.dashboard, name='index'),
     url(r'^profile/$', bviews.profile.edit_profile, name='profile'),
@@ -36,13 +35,28 @@ urlpatterns = patterns('',
     url(r'^upload/$', views.excel_upload.upload_form, name='upload'),
 
     # for districts and regions
-    url(r'^validations/$', \
-        views.validation.validation_list, name='validation-list'),
+    # url(r'^validations/$', \
+    #     views.validation.validation_list, name='validation-list'),
 
-    # for districts and regions
-    url(r'^validation/(?P<entity>\d+)/(?:(?P<slug>[a-z0-9_\-]+/))?(?P<year>\d{4})/(?P<month>\d{1,2})/$',
-        views.validation.report_validation, name='validation'),
+    # # for districts and regions
+    # url(r'^validation/(?P<entity>\d+)/(?:(?P<slug>[a-z0-9_\-]+/))?(?P<year>\d{4})/(?P<month>\d{1,2})/$',
+    #     views.validation.report_validation, name='validation'),
+    # district, region
+    url(r'^validation/$', \
+        views.validation.validation_list, name='validation'),
+    url(r'^validation/do/' + RGXP_RECEIPT + '$', \
+        views.validation.report_do_validation, name='report_do_validation'),
+    url(r'^validation/' + RGXP_RECEIPT + '$', \
+        views.validation.report_validation, name='report_validation'),
 
+    # ALL
+    url(r'^raw_data/' + RGXP_ENTITY + '/' + RGXP_PERIOD + '$', \
+        views.raw_data.data_browser, name='raw_data'),
+    url(r'^raw_data/' + RGXP_ENTITY + '$', \
+        views.raw_data.data_browser, name='raw_data'),
+    url(r'^raw_data/$', views.raw_data.data_browser, name='raw_data'),
+    url(r'^raw_data/excel/' + RGXP_RECEIPT + '$', \
+        views.raw_data.excel_export, name='raw_data_excel'),
 
     # Indicator Views
     url(r'^browse/' + RGXP_ENTITY + '/' + RGXP_PERIODS + '/' \

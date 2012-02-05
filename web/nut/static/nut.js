@@ -98,7 +98,7 @@ function addJQEventsForValidationChange(base_url) {
     $("#reset_button").click(function (event) {
         event.preventDefault();
         $("form#report_form input, form#report_form select").parent().removeClass('changed');
-        $("form#report_form")[0].reset();
+        $("form#report_form").get(0).reset();
     });
     $("form").submit(function (event) {});
     $("#validate_form").click(function (event) {
@@ -160,5 +160,104 @@ function addJQEventForHelpNavigation() {
 
         $("#content div").removeClass("helpon");
         elem.addClass("helpon");
+    });
+}
+
+function addJQEventFormChange() {
+
+    auto_fields = {
+        "total_beginning": ['total_beginning_m', 'total_beginning_f'],
+        "crit_admitted": ['hw_b7080_bmi_u18', 'muac_u120', 'hw_u70_bmi_u16',
+                     'muac_u11_muac_u18', 'oedema', 'other'],
+        "admitted": ['new_case', 'relapse', 'returned', 'nut_tranfered_in', 
+                     'nut_referred_in'],
+    }
+
+    ages = ['u6', 'u59', 'o59', 'fu1', 'pw', 'fu12']
+
+    function field_prefix(field) {
+        for (var i in ages) {
+            if (field.indexOf(ages[i] + '_') == 0) {
+                return ages[i];
+            }
+        }
+        return null;
+    }
+
+    function get_auto_field(field) {
+        for (var key in auto_fields) {
+            if (auto_fields[key].indexOf(field) != -1)
+                return key;
+        }
+        return null;
+    }
+
+    function update_auto_field(report, prefix, target) {
+
+        target_id = "auto-" + report + "-" + prefix + "_" + target;
+        value = 0;
+        for (var i in auto_fields[target]) {
+            f_id = 'id_' + report + "-" + prefix + "_" + auto_fields[target][i];
+            field = $('#' + f_id);
+            // missing fields have no name prop
+            if (field.prop('name') != undefined)
+                value += parseInt(field.val());
+        }
+        if (isNaN(value))
+            value = '?';
+        $('#'+target_id).html(value);
+    }
+
+    function update_column_total(field) {
+        column_index = null;
+        ftr = field.parent().parent();
+        ftd = field.parent('td');
+
+        ftr.children('td').each(function (index) {
+            if (ftd.is(ftr.children('td').get(index)))
+                column_index = index;
+        });
+
+        table = field.parent().parent().parent();
+
+        total_value = 0;
+        table.children('tr').each(function (index) {
+            tr = table.children('tr').get(index);
+            td = $(tr).children('td').get(column_index);
+            col_value = $(td).children('input').first().val();
+            if (col_value != undefined) {
+                total_value += parseInt(col_value);
+            }
+        });
+        
+        total_tr = table.children('tr:last-child');
+        total_td = total_tr.children('td').get(column_index);
+
+        if (isNaN(total_value))
+            total_value = '?';
+        $(total_td).html(total_value);
+    }
+
+    $('input').change(function () {
+        // update bottom line total
+        update_column_total($(this));
+
+        from_name = $(this).prop('name');
+        from_name_data = from_name.split('-');
+        from_report = from_name_data[0];
+        from_field = from_name_data[1];
+        from_prefix = field_prefix(from_field);
+
+        if (from_prefix != null) {
+            from_field = from_field.replace(from_prefix + '_', '')
+        }
+
+        target_field = get_auto_field(from_field);
+
+        if (target_field == null)
+            return false;
+        else {
+            update_auto_field(from_report, from_prefix, target_field);
+        }
     });
 }

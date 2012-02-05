@@ -1,11 +1,2 @@
-{% if field == None %}
-<td style='background: none repeat scroll 0 0 #6f9bd1;'>
-
-</td>
-{% else %}
-
-<td >
-    {{ field }}
-</td>
-
-{% endif %}
+{% load bolibana %}
+<td{%if field.errors %} class="error" title="{% for error in field.errors %}{{ error }}{% endfor %}"{% endif %}{% if field %}{% else %} class="nodata"{% endif %}>{% if field %}{% if dataonly %}{{ field.value|reportvalue }}{% else %}{{ field }}{% endif %}{% endif %}</td>

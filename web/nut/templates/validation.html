@@ -1,33 +1,33 @@
 {% extends "base.html" %}
 
-{% block title %}Validation: {{ entity }} ({{ month }}/{{ year }}){% endblock %}
+{% block title %}Validation: {{ report }}{% endblock %}
 
 {% block pagetitle %}
-    <h1 class="pagetitle">
-        Validation du rapport de {{ entity }} pour la
-        période du {{ month }}/{{ year }}
-    </h1>
+    <h1 class="pagetitle">Validation du rapport {{ report }}</h1>
 {% endblock %}
+
+{% block jqueryonload %}addJQEventFormChange();
+addJQEventsForValidationChange('{% url report_do_validation report.receipt %}');
+{% endblock %}
+
+{% block page-name %}validation{% endblock %}
 
 {% block content %}
 
-<form action='.' method='post' class="validation">
+<form id="report_form" action='{%url report_validation report.receipt %}' method='post' class="validation">
+{% csrf_token %}
 
 {% comment %} Print all the hidden fields {% endcomment %}
 
 {% for name, form in forms.iteritems %}
   {% if 'pec' in name %}
     {% for field in form %}
-        {% if field.is_hidden %}
-            {{ field }}
-        {% endif %}
+        {% if field.is_hidden %}{{ field }}{% endif %}
     {% endfor %}
   {% else %}
        {% for subform in form %}
           {% for field in subform %}
-              {% if field.is_hidden %}
-                  {{ field }}
-              {% endif %}
+              {% if field.is_hidden %}{{ field }}{% endif %}
           {% endfor %}
        {% endfor %}
   {% endif %}
@@ -41,82 +41,63 @@
 {% endfor %}
 </ul>
 
+<button class="formbutt" id="reset_button" title="Ré-initialise les valeurs du formulaire à celles de départ.">Annuler modifications</button>
+<button class="formbutt important confirm" id="validate_form" title="Valide le rapport tel qu'enregistré.">Valider le rapport</button>
+
 <table>
+<caption>PEC pour la période de {{ report.mperiod }}</caption>
 
-<thead>
     <tr>
-      <th colspan="1" rowspan="3">Groupe d'age
-      </th>
-      <th colspan="1" rowspan="3">Total au début du mois (A1)
-      </th>
-      <th colspan="2" rowspan="1">Sexe(A2)
-      </th>
-      <th colspan="7" rowspan="1">Admissions (B)
-      </th>
+      <th colspan="1" rowspan="3">Groupe d'age</th>
+      <th colspan="1" rowspan="3">Total au début du mois (A1)</th>
+      <th colspan="2" rowspan="1">Sexe(A2)</th>
+      <th colspan="7" rowspan="1">Admissions (B)</th>
     </tr>
     <tr>
-      <th colspan="1" rowspan="2">M
-      </th>
-      <th colspan="1" rowspan="2">F
-      </th>
+      <th colspan="1" rowspan="2">M</th>
+      <th colspan="1" rowspan="2">F</th>
       <th colspan="6" rowspan="1">Critere d'admissions (B1)</th>
-      <th colspan="1" rowspan="2">Total Admissions (B3)
-      </th>
+      <th colspan="1" rowspan="2">Total Admissions (B3)</th>
     </tr>
     <tr>
-      <th>P/T &gt;= 70 &lt; 80% ou IMC &lt; 18
-      </th>
-      <th>PB &lt; 120 mm (ou PB &lt; 210)
-      </th>
-      <th>P/T &lt;70% ou IMC &lt;16
-      </th>
-      <th>PB &lt;11 cm (ou PB &lt;18 cm)
-      </th>
-      <th>Oedemes
-      </th>
-      <th>Autre
-      </th>
+      <th>P/T &gt;= 70 &lt; 80% ou IMC &lt; 18</th>
+      <th>PB &lt; 120 mm (ou PB &lt; 210)</th>
+      <th>P/T &lt;70% ou IMC &lt;16</th>
+      <th>PB &lt;11 cm (ou PB &lt;18 cm)</th>
+      <th>Oedemes</th>
+      <th>Autre</th>
     </tr>
-</thead>
 
-<tbody>
 
     {% if pec_samp_report %}
 
     <tr>
-      <th colspan="11" >URENI 1</th>
+      <th colspan="11" class="left">URENI 1</th>
     </tr>
 
     <tr>
-      <th>&lt; 6 mois
-      </th>
-      <td>
-      </td>
+      <th class="left">&lt;&nbsp;6&nbsp;mois</th>
+      <td class="autovalue" id="auto-pec_samp_report-u6_total_beginning">{{ pec_samp_report.u6_total_beginning }}"</td>
       {% for field in pec_samp_form.part1_form_fields %}
           {% include '_field_cell.html' with field=field %}
       {% endfor %}
-      <td>
-      </td>
+      <td class="autovalue" id="auto-pec_samp_report-u59_crit_admitted">{{ pec_samp_report.u59_admitted }}</td>
     </tr>
     <tr>
-      <th> 6-59 mois
-      <td>
-      </td>
+      <th class="left">6-59&nbsp;mois</th>
+      <td class="autovalue" id="auto-pec_samp_report-u59_total_beginning">{{ pec_samp_report.u59_total_beginning }}</td>
       {% for field in pec_samp_form.part1_form_fields %}
           {% include '_field_cell.html' with field=field %}
       {% endfor %}
-      <td>
-      </td>
+      <td class="autovalue" id="auto-pec_samp_report-u59_crit_admitted">{{ pec_samp_report.u59_admitted }}</td>
     </tr>
     <tr>
-      <th>&gt; 59 mois
-      <td>
-      </td>
+      <th class="left">&gt;&nbsp;59&nbsp;mois</th>
+      <td class="autovalue" id="auto-pec_samp_report-o59_total_beginning">{{ pec_samp_report.o59_total_beginning }}</td>
       {% for field in pec_samp_form.part1_form_fields %}
           {% include '_field_cell.html' with field=field %}
       {% endfor %}
-      <td>
-      </td>
+      <td class="autovalue" id="auto-pec_samp_report-o59_crit_admitted">{{ pec_samp_report.o59_admitted }}</td>
     </tr>
 
     {% endif %}
@@ -124,42 +105,34 @@
     {% if pec_sam_report %}
 
     <tr>
-      <th colspan="11" >URENAS 2</th>
+      <th colspan="11" class="left">URENAS 2</th>
     </tr>
 
     <tr>
-      <th>6-59 mois
-      </th>
-      <td>
-      </td>
+      <th class="left">6-59&nbsp;mois</th>
+      <td class="autovalue" id="auto-pec_sam_report-u59_total_beginning">{{ pec_sam_report.u59_total_beginning }}</td>
       {% for field in pec_sam_form.part1_form_fields %}
           {% include '_field_cell.html' with field=field %}
       {% endfor %}
-      <td>
-      </td>
+      <td class="autovalue" id="auto-pec_sam_report-u59_crit_admitted">{{ pec_sam_report.u59_admitted }}</td>
     </tr>
 
     <tr>
-      <th>&gt; 59 mois
-      </th>
-      <td>
-      </td>
+      <th class="left">&gt;&nbsp;59&nbsp;mois</th>
+      <td class="autovalue" id="auto-pec_sam_report-o59_total_beginning">{{ pec_sam_report.o59_total_beginning }}</td>
       {% for field in pec_sam_form.part1_form_fields %}
              {% include '_field_cell.html' with field=field %}
       {% endfor %}
-      <td>
-      </td>
+      <td class="autovalue" id="auto-pec_sam_report-o59_crit_admitted">{{ pec_sam_report.o59_admitted }}</td>
     </tr>
 
     <tr>
-      <th>Suivi de URENI 1</th>
-      <td>
-      </td>
+      <th class="left"><acronym title="Suivi de URENI">Suivi&nbsp;1</acronym></th>
+      <td class="autovalue" id="auto-pec_sam_report-fu1_total_beginning">{{ pec_sam_report.fu1_total_beginning }}</td>
       {% for field in pec_sam_form.part1_form_fields %}
              {% include '_field_cell.html' with field=field %}
       {% endfor %}
-      <td>
-      </td>
+      <td class="autovalue" id="auto-pec_sam_report-fu1_crit_admitted">{{ pec_sam_report.fu1_admitted }}</td>
     </tr>
 
     {% endif %}
@@ -167,186 +140,161 @@
     {% if pec_mam_report %}
 
     <tr>
-      <th colspan="11" >URENAM 3</th>
+      <th colspan="11" class="left">URENAM 3</th>
     </tr>
     <tr>
-      <th>6-59 mois
-      <td>
-      </td>
+      <th class="left">6-59&nbsp;mois</th>
+      <td class="autovalue" id="auto-pec_mam_report-u59_total_beginning">{{ pec_mam_report.u59_total_beginning }}</td>
       {% for field in pec_mam_form.part1_form_fields %}
           {% include '_field_cell.html' with field=field %}
       {% endfor %}
-      <td>
-      </td>
+      <td class="autovalue" id="auto-pec_mam_report-u59_crit_admitted">{{ pec_mam_report.u59_admitted }}</td>
     </tr>
     <tr>
-      <th>FE/FA</th>
-      <td>
-      </td>
+      <th class="left"><acronym title="Femmes Enceintes/Femmes alaitantes">FE/FA</acronym></th>
+      <td class="autovalue" id="auto-pec_mam_report-pw_total_beginning">{{ pec_mam_report.pw_total_beginning }}</td>
       {% for field in pec_mam_form.part1_form_fields %}
           {% include '_field_cell.html' with field=field %}
       {% endfor %}
-      <td>
-      </td>
+      <td class="autovalue" id="auto-pec_mam_report-pw_crit_admitted">{{ pec_mam_report.pw_admitted }}</td>
     </tr>
     <tr>
-      <th>Suivi de 1 et 2</th>
-      <td>
-      </td>
+      <th class="left"><acronym title="Suivi de URENI et URENAS">Suivi&nbsp;1&nbsp;&&nbsp;2</acronym></th>
+      <td class="autovalue" id="auto-pec_mam_report-fu12_total_beginning">{{ pec_mam_report.fu12_total_beginning }}</td>
       {% for field in pec_mam_form.part1_form_fields %}
           {% include '_field_cell.html' with field=field %}
       {% endfor %}
-      <td>
-      </td>
+      <td class="autovalue" id="auto-pec_mam_report-fu12_crit_admitted">{{ pec_mam_report.fu12_admitted }}</td>
     </tr>
 
     {% endif %}
-
     <tr>
-      <th>Total</th>
-      <td>
-      {% for field in pec_mam_form.part1_total_fields %}
-          <td>{{ field }}</td>
-      {% endfor %}
-      <td>
+      <th class="left">Total</th>
+      <td class="autovalue">{{ report.sum_all_total_beginning }}</td>
+      <td class="autovalue">{{ report.sum_all_total_beginning_m }}</td>
+      <td class="autovalue">{{ report.sum_all_total_beginning_f }}</td>
+      <td class="autovalue">{{ report.sum_all_hw_b7080_bmi_u18 }}</td>
+      <td class="autovalue">{{ report.sum_all_muac_u120 }}</td>
+      <td class="autovalue">{{ report.sum_all_hw_u70_bmi_u16 }}</td>
+      <td class="autovalue">{{ report.sum_all_muac_u11_muac_u18 }}</td>
+      <td class="autovalue">{{ report.sum_all_oedema }}</td>
+      <td class="autovalue">{{ report.sum_all_other }}</td>
+      <td class="autovalue">{{ report.sum_all_total_admitted }}</td>
     </tr>
 
-  </tbody>
 </table>
 
 
-<table border="1" cellpadding="2" cellspacing="2">
-
-  <thead>
+<table border="0" cellpadding="2" cellspacing="2">
     <tr>
-      <th colspan="1" rowspan="3">Groupe d'age
-      </th>
-      <th colspan="8" rowspan="1">Admissions (B)
-      </th>
+      <th colspan="1" rowspan="3">Groupe d'age</th>
+      <th colspan="8" rowspan="1">Admissions (B)</th>
     </tr>
     <tr>
-      <th colspan="5" rowspan="1">Type d'admission (B2)
-      </th>
-      <th colspan="1" rowspan="2">Total Admissions (B3)
-      </th>
-      <th colspan="2" rowspan="1">Sexe (B4)
-      </th>
+      <th colspan="5" rowspan="1">Type d'admission (B2)</th>
+      <th colspan="1" rowspan="2">Total Admissions (B3)</th>
+      <th colspan="2" rowspan="1">Sexe (B4)</th>
     </tr>
     <tr>
-      <th>Nouveau cas
-      </th>
-      <th>Rechute (après gueris)
-      </th>
-      <th>Réadmission (après abandons) ou Medical
-      </th>
-      <th>Transfert Nutritionnel
-      </th>
-      <th>Référence nutritionnelle
-      </th>
-      <th>M
-      </th>
-      <th>F
-      </th>
+      <th>Nouveau cas</th>
+      <th>Rechute (après gueris)</th>
+      <th>Réadmission (après abandons) ou Medical</th>
+      <th>Transfert Nutritionnel</th>
+      <th>Référence nutritionnelle</th>
+      <th>M</th>
+      <th>F</th>
     </tr>
-</thead>
-
-<tbody>
 
     {% if pec_samp_report %}
 
     <tr>
-      <th colspan="9" >URENI 1
-      </th>
+      <th colspan="9" class="left">URENI 1</th>
     </tr>
     <tr>
-      <th>&lt; 6 mois
+      <th class="left">&lt;&nbsp;6&nbsp;mois</th>
       {% with fields=pec_samp_form.part2_form_fields %}
              {% include '_field_cell.html' with field=fields.next %}
              {% include '_field_cell.html' with field=fields.next %}
              {% include '_field_cell.html' with field=fields.next %}
              {% include '_field_cell.html' with field=fields.next %}
              {% include '_field_cell.html' with field=fields.next %}
-            <td></td>
+            <td class="autovalue" id="auto-pec_samp_report-u6_admitted">{{ pec_samp_report.u6_admitted }}</td>
              {% include '_field_cell.html' with field=fields.next %}
              {% include '_field_cell.html' with field=fields.next %}
       {% endwith %}
     </tr>
     <tr>
-      <th> 6-59 mois</th>
+      <th class="left">6-59&nbsp;mois</th>
       {% with fields=pec_samp_form.part2_form_fields %}
              {% include '_field_cell.html' with field=fields.next %}
              {% include '_field_cell.html' with field=fields.next %}
              {% include '_field_cell.html' with field=fields.next %}
              {% include '_field_cell.html' with field=fields.next %}
              {% include '_field_cell.html' with field=fields.next %}
-            <td></td>
+            <td class="autovalue" id="auto-pec_samp_report-u59_admitted">{{ pec_samp_report.u59_admitted }}</td>
              {% include '_field_cell.html' with field=fields.next %}
              {% include '_field_cell.html' with field=fields.next %}
       {% endwith %}
     </tr>
     <tr>
-      <th>&gt; 59 mois</th>
+      <th class="left">&gt;&nbsp;59&nbsp;mois</th>
       {% with fields=pec_samp_form.part2_form_fields %}
              {% include '_field_cell.html' with field=fields.next %}
              {% include '_field_cell.html' with field=fields.next %}
              {% include '_field_cell.html' with field=fields.next %}
              {% include '_field_cell.html' with field=fields.next %}
              {% include '_field_cell.html' with field=fields.next %}
-            <td></td>
+            <td class="autovalue" id="auto-pec_samp_report-o59_admitted">{{ pec_samp_report.o59_admitted }}</td>
              {% include '_field_cell.html' with field=fields.next %}
              {% include '_field_cell.html' with field=fields.next %}
       {% endwith %}
     </tr>
-
+    
     {% endif %}
 
     {% if pec_sam_report %}
 
     <tr>
-      <th colspan="9" >URENAS 2</th>
+      <th class="left" colspan="9">URENAS 2</th>
     </tr>
 
     <tr>
-      <th>6-59 mois
-      </th>
+      <th class="left">6-59&nbsp;mois</th>
       {% with fields=pec_sam_form.part2_form_fields %}
              {% include '_field_cell.html' with field=fields.next %}
              {% include '_field_cell.html' with field=fields.next %}
              {% include '_field_cell.html' with field=fields.next %}
              {% include '_field_cell.html' with field=fields.next %}
              {% include '_field_cell.html' with field=fields.next %}
-            <td></td>
+            <td class="autovalue" id="auto-pec_sam_report-u59_admitted">{{ pec_sam_report.u59_admitted }}</td>
              {% include '_field_cell.html' with field=fields.next %}
              {% include '_field_cell.html' with field=fields.next %}
       {% endwith %}
     </tr>
 
     <tr>
-      <th>&gt; 59 mois
-      </th>
+      <th class="left">&gt;&nbsp;59&nbsp;mois</th>
       {% with fields=pec_sam_form.part2_form_fields %}
              {% include '_field_cell.html' with field=fields.next %}
              {% include '_field_cell.html' with field=fields.next %}
              {% include '_field_cell.html' with field=fields.next %}
              {% include '_field_cell.html' with field=fields.next %}
              {% include '_field_cell.html' with field=fields.next %}
-            <td></td>
+            <td class="autovalue" id="auto-pec_sam_report-o59_admitted">{{ pec_sam_report.o59_admitted }}</td>
              {% include '_field_cell.html' with field=fields.next %}
              {% include '_field_cell.html' with field=fields.next %}
       {% endwith %}
     </tr>
 
     <tr>
-      <th>Suivi de URENI 1</th>
-      </td>
-
+      <th class="left"><acronym title="Suivi de URENI">Suivi&nbsp;1</acronym></th>
       {% with fields=pec_sam_form.part2_form_fields %}
              {% include '_field_cell.html' with field=fields.next %}
              {% include '_field_cell.html' with field=fields.next %}
              {% include '_field_cell.html' with field=fields.next %}
              {% include '_field_cell.html' with field=fields.next %}
              {% include '_field_cell.html' with field=fields.next %}
-            <td></td>
+            <td class="autovalue" id="auto-pec_sam_report-fu1_admitted">{{ pec_sam_report.fu1_admitted }}</td>
              {% include '_field_cell.html' with field=fields.next %}
              {% include '_field_cell.html' with field=fields.next %}
       {% endwith %}
@@ -357,47 +305,43 @@
     {% if pec_mam_report %}
 
     <tr>
-      <th colspan="9" >URENAM 3
-      </th>
+      <th class="left" colspan="9">URENAM 3</th>
     </tr>
     <tr>
-      <th>6-59 mois
-      </th>
+      <th class="left">6-59&nbsp;mois</th>
       {% with fields=pec_mam_form.part2_form_fields %}
              {% include '_field_cell.html' with field=fields.next %}
              {% include '_field_cell.html' with field=fields.next %}
              {% include '_field_cell.html' with field=fields.next %}
              {% include '_field_cell.html' with field=fields.next %}
              {% include '_field_cell.html' with field=fields.next %}
-            <td></td>
+            <td class="autovalue" id="auto-pec_mam_report-u59_admitted">{{ pec_mam_report.u59_admitted }}</td>
              {% include '_field_cell.html' with field=fields.next %}
              {% include '_field_cell.html' with field=fields.next %}
       {% endwith %}
     </tr>
     <tr>
-      <th>FE/FA
-      </th>
+      <th class="left"><acronym title="Femmes Enceintes/Femmes alaitantes">FE/FA</acronym></th>
       {% with fields=pec_mam_form.part2_form_fields %}
              {% include '_field_cell.html' with field=fields.next %}
              {% include '_field_cell.html' with field=fields.next %}
              {% include '_field_cell.html' with field=fields.next %}
              {% include '_field_cell.html' with field=fields.next %}
              {% include '_field_cell.html' with field=fields.next %}
-            <td></td>
+            <td class="autovalue" id="auto-pec_mam_report-pw_admitted">{{ pec_mam_report.pw_admitted }}</td>
              {% include '_field_cell.html' with field=fields.next %}
              {% include '_field_cell.html' with field=fields.next %}
       {% endwith %}
     </tr>
     <tr>
-      <th>Suivi de 1 et 2
-      </th>
+      <th class="left"><acronym title="Suivi de URENI et URENAS">Suivi&nbsp;1&nbsp;&&nbsp;2</acronym></th>
       {% with fields=pec_mam_form.part2_form_fields %}
              {% include '_field_cell.html' with field=fields.next %}
              {% include '_field_cell.html' with field=fields.next %}
              {% include '_field_cell.html' with field=fields.next %}
              {% include '_field_cell.html' with field=fields.next %}
              {% include '_field_cell.html' with field=fields.next %}
-            <td></td>
+            <td class="autovalue" id="auto-pec_mam_report-fu12_admitted">{{ pec_mam_report.fu12_admitted }}</td>
              {% include '_field_cell.html' with field=fields.next %}
              {% include '_field_cell.html' with field=fields.next %}
       {% endwith %}
@@ -406,79 +350,55 @@
     {% endif %}
 
     <tr>
-      <th>Total
-      </th>
-      {% with fields=pec_mam_form.part2_total_fields %}
-             {% include '_field_cell.html' with field=fields.next %}
-             {% include '_field_cell.html' with field=fields.next %}
-             {% include '_field_cell.html' with field=fields.next %}
-             {% include '_field_cell.html' with field=fields.next %}
-             {% include '_field_cell.html' with field=fields.next %}
-             <td></td>
-             {% include '_field_cell.html' with field=fields.next %}
-             {% include '_field_cell.html' with field=fields.next %}
-      {% endwith %}
+      <th class="left">Total</th>
+      <td class="autovalue">{{ report.sum_all_new_case }}</td>
+      <td class="autovalue">{{ report.sum_all_relapse }}</td>
+      <td class="autovalue">{{ report.sum_all_returned }}</td>
+      <td class="autovalue">{{ report.sum_all_nut_transfered_in }}</td>
+      <td class="autovalue">{{ report.sum_all_nut_referred_in }}</td>
+      <td class="autovalue">{{ report.sum_all_total_admitted }}</td>
+      <td class="autovalue">{{ report.sum_all_total_admitted_m }}</td>
+      <td class="autovalue">{{ report.sum_all_total_admitted_f }}</td>
     </tr>
-  </tbody>
 </table>
 
 
-<table border="1" cellpadding="2" cellspacing="2">
-  <thead>
+<table border="0" cellpadding="2" cellspacing="2" style="width:100%;">
     <tr>
-      <th colspan="1" rowspan="3">Groupe d'age
-      </th>
-      <th colspan="10" rowspan="1">Sorties (C)
-      </th>
-      <th colspan="3" rowspan="1">Total restant à la fin mois (D)
-      </th>
+      <th colspan="1" rowspan="3">Age</th>
+      <th colspan="10" rowspan="1">Sorties (C)</th>
+      <th colspan="3" rowspan="1">Total restant à la fin mois (D)</th>
     </tr>
     <tr>
-      <th colspan="7" rowspan="1">Type de sortie (C1)
-      </th>
-      <th colspan="1" rowspan="2">Total sorties (C2)
-      </th>
-      <th colspan="2" rowspan="1">Sexe (C3)
-      </th>
+      <th colspan="7" rowspan="1">Type de sortie (C1)</th>
+      <th colspan="1" rowspan="2">Total sorties (C2)</th>
+      <th colspan="2" rowspan="1">Sexe (C3)</th>
       <th colspan="1" rowspan="2">Total (D1)</th>
       <th colspan="2" rowspan="1">Sexe (C3)</th>
     </tr>
     <tr>
-      <th>Gueris
-      </th>
-      <th>Referes vers 3 ou 2
-      </th>
-      <th>Deces
-      </th>
-      <th>Abandons
-      </th>
-      <th>Non-repondant
-      </th>
-      <th>Transfert medical
-      </th>
-      <th>Transfert Nutritionnel
-      </th>
-      <th>M
-      </th>
-      <th>F
-      </th>
-      <th>M
-      </th>
-      <th>F
-      </th>
+      <th>Gueris</th>
+      <th>Referes vers 3/2</th>
+      <th>Deces</th>
+      <th>Aband.</th>
+      <th>Non repond.</th>
+      <th>Transf. medical</th>
+      <th>Transf. nutri.</th>
+      <th>M</th>
+      <th>F</th>
+      <th>M</th>
+      <th>F</th>
     </tr>
-</thead>
 
-<tbody>
 
     {% if pec_samp_report %}
 
     <tr>
-      <th colspan="14" >URENI 1</th>
+      <th class="left" colspan="14">URENI 1</th>
     </tr>
 
     <tr>
-      <th>&lt; 6 mois</th>
+      <th class="left">&lt;&nbsp;6&nbsp;mois</th>
       {% with fields=pec_samp_form.part3_form_fields %}
             {% include '_field_cell.html' with field=fields.next %}
             {% include '_field_cell.html' with field=fields.next %}
@@ -487,17 +407,17 @@
             {% include '_field_cell.html' with field=fields.next %}
             {% include '_field_cell.html' with field=fields.next %}
             {% include '_field_cell.html' with field=fields.next %}
-            <td></td>
+            <td class="autovalue" id="auto-pec_samp_report-u6_total_out">{{ pec_sam_report.u6_total_out }}</td>
              {% include '_field_cell.html' with field=fields.next %}
              {% include '_field_cell.html' with field=fields.next %}
       {% endwith %}
-      <td></td>
-      <td></td>
-      <td></td>
+      <td class="autovalue" id="auto-pec_samp_report-u6_total_end">{{ pec_sam_report.u6_total_end }}</td>
+      <td class="autovalue" id="auto-pec_samp_report-u6_total_end_m">{{ pec_sam_report.u6_total_end_m }}</td>
+      <td class="autovalue" id="auto-pec_samp_report-u6_total_end_f">{{ pec_sam_report.u6_total_end_f }}</td>
     </tr>
 
     <tr>
-      <th> 6-59 mois</th>
+      <th class="left">6-59&nbsp;mois</th>
       {% with fields=pec_samp_form.part3_form_fields %}
             {% include '_field_cell.html' with field=fields.next %}
             {% include '_field_cell.html' with field=fields.next %}
@@ -506,18 +426,17 @@
             {% include '_field_cell.html' with field=fields.next %}
             {% include '_field_cell.html' with field=fields.next %}
             {% include '_field_cell.html' with field=fields.next %}
-            <td></td>
+            <td class="autovalue" id="auto-pec_samp_report-u59_total_out">{{ pec_sam_report.u59_total_out }}</td>
              {% include '_field_cell.html' with field=fields.next %}
              {% include '_field_cell.html' with field=fields.next %}
       {% endwith %}
-      <td></td>
-      <td></td>
-      <td></td>
+      <td class="autovalue" id="auto-pec_samp_report-u59_total_end">{{ pec_sam_report.u59_total_end }}</td>
+      <td class="autovalue" id="auto-pec_samp_report-u59_total_end_m">{{ pec_sam_report.u59_total_end_m }}</td>
+      <td class="autovalue" id="auto-pec_samp_report-u59_total_end_f">{{ pec_sam_report.u59_total_end_f }}</td>
     </tr>
 
     <tr>
-      <th>&gt; 59 mois
-      </th>
+      <th class="left">&gt;&nbsp;59&nbsp;mois</th>
       {% with fields=pec_samp_form.part3_form_fields %}
             {% include '_field_cell.html' with field=fields.next %}
             {% include '_field_cell.html' with field=fields.next %}
@@ -526,13 +445,13 @@
             {% include '_field_cell.html' with field=fields.next %}
             {% include '_field_cell.html' with field=fields.next %}
             {% include '_field_cell.html' with field=fields.next %}
-            <td></td>
+            <td class="autovalue" id="auto-pec_samp_report-o59_total_out">{{ pec_sam_report.o59_total_out }}</td>
              {% include '_field_cell.html' with field=fields.next %}
              {% include '_field_cell.html' with field=fields.next %}
       {% endwith %}
-      <td></td>
-      <td></td>
-      <td></td>
+      <td class="autovalue" id="auto-pec_samp_report-o59_total_end">{{ pec_sam_report.o59_total_end }}</td>
+      <td class="autovalue" id="auto-pec_samp_report-o59_total_end_m">{{ pec_sam_report.o59_total_end_m }}</td>
+      <td class="autovalue" id="auto-pec_samp_report-o59_total_end_f">{{ pec_sam_report.o59_total_end_f }}</td>
     </tr>
 
     {% endif %}
@@ -540,13 +459,11 @@
     {% if pec_sam_report %}
 
     <tr>
-      <th  colspan="14" >URENAS 2
-      </th>
+      <th class="left" colspan="14">URENAS 2</th>
     </tr>
 
     <tr>
-      <th>&lt; 6 mois
-      </th>
+      <th class="left">6-59&nbsp;mois</th>
       {% with fields=pec_sam_form.part3_form_fields %}
             {% include '_field_cell.html' with field=fields.next %}
             {% include '_field_cell.html' with field=fields.next %}
@@ -555,18 +472,17 @@
             {% include '_field_cell.html' with field=fields.next %}
             {% include '_field_cell.html' with field=fields.next %}
             {% include '_field_cell.html' with field=fields.next %}
-            <td></td>
+            <td class="autovalue" id="auto-pec_sam_report-u59_total_out">{{ pec_sam_report.u59_total_out }}</td>
              {% include '_field_cell.html' with field=fields.next %}
              {% include '_field_cell.html' with field=fields.next %}
       {% endwith %}
-      <td></td>
-      <td></td>
-      <td></td>
+      <td class="autovalue" id="auto-pec_sam_report-u59_total_end">{{ pec_sam_report.u59_total_end }}</td>
+      <td class="autovalue" id="auto-pec_sam_report-u59_total_end_m">{{ pec_sam_report.u59_total_end_m }}</td>
+      <td class="autovalue" id="auto-pec_sam_report-u59_total_end_f">{{ pec_sam_report.u59_total_end_f }}</td>
     </tr>
 
     <tr>
-      <th>6-59 mois
-      </th>
+      <th class="left">&gt;&nbsp;59&nbsp;mois</th>
       {% with fields=pec_sam_form.part3_form_fields %}
             {% include '_field_cell.html' with field=fields.next %}
             {% include '_field_cell.html' with field=fields.next %}
@@ -575,18 +491,17 @@
             {% include '_field_cell.html' with field=fields.next %}
             {% include '_field_cell.html' with field=fields.next %}
             {% include '_field_cell.html' with field=fields.next %}
-            <td></td>
+            <td class="autovalue" id="auto-pec_sam_report-o59_total_out">{{ pec_sam_report.o59_total_out }}</td>
              {% include '_field_cell.html' with field=fields.next %}
              {% include '_field_cell.html' with field=fields.next %}
       {% endwith %}
-      <td></td>
-      <td></td>
-      <td></td>
+      <td class="autovalue" id="auto-pec_sam_report-o59_total_end">{{ pec_sam_report.o59_total_end }}</td>
+      <td class="autovalue" id="auto-pec_sam_report-o59_total_end_m">{{ pec_sam_report.o59_total_end_m }}</td>
+      <td class="autovalue" id="auto-pec_sam_report-o59_total_end_f">{{ pec_sam_report.o59_total_end_f }}</td>
     </tr>
 
     <tr>
-      <th>&gt; 59 mois
-      </th>
+      <th class="left"><acronym title="Suivi de URENI">Suivi&nbsp;1</acronym></th>
       {% with fields=pec_sam_form.part3_form_fields %}
             {% include '_field_cell.html' with field=fields.next %}
             {% include '_field_cell.html' with field=fields.next %}
@@ -595,18 +510,17 @@
             {% include '_field_cell.html' with field=fields.next %}
             {% include '_field_cell.html' with field=fields.next %}
             {% include '_field_cell.html' with field=fields.next %}
-            <td></td>
+            <td class="autovalue" id="auto-pec_sam_report-fu1_total_out">{{ pec_sam_report.fu1_total_out }}</td>
              {% include '_field_cell.html' with field=fields.next %}
              {% include '_field_cell.html' with field=fields.next %}
       {% endwith %}
-      <td></td>
-      <td></td>
-      <td></td>
+      <td class="autovalue" id="auto-pec_sam_report-fu1_total_end">{{ pec_sam_report.fu1_total_end }}</td>
+      <td class="autovalue" id="auto-pec_sam_report-fu1_total_end_m">{{ pec_sam_report.fu1_total_end_m }}</td>
+      <td class="autovalue" id="auto-pec_sam_report-fu1_total_end_f">{{ pec_sam_report.fu1_total_end_f }}</td>
     </tr>
 
     <tr>
-      <th colspan="14" >Suivi de URENI 1
-      </th>
+      <th class="left" colspan="14">URENAM 3</th>
     </tr>
 
     {% endif %}
@@ -614,8 +528,7 @@
     {% if pec_mam_report %}
 
     <tr>
-      <th>URENAM 3
-      </th>
+      <th class="left">6-59&nbsp;mois</th>
       {% with fields=pec_mam_form.part3_form_fields %}
             {% include '_field_cell.html' with field=fields.next %}
             {% include '_field_cell.html' with field=fields.next %}
@@ -624,18 +537,17 @@
             {% include '_field_cell.html' with field=fields.next %}
             {% include '_field_cell.html' with field=fields.next %}
             {% include '_field_cell.html' with field=fields.next %}
-            <td></td>
+            <td class="autovalue" id="auto-pec_mam_report-u59_total_out">{{ pec_mam_report.u59_total_out }}</td>
              {% include '_field_cell.html' with field=fields.next %}
              {% include '_field_cell.html' with field=fields.next %}
       {% endwith %}
-      <td></td>
-      <td></td>
-      <td></td>
+      <td class="autovalue" id="auto-pec_mam_report-u59_total_end">{{ pec_mam_report.u59_total_end }}</td>
+      <td class="autovalue" id="auto-pec_mam_report-u59_total_end_m">{{ pec_mam_report.u59_total_end_m }}</td>
+      <td class="autovalue" id="auto-pec_mam_report-u59_total_end_f">{{ pec_mam_report.u59_total_end_f }}</td>
     </tr>
 
     <tr>
-      <th>6-59 mois
-      </th>
+      <th class="left"><acronym title="Femmes Enceintes/Femmes alaitantes">FE/FA</acronym></th>
       {% with fields=pec_mam_form.part3_form_fields %}
             {% include '_field_cell.html' with field=fields.next %}
             {% include '_field_cell.html' with field=fields.next %}
@@ -644,17 +556,17 @@
             {% include '_field_cell.html' with field=fields.next %}
             {% include '_field_cell.html' with field=fields.next %}
             {% include '_field_cell.html' with field=fields.next %}
-            <td></td>
+            <td class="autovalue" id="auto-pec_mam_report-pw_total_out">{{ pec_mam_report.pw_total_out }}</td>
              {% include '_field_cell.html' with field=fields.next %}
              {% include '_field_cell.html' with field=fields.next %}
       {% endwith %}
-      <td></td>
-      <td></td>
-      <td></td>
+      <td class="autovalue" id="auto-pec_mam_report-pw_total_end">{{ pec_mam_report.pw_total_end }}</td>
+      <td class="autovalue" id="auto-pec_mam_report-pw_total_end_m">{{ pec_mam_report.pw_total_end_m }}</td>
+      <td class="autovalue" id="auto-pec_mam_report-pw_total_end_f">{{ pec_mam_report.pw_total_end_f }}</td>
     </tr>
 
     <tr>
-      <th>FE/FA
+      <th class="left"><acronym title="Suivi de URENI et URENAS">Suivi&nbsp;1&nbsp;&&nbsp;2</acronym></th>
       {% with fields=pec_mam_form.part3_form_fields %}
             {% include '_field_cell.html' with field=fields.next %}
             {% include '_field_cell.html' with field=fields.next %}
@@ -663,92 +575,60 @@
             {% include '_field_cell.html' with field=fields.next %}
             {% include '_field_cell.html' with field=fields.next %}
             {% include '_field_cell.html' with field=fields.next %}
-            <td></td>
+            <td class="autovalue" id="auto-pec_mam_report-fu12_total_out">{{ pec_mam_report.fu12_total_out }}</td>
              {% include '_field_cell.html' with field=fields.next %}
              {% include '_field_cell.html' with field=fields.next %}
       {% endwith %}
-      <td></td>
-      <td></td>
-      <td></td>
+      <td class="autovalue" id="auto-pec_mam_report-fu12_total_end">{{ pec_mam_report.fu12_total_end }}</td>
+      <td class="autovalue" id="auto-pec_mam_report-fu12_total_end_m">{{ pec_mam_report.fu12_total_end_m }}</td>
+      <td class="autovalue" id="auto-pec_mam_report-fu12_total_end_f">{{ pec_mam_report.fu12_total_end_f }}</td>
     </tr>
 
     <tr>
-      <th>Suivi de 1 et 2
-      </th>
-      {% with fields=pec_mam_form.part3_form_fields %}
-            {% include '_field_cell.html' with field=fields.next %}
-            {% include '_field_cell.html' with field=fields.next %}
-            {% include '_field_cell.html' with field=fields.next %}
-            {% include '_field_cell.html' with field=fields.next %}
-            {% include '_field_cell.html' with field=fields.next %}
-            {% include '_field_cell.html' with field=fields.next %}
-            {% include '_field_cell.html' with field=fields.next %}
-            <td></td>
-             {% include '_field_cell.html' with field=fields.next %}
-             {% include '_field_cell.html' with field=fields.next %}
-      {% endwith %}
-      <td></td>
-      <td></td>
-      <td></td>
-    </tr>
-
-    <tr>
-      <th>Total
-      </th>
-
-      {% with fields=pec_mam_form.part3_total_fields %}
-            {% include '_field_cell.html' with field=fields.next %}
-            {% include '_field_cell.html' with field=fields.next %}
-            {% include '_field_cell.html' with field=fields.next %}
-            {% include '_field_cell.html' with field=fields.next %}
-            {% include '_field_cell.html' with field=fields.next %}
-            {% include '_field_cell.html' with field=fields.next %}
-            {% include '_field_cell.html' with field=fields.next %}
-            <td></td>
-             {% include '_field_cell.html' with field=fields.next %}
-             {% include '_field_cell.html' with field=fields.next %}
-      {% endwith %}
-      <td></td>
-      <td></td>
-      <td></td>
-
+      <th class="left">Total</th>
+      <td class="autovalue">{{ report.sum_all_healed }}</td>
+      <td class="autovalue">{{ report.sum_all_refered_out }}</td>
+      <td class="autovalue">{{ report.sum_all_deceased }}</td>
+      <td class="autovalue">{{ report.sum_all_aborted }}</td>
+      <td class="autovalue">{{ report.sum_all_non_respondant }}</td>
+      <td class="autovalue">{{ report.sum_all_medic_transfered_out }}</td>
+      <td class="autovalue">{{ report.sum_all_nut_transfered_out }}</td>
+      <td class="autovalue">{{ report.sum_all_total_out }}</td>
+      <td class="autovalue">{{ report.sum_all_total_out_m }}</td>
+      <td class="autovalue">{{ report.sum_all_total_out_f }}</td>
+      <td class="autovalue">{{ report.sum_all_total_end }}</td>
+      <td class="autovalue">{{ report.sum_all_total_end_m }}</td>
+      <td class="autovalue">{{ report.sum_all_total_end_f }}</td>
     </tr>
 
     {% endif %}
 
-  </tbody>
 </table>
 
 {% if pec_other_report %}
-    <p>
+<table>
+        <caption>Autres PEC</caption>
         {% for field in pec_other_form %}
-            <span>{{ field.label }}: {{field}}</span>
+        <tr><th class="left">{{ field.label }}</th><td>{{field}}</td></tr>
         {% endfor %}
-    </p>
+</table>
 {% endif %}
 
-
+{% if report.is_samp %}
 {{ cons_samp_form.management_form }}
 {{ order_samp_form.management_form }}
 
-<table border="1" cellpadding="2" cellspacing="2"
-{% if not cons_samp_report %}class='hide'{% endif %}
->
-  <caption>SAMP consumption report</caption>
+<table border="0" cellpadding="2" cellspacing="2"
+{% if not cons_samp_report %}class='hide'{% endif %}>
+  <caption>Consommation d'intrants URENI</caption>
   <thead>
     <tr>
-      <th>Désignation
-      </th>
-      <th>Stock Initial
-      </th>
-      <th>Quantités Reçues pendant la période
-      </th>
-      <th>Quantités Utlisées pendant la période
-      </th>
-      <th>Quantités Perdues* pendant la période
-      </th>
-      <th>Quantités Disponibles Utilisables en Fin de période
-      </th>
+      <th>Désignation</th>
+      <th>Stock Initial</th>
+      <th>Quantités Reçues pendant la période</th>
+      <th>Quantités Utlisées pendant la période</th>
+      <th>Quantités Perdues pendant la période</th>
+      <th>Quantités à commander</th>
     </tr>
 </thead>
 
@@ -756,22 +636,12 @@
     {% for line in cons_samp_form.forms %}
 
         <tr>
-          <th>{{ line.instance.nut_input.name }}
-          </th>
-          <td>
-          {{ line.initial }}
-          </td>
-          <td>
-          {{ line.received }}
-          </td>
-          <td>
-          {{ line.used }}
-          </td>
-          <td>
-          {{ line.lost }}
-          </td>
-          <td>
-          {% for input_form in order_samp_form %}
+          <th class="left">{{ line.instance.nut_input.name }}</th>
+          <td>{{ line.initial }}</td>
+          <td>{{ line.received }}</td>
+          <td>{{ line.used }}</td>
+          <td>{{ line.lost }}</td>
+          <td>{% for input_form in order_samp_form %}
               {% if input_form.instance.nut_input == line.instance.nut_input %}
                   {{ input_form.quantity }}
               {% endif %}
@@ -782,28 +652,23 @@
     {% endfor %}
   </tbody>
 </table>
+{% endif %}
 
+{% if report.is_sam %}
 {{ cons_sam_form.management_form }}
 {{ order_sam_form.management_form }}
 
-<table border="1" cellpadding="2" cellspacing="2"
-{% if not cons_sam_report %}class='hide'{% endif %}
->
-  <caption>SAM consumption report</caption>
+<table border="0" cellpadding="2" cellspacing="2"
+{% if not cons_sam_report %}class='hide'{% endif %}>
+  <caption>Consommation d'intrants URENAS</caption>
   <thead>
     <tr>
-      <th>Désignation
-      </th>
-      <th>Stock Initial
-      </th>
-      <th>Quantités Reçues pendant la période
-      </th>
-      <th>Quantités Utlisées pendant la période
-      </th>
-      <th>Quantités Perdues* pendant la période
-      </th>
-      <th>Quantités Disponibles Utilisables en Fin de période
-      </th>
+      <th>Désignation</th>
+      <th>Stock Initial</th>
+      <th>Quantités Reçues pendant la période</th>
+      <th>Quantités Utlisées pendant la période</th>
+      <th>Quantités Perdues pendant la période</th>
+      <th>Quantités à commander</th>
     </tr>
 </thead>
 
@@ -811,20 +676,11 @@
     {% for line in cons_sam_form.forms %}
 
         <tr>
-          <th>{{ line.instance.nut_input.name }}
-          </th>
-          <td>
-          {{ line.initial }}
-          </td>
-          <td>
-          {{ line.received }}
-          </td>
-          <td>
-          {{ line.used }}
-          </td>
-          <td>
-          {{ line.lost }}
-          </td>
+          <th class="left">{{ line.instance.nut_input.name }}</th>
+          <td>{{ line.initial }}</td>
+          <td>{{ line.received }}</td>
+          <td>{{ line.used }}</td>
+          <td>{{ line.lost }}</td>
           <td>
           {% for input_form in order_sam_form %}
               {% if input_form.instance.nut_input == line.instance.nut_input %}
@@ -838,27 +694,25 @@
   </tbody>
 </table>
 
+{% endif %}
+
+
+{% if report.is_mam %}
+
 {{ cons_mam_form.management_form }}
 {{ order_mam_form.management_form }}
 
-<table border="1" cellpadding="2" cellspacing="2"
-{% if not cons_mam_report %}class='hide'{% endif %}
->
-  <caption>MAM consumption report</caption>
+<table border="0" cellpadding="2" cellspacing="2"
+{% if not cons_mam_report %}class='hide'{% endif %}>
+  <caption>Consommation d'intrants URENAM</caption>
   <thead>
     <tr>
-      <th>Désignation
-      </th>
-      <th>Stock Initial
-      </th>
-      <th>Quantités Reçues pendant la période
-      </th>
-      <th>Quantités Utlisées pendant la période
-      </th>
-      <th>Quantités Perdues* pendant la période
-      </th>
-      <th>Quantités Disponibles Utilisables en Fin de période
-      </th>
+      <th>Désignation</th>
+      <th>Stock Initial</th>
+      <th>Quantités Reçues pendant la période</th>
+      <th>Quantités Utlisées pendant la période</th>
+      <th>Quantités Perdues pendant la période</th>
+      <th>Quantités à commander</th>
     </tr>
 </thead>
 
@@ -866,20 +720,11 @@
     {% for line in cons_mam_form.forms %}
 
         <tr>
-          <th>{{ line.instance.nut_input.name }}
-          </th>
-          <td>
-          {{ line.initial }}
-          </td>
-          <td>
-          {{ line.received }}
-          </td>
-          <td>
-          {{ line.used }}
-          </td>
-          <td>
-          {{ line.lost }}
-          </td>
+          <th class="left">{{ line.instance.nut_input.name }}</th>
+          <td>{{ line.initial }}</td>
+          <td>{{ line.received }}</td>
+          <td>{{ line.used }}</td>
+          <td>{{ line.lost }}</td>
           <td>
           {% for input_form in order_mam_form %}
               {% if input_form.instance.nut_input == line.instance.nut_input %}
@@ -892,9 +737,9 @@
     {% endfor %}
   </tbody>
 </table>
+{% endif %}
 
-{% csrf_token %}
-<input type="submit">
+<button class="formbutt" id="submit_form" title="Enregistre vos modifications.">Enregistrer les modifications</button>
 </form>
 
 {% endblock %}
