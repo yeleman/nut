@@ -277,6 +277,7 @@ class Report(BaseModel):
     def pec_sam_report(self):
         return self.get_pec_report('sam')
 
+    @property
     def pec_samp_report(self):
         return self.get_pec_report('samp')
 
