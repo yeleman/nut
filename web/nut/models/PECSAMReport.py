@@ -14,6 +14,8 @@ class PECSAMReport(models.Model, PECReport):
 
     """ PEC Report URENAS """
 
+    cap = u"URENAS"
+
     class Meta:
         app_label = 'nut'
         verbose_name = _(u"PEC URENAS Report")

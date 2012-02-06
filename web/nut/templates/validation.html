@@ -1,4 +1,5 @@
 {% extends "base.html" %}
+{% load nut %}
 
 {% block title %}Validation: {{ report }}{% endblock %}
 
@@ -35,16 +36,37 @@ addJQEventsForValidationChange('{% url report_do_validation report.receipt %}');
 
 {% comment %} Print errors {% endcomment %}
 
-<ul>
-{% for name, form in forms_with_instances.iteritems %}
-      <li>{{ form.errors }}</li>
+<h2>Erreurs</h2>
+<p>Le rapport n'a pas pu être enregistré car il contient des erreurs.</p>
+<p>La liste des erreurs est présentée ci-dessous.</p>
+<table>
+<tr><th>Rapport</th><th>Catégorie</th><th>Erreur</th></tr>
+{% for name, form in forms.iteritems %}
+    {% if form.non_field_errors|length %}
+        {% for error in form.non_field_errors %}
+            <tr><td>{{ form.report_name }}</td><td>{{ error|err_cat }}</td><td class="left">{{ error|err_text }}</td></tr>
+        {% endfor %}
+    {% endif %}
+    {% if form.errors|length %}
+        {% for field in form %}
+            {% if field.errors.items %}
+                {% for error in field.errors.values %}
+                <tr><td>{{ field.report_name }}</td><td>{{ error|striptags|err_cat }}</td><td class="left">{{ error|striptags|err_text }}</td></tr>
+                {% endfor %}
+            {% else %}
+                {% if field.errors|length %}
+                <tr><th>{{ field.label }}</th><td class="left">{{ field.errors|striptags }}</td></tr>
+                {% endif %}
+            {% endif %}
+        {% endfor %}
+    {% endif %}
 {% endfor %}
-</ul>
+</table>
 
 <button class="formbutt" id="reset_button" title="Ré-initialise les valeurs du formulaire à celles de départ.">Annuler modifications</button>
 <button class="formbutt important confirm" id="validate_form" title="Valide le rapport tel qu'enregistré.">Valider le rapport</button>
 
-<table>
+<table border="0" cellpadding="2" cellspacing="2" class="pec">
 <caption>PEC pour la période de {{ report.mperiod }}</caption>
 
     <tr>
@@ -185,7 +207,7 @@ addJQEventsForValidationChange('{% url report_do_validation report.receipt %}');
 </table>
 
 
-<table border="0" cellpadding="2" cellspacing="2">
+<table border="0" cellpadding="2" cellspacing="2" class="pec">
     <tr>
       <th colspan="1" rowspan="3">Groupe d'age</th>
       <th colspan="8" rowspan="1">Admissions (B)</th>
@@ -363,7 +385,7 @@ addJQEventsForValidationChange('{% url report_do_validation report.receipt %}');
 </table>
 
 
-<table border="0" cellpadding="2" cellspacing="2" style="width:100%;">
+<table border="0" cellpadding="2" cellspacing="2" class="pec">
     <tr>
       <th colspan="1" rowspan="3">Age</th>
       <th colspan="10" rowspan="1">Sorties (C)</th>
@@ -609,7 +631,7 @@ addJQEventsForValidationChange('{% url report_do_validation report.receipt %}');
 <table>
         <caption>Autres PEC</caption>
         {% for field in pec_other_form %}
-        <tr><th class="left">{{ field.label }}</th><td>{{field}}</td></tr>
+        <tr><th class="left">{{ field.label }}</th>{% include '_field_cell.html' with field=field %}</tr>
         {% endfor %}
 </table>
 {% endif %}
@@ -637,16 +659,15 @@ addJQEventsForValidationChange('{% url report_do_validation report.receipt %}');
 
         <tr>
           <th class="left">{{ line.instance.nut_input.name }}</th>
-          <td>{{ line.initial }}</td>
-          <td>{{ line.received }}</td>
-          <td>{{ line.used }}</td>
-          <td>{{ line.lost }}</td>
-          <td>{% for input_form in order_samp_form %}
+          {% include '_field_cell.html' with field=line.initial %}
+          {% include '_field_cell.html' with field=line.received %}
+          {% include '_field_cell.html' with field=line.used %}
+          {% include '_field_cell.html' with field=line.lost %}
+          {% for input_form in order_samp_form %}
               {% if input_form.instance.nut_input == line.instance.nut_input %}
-                  {{ input_form.quantity }}
+                  {% include '_field_cell.html' with field=input_form.quantity %}
               {% endif %}
           {% endfor %}
-          </td>
         </tr>
 
     {% endfor %}
@@ -677,17 +698,16 @@ addJQEventsForValidationChange('{% url report_do_validation report.receipt %}');
 
         <tr>
           <th class="left">{{ line.instance.nut_input.name }}</th>
-          <td>{{ line.initial }}</td>
-          <td>{{ line.received }}</td>
-          <td>{{ line.used }}</td>
-          <td>{{ line.lost }}</td>
-          <td>
+          {% include '_field_cell.html' with field=line.initial %}
+          {% include '_field_cell.html' with field=line.received %}
+          {% include '_field_cell.html' with field=line.used %}
+          {% include '_field_cell.html' with field=line.lost %}
+
           {% for input_form in order_sam_form %}
               {% if input_form.instance.nut_input == line.instance.nut_input %}
-                  {{ input_form.quantity }}
+                  {% include '_field_cell.html' with field=input_form.quantity %}
               {% endif %}
           {% endfor %}
-          </td>
         </tr>
 
     {% endfor %}
@@ -704,8 +724,8 @@ addJQEventsForValidationChange('{% url report_do_validation report.receipt %}');
 
 <table border="0" cellpadding="2" cellspacing="2"
 {% if not cons_mam_report %}class='hide'{% endif %}>
-  <caption>Consommation d'intrants URENAM</caption>
-  <thead>
+    <caption>Consommation d'intrants URENAM</caption>
+    <thead>
     <tr>
       <th>Désignation</th>
       <th>Stock Initial</th>
@@ -714,26 +734,22 @@ addJQEventsForValidationChange('{% url report_do_validation report.receipt %}');
       <th>Quantités Perdues pendant la période</th>
       <th>Quantités à commander</th>
     </tr>
-</thead>
+    </thead>
 
 <tbody>
     {% for line in cons_mam_form.forms %}
-
         <tr>
           <th class="left">{{ line.instance.nut_input.name }}</th>
-          <td>{{ line.initial }}</td>
-          <td>{{ line.received }}</td>
-          <td>{{ line.used }}</td>
-          <td>{{ line.lost }}</td>
-          <td>
+          {% include '_field_cell.html' with field=line.initial %}
+          {% include '_field_cell.html' with field=line.received %}
+          {% include '_field_cell.html' with field=line.used %}
+          {% include '_field_cell.html' with field=line.lost %}
           {% for input_form in order_mam_form %}
               {% if input_form.instance.nut_input == line.instance.nut_input %}
-                  {{ input_form.quantity }}
+                  {% include '_field_cell.html' with field=input_form.quantity %}
               {% endif %}
           {% endfor %}
-          </td>
         </tr>
-
     {% endfor %}
   </tbody>
 </table>

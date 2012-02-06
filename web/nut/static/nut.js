@@ -220,6 +220,10 @@ function addJQEventFormChange() {
 
         table = field.parent().parent().parent();
 
+        // only apply for PEC
+        if (!$(table).hasClass('pec'))
+            return false;
+
         total_value = 0;
         table.children('tr').each(function (index) {
             tr = table.children('tr').get(index);

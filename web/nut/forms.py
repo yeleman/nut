@@ -2,10 +2,10 @@
 # -*- coding: utf-8 -*-
 # vim: ai ts=4 sts=4 et sw=4 nu
 
-from itertools import chain, cycle, islice
+from itertools import islice
 
 from django import forms
-from django.forms.models import inlineformset_factory
+from django.forms.models import inlineformset_factory, BaseInlineFormSet
 
 from models import (PECSAMPReport, PECSAMReport, PECMAMReport, PECOthersReport,
                     InputConsumptionReport, ConsumptionReport, OrderReport,
@@ -44,8 +44,10 @@ class BasePECForm(object):
                       'total_out_m',
                       'total_out_f')
 
-    exclude = ('_status', 'type', 'created_by', 'entity', 'period')
+    exclude = ('_status', 'type', 'created_by', 'entity', 'period', 'nut_report')
 
+    def report_name(self):
+        return u"PEC %s" % self.instance.cap
 
     def field_names_matrix(self, prefixes=None, suffixes=None):
         """
@@ -164,9 +166,54 @@ class BasePECForm(object):
     def part3_total_fields(self, default=None):
         return self.part_total_fields(self.part3_suffixes, default)
 
+    def clean(self):
+        super(BasePECForm, self).clean()
+
+        def f(prefix_index, field):
+            return self.cleaned_data.get('%s_%s' % (self.prefixes[prefix_index],
+                                                    field), 0)
+
+        print("--------------- CLEAN ----")
+
+        for i in range(0, len(self.prefixes)):
+            # sum admission crit
+            sum_crit = sum([f(i, 'hw_b7080_bmi_u18'),
+                            f(i, 'muac_u120'),
+                            f(i, 'hw_u70_bmi_u16'),
+                            f(i, 'muac_u11_muac_u18'),
+                            f(i, 'oedema'),
+                            f(i, 'other')])
+            # sum admission typ
+            sum_typ = sum([f(i, 'new_case'),
+                           f(i, 'relapse'),
+                           f(i, 'returned'),
+                           f(i, 'nut_transfered_in'),
+                           f(i, 'nut_referred_in')])
+
+            sum_sex = sum([f(i, 'admitted_m'),
+                           f(i, 'admitted_f')])
+
+            # if different, raise
+            if sum_crit != sum_typ:
+                raise forms.ValidationError(u"[%s] " 
+                                            u"Les entrées par admissions (%d) "
+                                            u"sont différentes des entrées "
+                                            u"par type (%d)."
+                                            % (self.prefixes[i],
+                                               sum_crit, sum_typ))
+
+            if sum_crit != sum_sex:
+                raise forms.ValidationError(u"[%s] " 
+                                            u"Les entrées par sexe (%d) sont "
+                                            u"différentes des entrées par "
+                                            u"types et critères (%d)."
+                                            % (self.prefixes[i],
+                                               sum_sex, sum_crit))
+
+        return self.cleaned_data
 
 
-class PECSAMPReportForm(forms.ModelForm, BasePECForm):
+class PECSAMPReportForm(BasePECForm, forms.ModelForm):
 
     prefixes = ('u6', 'u59', 'o59')
 
@@ -175,7 +222,7 @@ class PECSAMPReportForm(forms.ModelForm, BasePECForm):
         exclude = BasePECForm.exclude
 
 
-class PECSAMReportForm(forms.ModelForm, BasePECForm):
+class PECSAMReportForm(BasePECForm, forms.ModelForm):
 
     prefixes = ('u59', 'o59', 'fu1')
 
@@ -184,7 +231,7 @@ class PECSAMReportForm(forms.ModelForm, BasePECForm):
         exclude = BasePECForm.exclude
 
 
-class PECMAMReportReportForm(forms.ModelForm, BasePECForm):
+class PECMAMReportReportForm(BasePECForm, forms.ModelForm):
 
     prefixes = ('u59', 'pw', 'fu12')
 
@@ -199,10 +246,70 @@ class PECOthersReportForm(forms.ModelForm):
         model = PECOthersReport
         fields = ('other_hiv', 'other_tb', 'other_lwb', 'id')
 
+    def clean(self):
+        print("PECOthersReportForm")
+        super(PECOthersReportForm, self).clean()
 
+        return self.cleaned_data
+
+
+class InputConsumptionReportFormSetHelper(BaseInlineFormSet):
+
+    def clean(self):
+
+        print("CLEAN ME")
+
+        self.validate_unique()
+        if any(self.errors):
+            return
+
+    def report_name(self):
+        return u"CONSO %s" % self.instance.nut_type.upper()
+
+class InputConsumptionForm(forms.ModelForm):
+
+    class Meta:
+        model = InputConsumptionReport
+        fields = ('initial', 'received', 'used', 'lost')
+
+    def report_name(self):
+        return u"CONSO %s" % self.instance.cons_report.nut_type.upper()
+
+    def clean(self):
+        print("YES WORK")
+        super(InputConsumptionForm, self).clean()
+
+        def f(field):
+            return self.cleaned_data.get(field, 0)
+
+        initial = f('initial')
+        received = f('received')
+        used = f('used')
+        lost = f('lost')
+
+        consumed = used + lost
+        possessed = initial + received
+
+        valid = consumed <= possessed
+
+        #print("report: %s" % report)
+        print("consumed: %d" % consumed)
+        print("possessed: %d" % possessed)
+        if not valid:
+            raise forms.ValidationError(u"[%s] "
+                                        u"Quantités consommés (%d) "
+                                        u"supérieures aux quantités "
+                                        u"possédées (%d)."
+                                        % (self.instance.nut_input.slug,
+                                           consumed,
+                                           possessed))
+
+        return self.cleaned_data
 
 InputConsumptionReportFormSet = inlineformset_factory(ConsumptionReport,
                                                       InputConsumptionReport,
+                                                      form=InputConsumptionForm,
+                                                      formset=InputConsumptionReportFormSetHelper,
                                                       exclude=('nut_input', 'id'),
                                                       extra=0)
 
