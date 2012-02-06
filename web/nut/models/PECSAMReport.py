@@ -284,26 +284,26 @@ class PECSAMReport(models.Model, PECReport):
     # MISSING FIELDS FOR GENERAL TOTALS
     @property
     def u59_hw_b7080_bmi_u18(self):
-        return 0
+        return None
 
     @property
     def o59_hw_b7080_bmi_u18(self):
-        return 0
+        return None
 
     @property
     def fu1_hw_b7080_bmi_u18(self):
-        return 0
+        return None
 
     @property
     def u59_muac_u120(self):
-        return 0
+        return None
 
     @property
     def o59_muac_u120(self):
-        return 0
+        return None
 
     @property
     def fu1_muac_u120(self):
-        return 0
+        return None
 
 reversion.register(PECSAMReport)

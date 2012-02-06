@@ -50,10 +50,12 @@ class PECReport(NutritionSubReport):
     # HELPERS
     def male_female_sum(self, field):
         """ sum of male + female for a field """
-        male = getattr(self, '%s_m' % field) \
-            if hasattr(self, '%s_m' % field) else 0
-        female = getattr(self, '%s_f' % field) \
-            if hasattr(self, '%s_f' % field) else 0
+        male = getattr(self, '%s_m' % field, 0)
+        female = getattr(self, '%s_f' % field, 0)
+        if male is None:
+            male = 0
+        if female is None:
+            female = 0
         return male + female
 
     def all_for_field(self, field):
@@ -66,9 +68,9 @@ class PECReport(NutritionSubReport):
 
     def total_end_for(self, age, sex):
         """ calculates remaining people for an age and sex """
-        initial = getattr(self, '%s_total_beginning_%s' % (age, sex))
-        admitted = getattr(self, '%s_admitted_%s' % (age, sex))
-        out = getattr(self, '%s_total_out_%s' % (age, sex))
+        initial = getattr(self, '%s_total_beginning_%s' % (age, sex), 0)
+        admitted = getattr(self, '%s_admitted_%s' % (age, sex), 0)
+        out = getattr(self, '%s_total_out_%s' % (age, sex), 0)
         return (initial + admitted) - out
 
     def add_all_data(self, data_browser):

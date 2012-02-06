@@ -38,14 +38,16 @@ CONSUMPTION_TABLE = {
 }
 
 CAPS = {
-    MODERATE: u"MAM",
+    SEVERE_COMP: u"NI",
     SEVERE: u"MAS",
-    SEVERE_COMP: u"NI"}
+    MODERATE: u"MAM",
+}
 
 HC_CAPS = {
-    MODERATE: u"URENAM",
+    SEVERE_COMP: u"URENI",
     SEVERE: u"URENAS",
-    SEVERE_COMP: u"URENI"}
+    MODERATE: u"URENAM",
+}
 
 PEC_FIELDS = {
     # ages
