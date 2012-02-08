@@ -1,0 +1,3 @@
+[gammu]
+device=/dev/ttyUSB2
+connection=at115200

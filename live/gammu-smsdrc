@@ -1,0 +1,29 @@
+[gammu]
+connection=at115200
+device=/dev/ttyUSB2
+
+[smsd]
+Service = sql
+Driver = sqlite3
+host = localhost
+DBDir = /home/nut/gammudb
+Database = nutsms
+driverspath = /usr/lib/dbd/
+
+
+debuglevel = 0
+logfile = /var/log/gammu-smsd.log
+LoopSleep = 10
+CheckSecurity = 0
+CheckBattery = 0
+CheckSignal = 0
+#ResetFrequency = 1800
+#HardResetFrequency = 86400
+
+DeliveryReport = log
+MultipartTimeout = 1800
+
+RunOnReceive = /opt/nutenv/bin/python /opt/nutenv/bin/nosmsd_incoming.py
+
+[exclude_smsc]
++22366700050

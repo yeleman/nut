@@ -1,0 +1,9 @@
+#!/bin/sh
+
+# restart gammu to prevent modem lockup
+
+/usr/sbin/service gammu-smsd stop
+
+/bin/sleep 2
+
+/usr/sbin/service gammu-smsd start

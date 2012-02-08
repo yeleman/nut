@@ -1,0 +1,10 @@
+#! /bin/sh
+
+DESC="Gammu SMS Daemon"
+NAME=gammu-smsd
+# user which will run this daemon
+USER=nut
+DAEMON=/usr/bin/$NAME
+PIDFILE=/var/run/$NAME.pid
+SCRIPTNAME=/etc/init.d/$NAME
+DAEMON_ARGS="--daemon --user $USER --pid $PIDFILE"
