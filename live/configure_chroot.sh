@@ -44,6 +44,7 @@ cp -v $SRC/xinitrc $DST/etc/X11/xinit/xinitrc || exit 1
 cp -v $SRC/gtkrc $DST/etc/gtk-2.0/gtkrc || exit 1
 
 # copy Trolltech.conf so that QT picks GTK theme
+mkdir -p $DST/etc/xdg || exit 1
 cp -v $SRC/Trolltech.conf $DST/etc/xdg/Trolltech.conf || exit 1
 
 # copy rc-local which mounts partition
@@ -71,11 +72,11 @@ chmod 777 $DST/media/export -R || exit 1
 touch $DST/media/export/not_mounted || exit 1
 
 # install gammu
-if [ -x "$DST/gammu-installer.sh" ]; then
-    echo "Installing " + `$DST/gammu-installer.sh --version`
-    $DST/gammu-installer.sh --prefix=$DST/usr --exclude-subdir --skip-license
+if [ -x "$SRC/gammu-installer.sh" ]; then
+    echo "Installing " + `$SRC/gammu-installer.sh --version`
+    $SRC/gammu-installer.sh --prefix=$DST/usr --exclude-subdir --skip-license
 else
-    echo "Unable to install Gammu. Archive $DST/gammu-installer.sh missing."
+    echo "Unable to install Gammu. Archive $SRC/gammu-installer.sh missing."
     exit 1
 fi
 
@@ -104,10 +105,14 @@ fi
 tar xf $DST/opt/bolibana.tar.gz -C $DST/opt/bolibana/ --strip-components=1 || exit 1
 
 # create pip bundle for dependencies
-if [ -e $DST/../client/nutclient/pip-requirements.txt ]; then
-    pip bundle $SRC/nutenv.pybundle -r $DST/../client/nutclient/pip-requirements.txt
+if [ -e $SRC/../client/nutclient/pip-requirements.txt ]; then
+    if [ -e $SRC/nutenv.pybundle ]; then
+        echo "bundle exist."
+    else
+        pip bundle $SRC/nutenv.pybundle -r $SRC/../client/nutclient/pip-requirements.txt
+    fi
 else
-    echo "Unable to find pip requirements file $DST/../client/nutclient/pip-requirements.txt"
+    echo "Unable to find pip requirements file $SRC/../client/nutclient/pip-requirements.txt"
     exit 1
 fi
 
