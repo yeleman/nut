@@ -81,6 +81,7 @@ else
 fi
 
 # install NUT python code
+rm -rf $DST/opt/nut/ || exit 1
 mkdir -p $DST/opt/nut || exit 1
 if [ -e $SRC/nut.tar.gz ]; then
     echo "Copying local nut code"
@@ -90,10 +91,12 @@ else
     wget -O $DST/opt/nut.tar.gz -c https://github.com/yeleman/nut/tarball/master
 fi
 # extract code to /opt/nut
-tar xf $DST/opt/nut.tar.gz -C $DST/opt/nut/ --strip-components=1 || exit 1
+# ignore tar error as github archive contain garbage
+tar xf $DST/opt/nut.tar.gz -C $DST/opt/nut/ --strip-components=1
 
 # install bolibana python code
-mkdir -p $DST/opt/bolibana
+rm -rf $DST/opt/bolibana/ || exit 1
+mkdir -p $DST/opt/bolibana || exit 1
 if [ -e $SRC/bolibana.tar.gz ]; then
     echo "Copying local bolibana code"
     cp -v $SRC/bolibana.tar.gz $DST/opt/bolibana.tar.gz
@@ -102,12 +105,23 @@ else
     wget -O $DST/opt/bolibana.tar.gz -c https://github.com/yeleman/bolibana/tarball/master
 fi
 # extract code to /opt/nut
-tar xf $DST/opt/bolibana.tar.gz -C $DST/opt/bolibana/ --strip-components=1 || exit 1
+# ignore tar error as github archive contain garbage
+tar xf $DST/opt/bolibana.tar.gz -C $DST/opt/bolibana/ --strip-components=1
+
+#create virtualenv bundle
+if [ -e $SRC/virtualenv.pybundle ]; then
+    echo "virtualenv bundle exist."
+else
+    pip bundle $SRC/virtualenv.pybundle virtualenv
+fi
+
+# copy virtualenv bundle for later processing (chroot)
+cp -v $SRC/virtualenv.pybundle $DST/opt/virtualenv.pybundle || exit 1
 
 # create pip bundle for dependencies
 if [ -e $SRC/../client/nutclient/pip-requirements.txt ]; then
     if [ -e $SRC/nutenv.pybundle ]; then
-        echo "bundle exist."
+        echo "nutenv bundle exist."
     else
         pip bundle $SRC/nutenv.pybundle -r $SRC/../client/nutclient/pip-requirements.txt
     fi
@@ -127,3 +141,4 @@ cp -v $SRC/local_config.py $DST/opt/nut/client/nutclient/local_config.py || exit
 
 # copy in-chroot setup script
 cp -v $SRC/setup_chroot.sh $DST/usr/bin/setup_chroot.sh || exit 1
+chmod +x $DST/usr/bin/setup_chroot.sh || exit 1
