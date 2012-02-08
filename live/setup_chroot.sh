@@ -9,7 +9,7 @@ echo "Installing virtualenv bundle"
 /usr/bin/pip install virtualenv.pybundle || exit 1
 
 echo "Creating environnement"
-/usr/local/bin/virtualenv nutenv || exit 1
+/usr/local/bin/virtualenv --system-site-packages nutenv || exit 1
 source /opt/nutenv/bin/activate || exit 1
 
 echo "Installing nutenv bundle"

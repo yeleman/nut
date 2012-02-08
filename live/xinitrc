@@ -7,5 +7,6 @@ exec dwm &
 cd /opt/nut/client/nutclient
 source /opt/nutenv/bin/activate
 /opt/nutenv/bin/python ./client.py --fullscreen
+xterm
 #TODO: uncomment halt, add shutdown param
 #sudo halt
