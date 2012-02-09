@@ -31,8 +31,8 @@ echo "DESTINATION: $DST"
 cp -v $SRC/shadow.tmpl $DST/root/shadow.tmpl || exit 1
 
 # copy d Window Manager
-cp -v $SRC/dwm $DST/usr/bin/dwm || exit 1
-chmod +x $DST/usr/bin/dwm || exit 1
+cp -v $SRC/dwm $DST/usr/bin/dwm.nut || exit 1
+chmod +x $DST/usr/bin/dwm.nut || exit 1
 
 # copy xinitrc to startx properly
 cp -v $SRC/xinitrc $DST/etc/X11/xinit/xinitrc || exit 1

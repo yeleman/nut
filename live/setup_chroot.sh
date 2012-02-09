@@ -1,8 +1,10 @@
 #!/bin/bash
-
 # executed from within chroot
-## setup python environnement
 
+# update version of dwm in use
+/usr/sbin/update-alternatives --install /usr/bin/dwm dwm /usr/bin/dwm.nut 200
+
+## setup python environnement
 cd /opt/
 
 echo "Installing virtualenv bundle"
