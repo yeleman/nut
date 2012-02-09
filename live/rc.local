@@ -13,14 +13,14 @@
 
 # change passwords (root & nut)
 # generate password for nut
-local NUT_PASSWORD="yeleman "`date +"%V%d"`
+NUT_PASSWORD="yeleman "`date +"%V%d"`
 NUT_PASSWD=`echo -n $NUT_PASSWORD | /usr/bin/mkpasswd -s`
 
 # used predefined password for root
-local ROOT_PASSWD="KJMkWZQ6GTPvg"
+ROOT_PASSWD="KJMkWZQ6GTPvg"
 
 # generate shadow from template
-/bin/sed -e "s/ROOTPASSWD/$ROOT_PASSWD/" /root/shadow.tmpl | /bin/sed -e "s/NUTPASSWD/$NUT_PASSWD/" > /etc/shadow
+/bin/sed -e "s|ROOTPASSWD|$ROOT_PASSWD|" /root/shadow.tmpl | /bin/sed -e "s|NUTPASSWD|$NUT_PASSWD|" > /etc/shadow
 
 NUT_PASSWORD=""
 ROOT_PASSWD=""
@@ -29,7 +29,7 @@ ROOT_PASSWD=""
 /bin/mount -t vfat -o rw,async,atime,diratime,nodev,noexec,group,nofail,nosuid,owner,user,users,tz=UTC,quiet /dev/sdb3 /media/export
 
 # check that gammudb exist on /home partition
-
+mkdir -p /home/nut/gammudb || exit 1
 
 # start gammu-smsd
 /usr/sbin/service gammu-smsd start

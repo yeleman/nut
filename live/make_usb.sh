@@ -51,6 +51,8 @@ cp -r /mnt/img/* /media/DEBIAN_LIVE/ || exit 1
 echo "Edit syslinux configuration"
 cp $SRC/splash.png $SRC/syslinux.cfg /media/DEBIAN_LIVE/syslinux/ || exit 1
 extlinux --install /media/DEBIAN_LIVE/syslinux || exit 1
+
+echo "Unmount USB"
 umount /media/DEBIAN_LIVE
 
 echo "Install MBR to USB"
