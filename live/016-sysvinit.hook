@@ -28,7 +28,7 @@ Configure_sysvinit ()
         # added following two lines:
         #  remove (comment) tty 2,3,4,5
         #  changed tty6 to regular login
-        sed -i -re "s|^[2-5]|#\1|" /etc/inittab
+        sed -i -re "s|^[2-5]|#&|" /etc/inittab
         sed -i -re "s|^(6.*)(login -f nut)|\1login|" /etc/inittab
 
         init q
