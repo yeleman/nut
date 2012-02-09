@@ -2,7 +2,7 @@
 # executed from within chroot
 
 # update version of dwm in use
-/usr/sbin/update-alternatives --install /usr/bin/dwm dwm /usr/bin/dwm.nut 200
+#/usr/sbin/update-alternatives --install /usr/bin/dwm dwm /usr/bin/dwm.nut 200
 
 ## setup python environnement
 cd /opt/
