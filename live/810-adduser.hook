@@ -1,0 +1,5 @@
+#!/bin/sh
+
+echo "NB: live-config: adding user to groups dialout,plugdev"
+adduser nut dialout
+adduser nut plugdev

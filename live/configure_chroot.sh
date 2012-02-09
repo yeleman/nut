@@ -27,15 +27,12 @@ fi
 echo "SOURCE: $SRC"
 echo "DESTINATION: $DST"
 
-# copy hooks
-mkdir -p $DST/../config/includes.chroot/lib/live/config/
-cp -v $SRC/800-inittab.hook $DST/../config/includes.chroot/lib/live/config/800-inittab || exit 1
-
 # copy shadow template
 cp -v $SRC/shadow.tmpl $DST/root/shadow.tmpl || exit 1
 
 # copy d Window Manager
 cp -v $SRC/dwm $DST/usr/bin/dwm || exit 1
+chmod +x $DST/usr/bin/dwm || exit 1
 
 # copy xinitrc to startx properly
 cp -v $SRC/xinitrc $DST/etc/X11/xinit/xinitrc || exit 1
@@ -49,12 +46,14 @@ cp -v $SRC/Trolltech.conf $DST/etc/xdg/Trolltech.conf || exit 1
 
 # copy rc-local which mounts partition
 cp -v $SRC/rc.local $DST/etc/rc.local || exit 1
+chmod +x $DST/etc/rc.local || exit 1
 
 # copy crontab
 cp -v $SRC/crontab $DST/etc/crontab || exit 1
 
 # copy gammu-smsd init
 cp -v $SRC/gammu-smsd.lsb $DST/etc/init.d/gammu-smsd || exit 1
+chmod +x $DST/etc/init.d/gammu-smsd || exit 1
 
 # copy gammu defaults so it starts as nut
 cp -v $SRC/gammu-smsd.default $DST/etc/default/gammu-smsd || exit 1
@@ -64,7 +63,8 @@ cp -v $SRC/gammurc $DST/etc/gammurc || exit 1
 cp -v $SRC/gammu-smsdrc $DST/etc/gammu-smsdrc || exit 1
 
 # copy gammu restart script
-cp -v $SRC/restart_gammu $DST/usr/bin/restart_gammu
+cp -v $SRC/restart_gammu $DST/usr/bin/restart_gammu || exit 1
+chmod +x $DST/usr/bin/restart_gammu || exit 1
 
 # create mount point for FAT32 partition
 mkdir -p $DST/media/export || exit 1
@@ -74,7 +74,7 @@ touch $DST/media/export/not_mounted || exit 1
 # install gammu
 if [ -x "$SRC/gammu-installer.sh" ]; then
     echo "Installing " + `$SRC/gammu-installer.sh --version`
-    $SRC/gammu-installer.sh --prefix=$DST/usr --exclude-subdir --skip-license
+    $SRC/gammu-installer.sh --prefix=$DST/usr --exclude-subdir --skip-license || exit 1
 else
     echo "Unable to install Gammu. Archive $SRC/gammu-installer.sh missing."
     exit 1
@@ -85,10 +85,10 @@ rm -rf $DST/opt/nut/ || exit 1
 mkdir -p $DST/opt/nut || exit 1
 if [ -e $SRC/nut.tar.gz ]; then
     echo "Copying local nut code"
-    cp -v $SRC/nut.tar.gz $DST/opt/nut.tar.gz
+    cp -v $SRC/nut.tar.gz $DST/opt/nut.tar.gz || exit 1
 else
     echo "Downloading nut from github"
-    wget -O $DST/opt/nut.tar.gz -c https://github.com/yeleman/nut/tarball/master
+    wget -O $DST/opt/nut.tar.gz -c https://github.com/yeleman/nut/tarball/master || exit 1
 fi
 # extract code to /opt/nut
 # ignore tar error as github archive contain garbage
@@ -99,10 +99,10 @@ rm -rf $DST/opt/bolibana/ || exit 1
 mkdir -p $DST/opt/bolibana || exit 1
 if [ -e $SRC/bolibana.tar.gz ]; then
     echo "Copying local bolibana code"
-    cp -v $SRC/bolibana.tar.gz $DST/opt/bolibana.tar.gz
+    cp -v $SRC/bolibana.tar.gz $DST/opt/bolibana.tar.gz || exit 1
 else
     echo "Downloading bolibana from github"
-    wget -O $DST/opt/bolibana.tar.gz -c https://github.com/yeleman/bolibana/tarball/master
+    wget -O $DST/opt/bolibana.tar.gz -c https://github.com/yeleman/bolibana/tarball/master || exit 1
 fi
 # extract code to /opt/nut
 # ignore tar error as github archive contain garbage
@@ -112,7 +112,7 @@ tar xf $DST/opt/bolibana.tar.gz -C $DST/opt/bolibana/ --strip-components=1
 if [ -e $SRC/virtualenv.pybundle ]; then
     echo "virtualenv bundle exist."
 else
-    pip bundle $SRC/virtualenv.pybundle virtualenv
+    pip bundle $SRC/virtualenv.pybundle virtualenv || exit 1
 fi
 
 # copy virtualenv bundle for later processing (chroot)
@@ -123,7 +123,7 @@ if [ -e $SRC/../client/nutclient/pip-requirements.txt ]; then
     if [ -e $SRC/nutenv.pybundle ]; then
         echo "nutenv bundle exist."
     else
-        pip bundle $SRC/nutenv.pybundle -r $SRC/../client/nutclient/pip-requirements.txt
+        pip bundle $SRC/nutenv.pybundle -r $SRC/../client/nutclient/pip-requirements.txt || exit 1
     fi
 else
     echo "Unable to find pip requirements file $SRC/../client/nutclient/pip-requirements.txt"
@@ -142,3 +142,7 @@ cp -v $SRC/local_config.py $DST/opt/nut/client/nutclient/local_config.py || exit
 # copy in-chroot setup script
 cp -v $SRC/setup_chroot.sh $DST/usr/bin/setup_chroot.sh || exit 1
 chmod +x $DST/usr/bin/setup_chroot.sh || exit 1
+
+# copy live hooks
+cp -v $SRC/800-inittab.hook $DST/lib/live/config/800-inittab || exit 1
+cp -v $SRC/800-inittab.hook $DST/lib/live/config/800-inittab || exit 1
