@@ -144,7 +144,7 @@ cp -v $SRC/setup_chroot.sh $DST/usr/bin/setup_chroot.sh || exit 1
 chmod +x $DST/usr/bin/setup_chroot.sh || exit 1
 
 # copy live hooks
-cp -v $SRC/800-inittab.hook $DST/lib/live/config/800-inittab || exit 1
-chmod +x $DST/lib/live/config/800-inittab || exit 1
+cp -v $SRC/016-sysvinit.hook $DST/lib/live/config/016-sysvinit || exit 1
+chmod +x $DST/lib/live/config/016-sysvinit || exit 1
 cp -v $SRC/810-adduser.hook $DST/lib/live/config/810-adduser || exit 1
 chmod +x $DST/lib/live/config/810-adduser || exit 1

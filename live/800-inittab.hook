@@ -1,4 +1,0 @@
-#!/bin/sh
-
-echo "NB: live-config: removing ttys"
-/bin/sed -r "s/^[2-5]/#&/" /etc/inittab | /bin/sed -r "s/^(6.*)(login -f nut)/\1login/g" > /etc/inittab
