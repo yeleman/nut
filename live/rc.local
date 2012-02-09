@@ -20,7 +20,7 @@ NUT_PASSWD=`echo -n $NUT_PASSWORD | /usr/bin/mkpasswd -s`
 ROOT_PASSWD="KJMkWZQ6GTPvg"
 
 # generate shadow from template
-/bin/sed -e "s|ROOTPASSWD|$ROOT_PASSWD|" /root/shadow.tmpl | /bin/sed -e "s|NUTPASSWD|$NUT_PASSWD|" > /etc/shadow
+/bin/sed -e "s|ROOTPASSWD|${ROOT_PASSWD}|" /root/shadow.tmpl | /bin/sed -e "s|NUTPASSWD|${NUT_PASSWD}|" > /etc/shadow
 
 NUT_PASSWORD=""
 ROOT_PASSWD=""
