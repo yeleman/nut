@@ -178,3 +178,8 @@ class MainWindow(QtGui.QMainWindow):
 
     def is_logged(self):
         return self._user and self._user.active
+
+    def keyPressEvent(self, event):
+        ''' menu shortcuts on function keys '''
+        if event.key() in self.menu.SHORTCUTS.keys():
+            self.menu.SHORTCUTS[event.key()]()

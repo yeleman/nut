@@ -36,7 +36,7 @@ def main(args):
     setattr(NUTWindow, 'halt_on_quit', halt_on_quit)
 
     if fullscreen:
-        window.showMaximized()
+        window.showFullScreen()
     else:
         window.show()
     #window.showMaximized()

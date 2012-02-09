@@ -56,9 +56,9 @@ class ACPIBatteryStatus:
         self._percent = battery['percent']
 
     def loop(self):
-        self.update()
-        time.sleep(self.interval)
-        self.loop()
+        while True:
+            self.update()
+            time.sleep(self.interval)
 
     def fetch(self, device):
         # launch acpi bin with device parameter.

@@ -50,9 +50,8 @@ class NUTMenu(QtGui.QToolBar):
             btn.setDefaultAction(action)
             btn.setTarget(item.action)
             self.addWidget(btn)
-            QtGui.QShortcut(QtGui.QKeySequence(QtCore\
-                                 .QCoreApplication.translate('', "F%d" \
-                                 % item.shortcut)), self, item.action)
+            self.SHORTCUTS[eval('QtCore.Qt.Key_F%d'
+                                % item.shortcut)] = item.action
 
     def goto(self, action):
         pass
@@ -80,6 +79,8 @@ class MainMenu(NUTMenu):
     def __init__(self, parent):
         NUTMenu.__init__(self, parent)
         QtGui.QShortcut(QtGui.QKeySequence(QtCore.QCoreApplication.translate('', "Ctrl+q")), self, self.quit)
+
+        self.SHORTCUTS = {}
 
     def ident(self):
         return 'main'
@@ -127,9 +128,6 @@ class MainMenu(NUTMenu):
 
     def preferences(self):
         self.parent.change_context(PreferencesWidget)
-
-    def send(self):
-        self.parent.change_context(SendWidget)
 
     def quit(self):
         if self.parent.view_widget.prevent_close():
