@@ -5,21 +5,19 @@
 import pickle
 import threading
 import Queue
-import time
 
+import envoy
 import snakemq.link
 import snakemq.packeter
 import snakemq.messaging
 import snakemq.message
-from PyQt4 import QtGui, QtCore
+from PyQt4 import QtGui
 
 from nutclient.event import Event
-from dashboard import DashboardWidget
 from common import NUTWidget
 from login import LoginWidget
-from menu import *
+from menu import MainMenu
 from statusbar import NUTStatusBar
-from nutclient.exceptions import UnableToCompleteWidget
 
 
 class SnakeMQServer():
@@ -175,6 +173,8 @@ class MainWindow(QtGui.QMainWindow):
         # make sure we kill ZMQ thread before leaving
         self.thread.stop()
         event.accept()
+        # stop Gammu-SMSD
+        envoy.run('sudo /etc/init.d/gammu-smsd stop')
 
     def is_logged(self):
         return self._user and self._user.active

@@ -61,7 +61,7 @@ class BatteryIndicator(QtGui.QWidget):
             return u"Secteur"
         if status == ACPIBatteryStatus.UNKNOWN:
             if percent != ACPIBatteryStatus.P_UNKNOWN:
-                return u"Inconnu (%d%%)" % percent
+                return u"Secteur (%d%%)" % percent
             else:
                 return u"Inconnu"
         if status == ACPIBatteryStatus.ONLINE:

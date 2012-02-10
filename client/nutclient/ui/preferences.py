@@ -4,7 +4,8 @@
 
 from PyQt4 import QtGui
 
-from common import *
+from common import (NUTWidget, PageTitle, PageIntro, EnterTabbedLineEdit,
+                    FormLabel, ErrorLabel, SuccessLabel)
 from database import options
 
 
@@ -83,3 +84,7 @@ class PreferencesWidget(NUTWidget):
             self.number_error.setText(u"Impossible d'enregistrer le numéro.")
         else:
             self.number_success.setVisible(True)
+
+    @classmethod
+    def require_logged_user(self):
+        return False
