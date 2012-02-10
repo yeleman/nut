@@ -1,7 +1,7 @@
 #!/usr/bin/env python
 # encoding=utf-8
 
-from models import (Revision, Report, ReportHistory, ConsumptionReport,
+from models import (config, Revision, Report, ReportHistory, ConsumptionReport,
                     InputConsumptionReport, OrderReport, InputOrderReport,
                     PECMAMReport, PECSAMReport, PECSAMPReport,
                     User, Period, NUTInput, Message, Setting, Options)
