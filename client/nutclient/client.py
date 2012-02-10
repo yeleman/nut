@@ -6,7 +6,7 @@ import sys
 import gettext
 import locale
 
-from PyQt4 import QtGui
+from PyQt4 import QtGui, QtCore
 
 from ui.mainwindow import MainWindow
 from ui.window import NUTWindow
@@ -23,13 +23,20 @@ def main(args):
     if 'halt_on_quit' in args:
         halt_on_quit = True
 
-    #gettext_windows.setup_env()
-
     locale.setlocale(locale.LC_ALL, '')
 
     gettext.install('nut', localedir='locale', unicode=True)
 
     app = QtGui.QApplication(sys.argv)
+
+    # translation file for Qt (QT's widgets)
+    loc = QtCore.QLocale.system()
+    trans = QtCore.QTranslator(app)
+    sLocName = "qt_" + loc.name()
+    sLocPath = QtCore.QLibraryInfo.location(QtCore.QLibraryInfo.TranslationsPath)
+    if trans.load(sLocName, sLocPath):
+        app.installTranslator(trans)
+
     window = MainWindow(app)
 
     setattr(NUTWindow, 'window', window)
