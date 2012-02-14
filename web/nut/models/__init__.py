@@ -1,10 +1,11 @@
 
 from NUTInput import NUTInput
+from NutritionReport import NutritionReport
 from ConsumptionReport import ConsumptionReport
 from InputConsumption import InputConsumptionReport
 from OrderReport import OrderReport
 from InputOrder import InputOrderReport
-from NUTReport import NUTReport
+from PECReport import PECReport
 from PECSAMPReport import PECSAMPReport
 from PECSAMReport import PECSAMReport
 from PECMAMReport import PECMAMReport

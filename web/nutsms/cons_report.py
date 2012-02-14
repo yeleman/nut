@@ -20,7 +20,7 @@ logger = logging.getLogger(__name__)
 locale.setlocale(locale.LC_ALL, settings.DEFAULT_LOCALE)
 
 
-def cons_sub_report(message, cons, infos, *args):
+def cons_sub_report(message, cons, infos, *args, **kwargs):
     """ PEC Report part of main Report SMS handling """
 
     def resp_error(code, msg):
@@ -28,6 +28,8 @@ def cons_sub_report(message, cons, infos, *args):
 
     def holder_for(cap):
         return eval('CONS%sDataHolder' % cap.upper())
+
+    nut_report = kwargs.get('nut_report', None)
 
     # store MAM/SAM/SAM+ reports
     reports = {}
@@ -84,16 +86,6 @@ def cons_sub_report(message, cons, infos, *args):
 
     # Create Validator then Report then store #recipt ID for each CAP
     for capid, data_browser in cons_holder.items():
-       
-        # feed data holder with guessable data
-        try:
-            hc = infos['entity'].slug
-        except:
-            hc = None
-        data_browser.set('hc', hc)
-        data_browser.set('month', infos['month'])
-        data_browser.set('year', infos['year'])
-
         # create validator and fire
         validator = CONSReportValidator(data_browser)
         validator.errors.reset()
@@ -111,10 +103,8 @@ def cons_sub_report(message, cons, infos, *args):
         errors = validator.errors
 
         # UNIQUENESS
-        if ConsumptionReport.objects.filter(period=infos['period'],
-                                      entity=infos['entity'],
-                                      type=Report.TYPE_SOURCE,
-                                      nut_type=ntype(capid)).count() > 0:
+        if ConsumptionReport.objects.filter(nut_report=nut_report,
+                                            nut_type=ntype(capid)).count() > 0:
             return resp_error('UNIQ', REPORT_ERRORS['UNIQ'])
 
         # return first error to user
@@ -125,13 +115,7 @@ def cons_sub_report(message, cons, infos, *args):
         reports[capid] = []
         # create the report
         try:
-            period = MonthPeriod.find_create_from( \
-                                                year=data_browser.get('year'), \
-                                                month=data_browser.get('month'))
-            report = ConsumptionReport(period=infos['period'],
-                                       entity=infos['entity'],
-                                       created_by=infos['provider'], \
-                                       type=Report.TYPE_SOURCE,
+            report = ConsumptionReport(nut_report=nut_report,
                                        nut_type=ntype(capid))
 
             # need to add first so it's savec first (ref to ID)
@@ -154,4 +138,5 @@ def cons_sub_report(message, cons, infos, *args):
                          % (message.content, e))
             return resp_error('SRV', REPORT_ERRORS['SRV'])
 
+    logger.info('end CONS')
     return (True, reports)

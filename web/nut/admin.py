@@ -17,7 +17,7 @@ from bolibana.admin import (RoleAdmin, PermissionAdmin, \
 from nut.models import (PECSAMReport, PECMAMReport, PECSAMPReport,
                         NUTInput, InputConsumptionReport, ConsumptionReport,
                         InputOrderReport, OrderReport, NUTEntity,
-                        PECOthersReport)
+                        PECOthersReport, NutritionReport)
 
 
 class ProviderUserStacked(admin.StackedInline):
@@ -44,6 +44,11 @@ admin.site.register(NUTEntity)
 admin.site.register(PECOthersReport)
 
 
+class NutritionReportAdmin(admin.ModelAdmin):
+    list_display = ('__unicode__', 'period', 'entity', 'type', '_status', 'receipt')
+    list_filter = ('period', 'type', '_status', 'entity')
+
+
 class InputAdmin(admin.ModelAdmin):
     list_display = ('__unicode__', 'slug', 'name')
 
@@ -60,11 +65,11 @@ class InputOrderReportAdmin(admin.ModelAdmin):
 
 
 class ConsumptionReportAdmin(admin.ModelAdmin):
-    list_display = ('__unicode__', 'period', 'entity',
-                    'nut_type', 'receipt', '_status')
-    list_filter = ('period', 'type', '_status', 'nut_type')
+    list_display = ('__unicode__', 'nut_report', 'nut_type')
+    list_filter = ('nut_report', 'nut_type')
 
 admin.site.register(NUTInput, InputAdmin)
+admin.site.register(NutritionReport, NutritionReportAdmin)
 admin.site.register(InputConsumptionReport, InputConsumptionReportAdmin)
 admin.site.register(ConsumptionReport, ConsumptionReportAdmin)
 admin.site.register(OrderReport, ConsumptionReportAdmin)
@@ -72,16 +77,12 @@ admin.site.register(InputOrderReport, InputOrderReportAdmin)
 
 
 class PECSAMPReportAdmin(admin.ModelAdmin):
-    list_display = ('__unicode__', 'period', 'entity', 'receipt', '_status')
-    list_filter = ('period', 'type', '_status')
+    list_display = ('__unicode__', 'nut_report')
+    list_filter = ('nut_report',)
 
     fieldsets = (
       (None, {
-           'fields': ('receipt', \
-                      ('_status', 'type'), \
-                      ('period', 'entity'), \
-                      ('created_by', 'modified_by'), \
-                      'sources')
+           'fields': ('nut_report',)
        }),
        (_(u"6-59 months"), {
                         'fields': (('u6_total_beginning_m',
@@ -136,23 +137,19 @@ class PECSAMPReportAdmin(admin.ModelAdmin):
 
     def get_readonly_fields(self, request, obj=None):
         if obj is not None:
-            return ('receipt',) + self.readonly_fields
+            return ('nut_report',) + self.readonly_fields
         return self.readonly_fields
 
 admin.site.register(PECSAMPReport, PECSAMPReportAdmin)
 
 
 class PECMAMReportAdmin(reversion.VersionAdmin):
-    list_display = ('__unicode__', 'period', 'entity', 'receipt', '_status')
-    list_filter = ('period', 'type', '_status')
+    list_display = ('__unicode__', 'nut_report')
+    list_filter = ('nut_report',)
 
     fieldsets = (
       (None, {
-           'fields': ('receipt', \
-                      ('_status', 'type'), \
-                      ('period', 'entity'), \
-                      ('created_by', 'modified_by'), \
-                      'sources')
+           'fields': ('nut_report',)
        }),
        (_(u"6-59 months"), {
             'fields': (('u59_total_beginning_m', 'u59_total_beginning_f'),
@@ -200,23 +197,19 @@ class PECMAMReportAdmin(reversion.VersionAdmin):
 
     def get_readonly_fields(self, request, obj=None):
         if obj is not None:
-            return ('receipt',) + self.readonly_fields
+            return ('nut_report',) + self.readonly_fields
         return self.readonly_fields
 
 admin.site.register(PECMAMReport, PECMAMReportAdmin)
 
 
 class PECSAMReportAdmin(admin.ModelAdmin):
-    list_display = ('__unicode__', 'period', 'entity', 'receipt', '_status')
-    list_filter = ('period', 'type', '_status')
+    list_display = ('__unicode__', 'nut_report')
+    list_filter = ('nut_report',)
 
     fieldsets = (
       (None, {
-           'fields': ('receipt', \
-                      ('_status', 'type'), \
-                      ('period', 'entity'), \
-                      ('created_by', 'modified_by'), \
-                      'sources')
+           'fields': ('nut_report',)
        }),
        (_(u"6-59 months"), {
             'fields': (('u59_total_beginning_m', 'u59_total_beginning_f'),
@@ -273,7 +266,7 @@ class PECSAMReportAdmin(admin.ModelAdmin):
 
     def get_readonly_fields(self, request, obj=None):
         if obj is not None:
-            return ('receipt',) + self.readonly_fields
+            return ('nut_report',) + self.readonly_fields
         return self.readonly_fields
 
 admin.site.register(PECSAMReport, PECSAMReportAdmin)

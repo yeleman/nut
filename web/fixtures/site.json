@@ -1,1 +1,1 @@
-[{"pk": 1, "model": "sites.site", "fields": {"domain": "http://pnlp.sante.gov.ml", "name": "PNLP"}}]
+[{"pk": 1, "model": "sites.site", "fields": {"domain": "http://nut.sante.gov.ml", "name": "Nutrition"}}]

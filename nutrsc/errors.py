@@ -43,4 +43,5 @@ REPORT_ERRORS = {
     'SRV': u"Une erreur technique s'est produite. "
            u"Contactez le support technique.",
     'UNIQ': u"Ce centre de santé a déjà un rapport pour cette période.",
+    'MISS': u"Impossible de mettre à jour le rapport. Il n'existe pas.",
 }

@@ -5,7 +5,8 @@ import re
 import math
 from datetime import date
 
-from nutrsc.constants import *
+from nutrsc.constants import (MODERATE, SEVERE, SEVERE_COMP, DEFAULT_VERSION,
+                              POPULATIONS_CAP, POPULATIONS)
 import gao_data
 
 PPN = 'plumpy'
@@ -468,8 +469,8 @@ def get_expected_conso_value(period, hc_code, cap, nut_input):
 def ration_mam(age, other_type=None):
 
     # no inputs for follow-up?
-    if not age in ('u59', 'pw'):
-        return {}
+    #if not age in ('u59', 'pw'):
+    #    return {}
 
     nb_days = 4
     
@@ -495,8 +496,8 @@ def ration_mam(age, other_type=None):
 def ration_sam(age, other_type=None):
 
     # no inputs for o59 nor follow-up?
-    if not age in ('u59'):
-        return {}
+    #if not age in ('u59'):
+    #    return {}
 
     nb_days = 4
     nb_ppn_per_day = 15

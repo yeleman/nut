@@ -19,7 +19,7 @@ logger = logging.getLogger(__name__)
 locale.setlocale(locale.LC_ALL, settings.DEFAULT_LOCALE)
 
 
-def order_sub_report(message, order, infos, *args):
+def order_sub_report(message, order, infos, *args, **kwargs):
     """ PEC Report part of main Report SMS handling """
 
     def resp_error(code, msg):
@@ -27,6 +27,8 @@ def order_sub_report(message, order, infos, *args):
 
     def holder_for(cap):
         return eval('CONS%sDataHolder' % cap.upper())
+
+    nut_report = kwargs.get('nut_report', None)
 
     # store MAM/SAM/SAM+ reports
     reports = {}
@@ -83,15 +85,6 @@ def order_sub_report(message, order, infos, *args):
 
     # Create Validator then Report then store #recipt ID for each CAP
     for capid, data_browser in order_holder.items():
-       
-        # feed data holder with guessable data
-        try:
-            hc = infos['entity'].slug
-        except:
-            hc = None
-        data_browser.set('hc', hc)
-        data_browser.set('month', infos['month'])
-        data_browser.set('year', infos['year'])
 
         # create validator and fire
         validator = ORDERReportValidator(data_browser)
@@ -110,9 +103,7 @@ def order_sub_report(message, order, infos, *args):
         errors = validator.errors
 
         # UNIQUENESS
-        if OrderReport.objects.filter(period=infos['period'],
-                                      entity=infos['entity'],
-                                      type=Report.TYPE_SOURCE,
+        if OrderReport.objects.filter(nut_report=nut_report,
                                       nut_type=ntype(capid)).count() > 0:
             return resp_error('UNIQ', REPORT_ERRORS['UNIQ'])
 
@@ -124,14 +115,8 @@ def order_sub_report(message, order, infos, *args):
         reports[capid] = []
         # create the report
         try:
-            period = MonthPeriod.find_create_from( \
-                                                year=data_browser.get('year'), \
-                                                month=data_browser.get('month'))
-            report = OrderReport(period=infos['period'],
-                               entity=infos['entity'],
-                               created_by=infos['provider'], \
-                               type=Report.TYPE_SOURCE,
-                               nut_type=ntype(capid))
+            report = OrderReport(nut_report=nut_report,
+                                 nut_type=ntype(capid))
 
             # need to add first so it's savec first (ref to ID)
             reports[capid].append(report)
@@ -149,5 +134,7 @@ def order_sub_report(message, order, infos, *args):
             logger.error(u"Unable to save report to DB. Message: %s | Exp: %r" \
                          % (message.content, e))
             return resp_error('SRV', REPORT_ERRORS['SRV'])
+
+    logger.info('end ORDER')
 
     return (True, reports)

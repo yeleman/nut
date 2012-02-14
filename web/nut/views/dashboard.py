@@ -4,8 +4,7 @@
 
 from django import forms
 from django.contrib import messages
-from django.contrib.auth.decorators import login_required
-from django.shortcuts import render, RequestContext, redirect
+from django.shortcuts import render, redirect
 from django.utils.translation import ugettext as _, ugettext_lazy
 from django.conf import settings
 
@@ -46,7 +45,7 @@ class ContactForm(forms.Form):
 
 def contact(request):
     category = 'contact'
-    context = {}
+    context = {'category': category}
 
     try:
         web_provider = request.user.get_profile()
@@ -100,7 +99,7 @@ def contact(request):
 @provider_required
 def dashboard(request):
     category = 'dashboard'
-    context = {}
+    context = {'category': category}
 
     return render(request, 'dashboard.html', context)
 

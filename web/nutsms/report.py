@@ -10,7 +10,7 @@ from django.conf import settings
 from django.db import transaction
 
 from nosmsd.utils import send_sms
-from bolibana.models import Provider, Entity, MonthPeriod
+from bolibana.models import Provider, Entity, MonthPeriod, Report
 from bolibana.tools.utils import provider_can
 from ylmnut.data import current_reporting_period, contact_for
 from nutrsc.errors import REPORT_ERRORS
@@ -18,7 +18,7 @@ from pec_report import pec_sub_report
 from cons_report import cons_sub_report
 from order_report import order_sub_report
 from other_report import other_sub_report
-from nut.models import NUTEntity
+from nut.models import NUTEntity, NutritionReport
 
 logger = logging.getLogger(__name__)
 locale.setlocale(locale.LC_ALL, settings.DEFAULT_LOCALE)
@@ -111,26 +111,27 @@ def nut_report(message, args, sub_cmd, **kwargs):
 
     @reversion.create_revision()
     @transaction.commit_manually
-    def save_reports(reports, receipts, user=None):
+    def save_reports(reports, user=None):
         reversion.set_user(user)
         reversion.set_comment("SMS transmitted report")
-        for secid, section in reports.items():
         
-            # create key for report type (P,C,O,T)
-            if not receipts.has_key(secid):
-                receipts[secid] = {}
-                
+        # save main first
+        reports['main'].save()
+
+        for secid, section in reports.items():
+            if secid == 'main':
+                continue
+                      
             for catid, reports in section.items():
-            
-                # create key for category (MAM,SAM,SAMP)
-                if not receipts[secid].has_key(catid):
-                    receipts[secid][catid] = []
                     
                 for report in reports:
                     logger.info("%s > %s > %s" \
                                 % (secid, catid, report.__class__))
                     try:
                         # HACK: write foreign key id if needed
+                        if hasattr(report, 'nut_report_id'):
+                            report.nut_report_id = report.nut_report.id
+
                         if hasattr(report, 'cons_report_id'):
                             report.cons_report_id = report.cons_report.id
 
@@ -138,9 +139,6 @@ def nut_report(message, args, sub_cmd, **kwargs):
                             report.order_report_id = report.order_report.id
 
                         report.save()
-                        # store receipt if exist.
-                        if hasattr(report, 'receipt'):
-                            receipts[secid][catid].append(report.receipt)
                     except Exception as e:
                         logger.error(u"Unable to save report to DB. " \
                                      u"Message: %s | Exp: %r" \
@@ -210,7 +208,8 @@ def nut_report(message, args, sub_cmd, **kwargs):
         return resp_error('BAD_PERIOD', REPORT_ERRORS['BAD_PERIOD'])
 
     # report receipts holder for confirm message
-    report_receipts = {}
+    #report_receipts = {}
+
     # reports holder for delayed database commit
     reports = {}
 
@@ -223,6 +222,24 @@ def nut_report(message, args, sub_cmd, **kwargs):
              'period': period,
              'username': username,
              'pwhash': pwhash}
+
+    # UNIQUENESS
+    if NutritionReport.objects.filter(period=infos['period'],
+                                      entity=infos['entity'],
+                                      type=Report.TYPE_SOURCE).count() > 0:
+        return resp_error('UNIQ', REPORT_ERRORS['UNIQ'])
+
+    # create main report
+    try:
+        period = MonthPeriod.find_create_from(year=year, month=month)
+        nut_report = NutritionReport.start(period, entity, provider,
+                                           type=Report.TYPE_SOURCE)
+        reports['main'] = nut_report
+    except Exception as e:
+        #raise
+        logger.error(u"Unable to save report to DB. Message: %s | Exp: %r" \
+                     % (message.content, e))
+        return resp_error('SRV', REPORT_ERRORS['SRV'])
 
     # SECTIONS
     for sid, section in {'P': 'pec', 'C': 'cons',
@@ -242,7 +259,8 @@ def nut_report(message, args, sub_cmd, **kwargs):
 
         # call sub-report section handler
         sec_succ, sec_data = SUB_REPORTS.get(section)(message,
-                                                      sec, infos, reports)
+                                                      sec, infos, reports,
+                                                      nut_report=nut_report)
         # cancel if sub report failed.
         if not sec_succ:
             logger.warning(u"   FAILED.")
@@ -257,22 +275,14 @@ def nut_report(message, args, sub_cmd, **kwargs):
     # create the reports in DB
     # save receipts number
     logger.info("Saving reports")
-    if not save_reports(reports, report_receipts, user=provider.user):
+    if not save_reports(reports, user=provider.user):
         logger.warning("Unable to save reports")
         return resp_error('SRV', REPORT_ERRORS['SRV'])
     logger.info("Reports saved")
 
     ## CONFIRM RESPONSE
     
-    # list of section/sub section formatted receipts
-    recstr = ""
-    for secid, section in report_receipts.items():
-        recstr += "#%s" % secid.upper()
-        for catid, receipts in section.items():
-            recstr += "&%s " % catid.upper()
-            recstr += " ".join(receipts)
-
-    confirm = "nut report ok %s" % recstr
+    confirm = "nut report ok %s" % nut_report.receipt
 
     message.respond(confirm)
     return True

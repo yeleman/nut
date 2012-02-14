@@ -8,7 +8,7 @@ import locale
 from django.utils.translation import ugettext as _
 from django.conf import settings
 
-from bolibana.models import Report, Provider, Entity, MonthPeriod
+from bolibana.models import Report, Provider, MonthPeriod
 from bolibana.tools.utils import provider_can
 from nut.models import NUTEntity, PECMAMReport, PECSAMReport, PECSAMPReport
 from nutrsc.errors import REPORT_ERRORS
@@ -19,7 +19,7 @@ logger = logging.getLogger(__name__)
 locale.setlocale(locale.LC_ALL, settings.DEFAULT_LOCALE)
 
 
-def pec_sub_report(message, pec, infos, *args):
+def pec_sub_report(message, pec, infos, *args, **kwargs):
     """ PEC Report part of main Report SMS handling """
 
     def resp_error(code, msg):
@@ -30,6 +30,8 @@ def pec_sub_report(message, pec, infos, *args):
 
     def holder_for(cap):
         return eval('PEC%sDataHolder' % cap.upper())
+
+    nut_report = kwargs.get('nut_report', None)
 
     # store MAM/SAM/SAM+ reports
     reports = {}
@@ -72,15 +74,6 @@ def pec_sub_report(message, pec, infos, *args):
 
         # class of the report to create
         ClassReport = class_for(capid)
-        
-        # feed data holder with guessable data
-        try:
-            hc = infos['entity'].slug
-        except:
-            hc = None
-        data_browser.set('hc', hc)
-        data_browser.set('month', infos['month'])
-        data_browser.set('year', infos['year'])
 
         # create validator and fire
         validator = PECReportValidator(data_browser)
@@ -99,9 +92,7 @@ def pec_sub_report(message, pec, infos, *args):
         errors = validator.errors
 
         # UNIQUENESS
-        if ClassReport.objects.filter(period=infos['period'],
-                                      entity=infos['entity'],
-                                      type=Report.TYPE_SOURCE).count() > 0:
+        if ClassReport.objects.filter(nut_report=nut_report).count() > 0:
             return resp_error('UNIQ', REPORT_ERRORS['UNIQ'])
 
         # return first error to user
@@ -111,22 +102,18 @@ def pec_sub_report(message, pec, infos, *args):
 
         # create the report
         try:
-            period = MonthPeriod.find_create_from( \
-                                                year=data_browser.get('year'), \
-                                                month=data_browser.get('month'))
-            report = ClassReport.start(infos['period'],
-                                       infos['entity'],
-                                       infos['provider'], \
-                                         type=Report.TYPE_SOURCE)
+            report = ClassReport(nut_report=nut_report)
 
             report.add_all_data(data_browser)
 
         except Exception as e:
-            #raise
+            logger.error(ClassReport)
+            raise
             logger.error(u"Unable to save report to DB. Message: %s | Exp: %r" \
                          % (message.content, e))
             return resp_error('SRV', REPORT_ERRORS['SRV'])
 
         reports[capid] = [report, ]
+        logger.info("END OF PEC")
 
     return (True, reports)

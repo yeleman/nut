@@ -7,16 +7,12 @@ import reversion
 from django.utils.translation import ugettext
 
 from nutrsc.constants import POPULATIONS
-from bolibana.models import MonthPeriod
+from common import NutritionSubReport
 
 
-class PECReport(object):
+class PECReport(NutritionSubReport):
 
     """ PEC Meta Report """
-
-
-    # class Meta:
-    #     abstract = True
 
     def cap_from_class(self):
         for cap in ('mam', 'samp', 'sam'):
@@ -33,85 +29,13 @@ class PECReport(object):
                            'period': self.nut_report.period,
                            'cap': cap}
 
-    @property
-    def dirty_fields(self, only_data=True):
-        """ List of fields which have changed since previous revision """
-        # no dirty fields if validated
-        if self.nut_report._status >= self.nut_report.STATUS_VALIDATED:
-            return []
-
-        versions = reversion.get_for_object(self)
-
-        # no dirty fields if only one rev.
-        if len(versions) <= 1:
-            return []
-
-        last, previous = versions[0:2]
-
-        diff = []
-
+    def data_fields(self, only_data=True):
         fields = self._meta.get_all_field_names()
         if only_data:
-            # only data fields
             # ie. the ones starting by the age prefix
             fields = [x for x in fields if x[0:3] \
                      in ([('%s_' % k)[0:3] for k in POPULATIONS.keys()])]
-        for field in fields:
-            if last.field_dict[field] != previous.field_dict[field]:
-                diff.append(field)
-        return diff
-
-    def previous_value(self, field):
-        """ Value of a field in previous revision """
-        versions = reversion.get_for_object(self)
-
-        # return current value if no previous one
-        if len(versions) <= 1:
-            return getattr(field)
-
-        # return value form previous [1] version
-        return versions[1].field_dict[field]
-
-    @property
-    def mperiod(self):
-        """ casted period to MonthPeriod """
-        mp = self.period
-        mp.__class__ = MonthPeriod
-        return mp
-
-    # @classmethod
-    # def start(cls, period, entity, author, \
-    #            type=Report.TYPE_SOURCE, *args, **kwargs):
-    #     """ creates a report object with meta data only. Object not saved """
-    #     report = cls(period=period, entity=entity, created_by=author, \
-    #                  modified_by=author, _status=cls.STATUS_CREATED, \
-    #                  type=type)
-    #     for arg, value in kwargs.items():
-    #         try:
-    #             setattr(report, arg, value)
-    #         except AttributeError:
-    #             pass
-
-    #     return report
-
-    def to_dict(self):
-        d = {}
-        for field in self._meta.get_all_field_names():
-            try:
-                if not field.split('_')[0] in ('u5', 'o5', 'pw', 'stockout'):
-                    continue
-            except:
-                continue
-            d[field] = getattr(self, field)
-        return d
-
-    def get(self, slug):
-        """ [data browser] returns data for a slug variable """
-        return getattr(self, slug)
-
-    def field_name(self, slug):
-        """ [data browser] returns name of field for a slug variable """
-        return self._meta.get_field(slug).verbose_name
+        return fields
 
     def validate(self):
         """ runs MalariaReportValidator """

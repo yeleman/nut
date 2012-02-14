@@ -2,17 +2,15 @@
 # encoding=utf_8
 # maintainer: rgaudin
 
-import inspect
-
+import reversion
 from django.db import models
-from django.utils.translation import ugettext_lazy as _, ugettext
-from django.db.models.signals import pre_save, post_save
+from django.utils.translation import ugettext_lazy as _
 
-from NUTReport import NUTReport, pre_save_report, post_save_report
-from bolibana.models import EntityType, Entity, Report, MonthPeriod
+from PECReport import PECReport
+from NutritionReport import NutritionReport
 
 
-class PECSAMReport(NUTReport, Report):
+class PECSAMReport(models.Model, PECReport):
 
     """ PEC Report URENAS """
 
@@ -20,11 +18,14 @@ class PECSAMReport(NUTReport, Report):
         app_label = 'nut'
         verbose_name = _(u"PEC URENAS Report")
         verbose_name_plural = _(u"PEC URENAS Reports")
-        unique_together = ('period', 'entity', 'type')
 
     CATEGORIES = (('u59', _(u"6 to 59 months old")),
                   ('o59', _(u"Over 59 months old")),
                   ('fu1', _(u"Follow-up URENI 1")))
+
+    nut_report = models.ForeignKey(NutritionReport,
+                                   related_name='pec_sam_reports',
+                                   unique=True)
 
     # 6 months old to 59 months old
     u59_total_beginning_m = models.PositiveIntegerField( \
@@ -303,5 +304,4 @@ class PECSAMReport(NUTReport, Report):
     def fu1_muac_u120(self):
         return 0
 
-pre_save.connect(pre_save_report, sender=PECSAMReport)
-post_save.connect(post_save_report, sender=PECSAMReport)
+reversion.register(PECSAMReport)

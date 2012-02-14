@@ -2,15 +2,15 @@
 # encoding=utf_8
 # maintainer: rgaudin
 
+import reversion
 from django.db import models
-from django.utils.translation import ugettext_lazy as _, ugettext
-from django.db.models.signals import pre_save, post_save
+from django.utils.translation import ugettext_lazy as _
 
-from NUTReport import NUTReport, pre_save_report, post_save_report
-from bolibana.models import EntityType, Entity, Report, MonthPeriod
+from PECReport import PECReport
+from NutritionReport import NutritionReport
 
 
-class PECSAMPReport(NUTReport, Report):
+class PECSAMPReport(models.Model, PECReport):
 
     """ PEC Report URENI """
 
@@ -18,12 +18,14 @@ class PECSAMPReport(NUTReport, Report):
         app_label = 'nut'
         verbose_name = _(u"PEC URENI Report")
         verbose_name_plural = _(u"PEC URENI Reports")
-        unique_together = ('period', 'entity', 'type')
 
     CATEGORIES = (('u6', _(u"Under 6 months old")),
                   ('u59', _(u"6 to 59 months old")),
                   ('o59', _(u"Over 59 months old")))
 
+    nut_report = models.ForeignKey(NutritionReport,
+                                   related_name='pec_samp_reports',
+                                   unique=True)
     # under 6 months
     u6_total_beginning_m = models.PositiveIntegerField( \
                                          _(u"Total male at Begining of Month"))
@@ -152,11 +154,6 @@ class PECSAMPReport(NUTReport, Report):
                                                      _(u"Total male departed"))
     o59_total_out_f = models.PositiveIntegerField( \
                                                    _(u"Total female departed"))
-
-    # Aggregation
-    sources = models.ManyToManyField('PECSAMPReport', \
-                                     verbose_name=_(u"Sources"), \
-                                     blank=True, null=True)
 
     def add_u6_data(self, u6_total_beginning_m,
                     u6_total_beginning_f, u6_hw_u70_bmi_u16,
@@ -303,5 +300,4 @@ class PECSAMPReport(NUTReport, Report):
     def o59_referred_out(self):
         return 0
 
-pre_save.connect(pre_save_report, sender=PECSAMPReport)
-post_save.connect(post_save_report, sender=PECSAMPReport)
+reversion.register(PECSAMPReport)

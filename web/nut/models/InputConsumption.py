@@ -1,15 +1,16 @@
 #!/usr/bin/env python
 # encoding=utf-8
 
+import reversion
 from django.db import models
 from django.utils.translation import ugettext_lazy as _, ugettext
 from django.db.models.signals import pre_save, post_save, post_delete
 
 from nutrsc.exceptions import IncoherentValue
-from common import ensure_completeness, previous_value_for
+from common import ensure_completeness, previous_value_for, NutritionSubReport
 
 
-class InputConsumptionReport(models.Model):
+class InputConsumptionReport(models.Model, NutritionSubReport):
 
     """ CONSUMPTION Report """
 
@@ -20,7 +21,8 @@ class InputConsumptionReport(models.Model):
         unique_together = ('cons_report', 'nut_input')
 
     cons_report = models.ForeignKey('ConsumptionReport',
-                                    verbose_name=_(u"Report"))
+                                    verbose_name=_(u"Report"),
+                                    related_name='input_cons_reports')
     nut_input = models.ForeignKey('NUTInput',
                               related_name='nutinput_reports',
                               verbose_name=_(u"Inputs"))
@@ -47,6 +49,12 @@ class InputConsumptionReport(models.Model):
     def left(self):
         return self.possessed - self.consumed
 
+    def data_fields(self, only_data=True):
+        fields = self._meta.get_all_field_names()
+        if only_data:
+            fields = ['initial', 'received', 'used', 'lost']
+        return fields
+
 
 def check_stock_integrity(sender, instance, **kwargs):
     print('check_stock_integrity %s' % sender)
@@ -70,6 +78,8 @@ def post_delete_update_parent(sender, instance, **kwargs):
     print('post_delete_update_parent %s' % sender)
     # if cons_report was complete or more, we invalidate.
     ensure_completeness(instance.cons_report)
+
+reversion.register(InputConsumptionReport)
 
 pre_save.connect(check_stock_integrity, sender=InputConsumptionReport)
 post_save.connect(post_save_update_parent, sender=InputConsumptionReport)

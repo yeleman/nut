@@ -5,7 +5,6 @@
 import logging
 import locale
 
-from django.utils.translation import ugettext as _
 from django.conf import settings
 
 from nutrsc.constants import *
@@ -19,11 +18,13 @@ logger = logging.getLogger(__name__)
 locale.setlocale(locale.LC_ALL, settings.DEFAULT_LOCALE)
 
 
-def other_sub_report(message, other, infos, previous_reports, *args):
+def other_sub_report(message, other, infos, previous_reports, *args, **kwargs):
     """ Others Report part of main Report SMS handling """
 
     def resp_error(code, msg):
         return (False, (code, msg))
+
+    nut_report = kwargs.get('nut_report', None)
 
     # store report (std format)
     reports = {'ALL': []}
@@ -47,9 +48,7 @@ def other_sub_report(message, other, infos, previous_reports, *args):
     total_pec_others = sum(total_pec)
           
     # UNIQUENESS
-    if PECOthersReport.objects.filter(period=infos['period'],
-                                  entity=infos['entity'],
-                                  type=Report.TYPE_SOURCE).count() > 0:
+    if PECOthersReport.objects.filter(nut_report=nut_report).count() > 0:
         return resp_error('UNIQ', REPORT_ERRORS['UNIQ'])
 
     # check validity
@@ -58,10 +57,7 @@ def other_sub_report(message, other, infos, previous_reports, *args):
 
     # create the report
     try:
-        report = PECOthersReport(period=infos['period'],
-                           entity=infos['entity'],
-                           created_by=infos['provider'], \
-                           type=Report.TYPE_SOURCE,
+        report = PECOthersReport(nut_report=nut_report,
                            other_lwb = lwb,
                            other_tb = tb,
                            other_hiv = hiv)
@@ -74,5 +70,7 @@ def other_sub_report(message, other, infos, previous_reports, *args):
         logger.error(u"Unable to save report to DB. Message: %s | Exp: %r" \
                      % (message.content, e))
         return resp_error('SRV', REPORT_ERRORS['SRV'])
+
+    logger.info('end others')
 
     return (True, reports)

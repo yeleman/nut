@@ -2,17 +2,17 @@
 # encoding=utf_8
 # maintainer: rgaudin
 
+import reversion
 from django.db import models
 from django.utils.translation import ugettext_lazy as _, ugettext
 from django.db.models.signals import pre_save, post_save
 
-from bolibana.models import EntityType, Entity, Report, MonthPeriod
-from bolibana.tools.utils import generate_receipt
-
+from nutrsc.constants import MODERATE, SEVERE, SEVERE_COMP
+from nutrsc.mali import DEFAULT_VERSION, CONSUMPTION_TABLE
+from NutritionReport import NutritionReport
 from InputOrder import InputOrderReport
-from common import ensure_completeness
-from nutrsc.constants import *
-from nutrsc.mali import *
+from common import (ensure_completeness, OverLoadedReport,
+                    InputsDependantReport, NutritionSubReport)
 
 
 class MAMManager(models.Manager):
@@ -35,7 +35,7 @@ class SAMPManager(models.Manager):
         return super(SAMPManager, self).get_query_set() \
                                       .filter(nut_type=SEVERE_COMP)
 
-class OrderReport(Report):
+class OrderReport(models.Model, InputsDependantReport, NutritionSubReport):
 
     NUT_TYPES = (
         (MODERATE, _(u"MAM")),  # fr-MAM
@@ -46,7 +46,7 @@ class OrderReport(Report):
         app_label = 'nut'
         verbose_name = _(u"Order Report")
         verbose_name_plural = _(u"Order Reports")
-        unique_together = ('period', 'entity', 'type', 'nut_type')
+        unique_together = ('nut_type', 'nut_report')
 
     nut_type = models.CharField(max_length=20, choices=NUT_TYPES,
                                            verbose_name=_(u"Nutrition Type"))
@@ -54,17 +54,19 @@ class OrderReport(Report):
                                verbose_name=_(u"Version"),
                                default=DEFAULT_VERSION)
 
+    nut_report = models.ForeignKey(NutritionReport,
+                                   related_name='order_reports')
+
     objects = models.Manager()
     mam = MAMManager()
     sam = SAMManager()
     samp = SAMPManager()
 
     def __unicode__(self):
-        cap = self.nut_type.upper()
         return ugettext(u"%(entity)s/%(cap)s/%(period)s") \
-                        % {'entity': self.entity, \
-                           'period': self.period,
-                           'cap': cap}
+                        % {'entity': self.nut_report.entity, \
+                           'period': self.nut_report.period,
+                           'cap': self.nut_type.upper()}
 
     def is_complete(self):
         print('is_complete %s' % self)
@@ -87,15 +89,10 @@ class OrderReport(Report):
                                                nut_input__slug=code) \
                                        .count() == 1
 
+    def icr(self, code):
+        return self.input_cons_reports.get(nut_input__slug=code)
 
 def pre_save_report(sender, instance, **kwargs):
-    print('pre_save_report %s' % sender)
-    """ change _status property of Report on save() at creation """
-    if instance._status == instance.STATUS_UNSAVED:
-        instance._status = instance.STATUS_CLOSED
-    # following will allow us to detect failure in registration
-    if not instance.receipt:
-        instance.receipt = 'NO_RECEIPT'
     # check that version exist
     if not instance.version in CONSUMPTION_TABLE[instance.nut_type]:
         raise ValueError(u"Version %s does not exist for %s" \
@@ -107,13 +104,9 @@ def pre_save_report(sender, instance, **kwargs):
 
 
 def post_save_report(sender, instance, **kwargs):
-    print('post_save_report %s' % sender)
-    """ generates the receipt """
-    if instance.receipt == 'NO_RECEIPT':
-        instance.receipt = generate_receipt(instance, fix='O',
-                                            add_random=True)
-        instance.save()
     ensure_completeness(instance)
+
+reversion.register(OrderReport)
 
 pre_save.connect(pre_save_report, sender=OrderReport)
 post_save.connect(post_save_report, sender=OrderReport)

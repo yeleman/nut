@@ -1,10 +1,11 @@
 #!/usr/bin/env python
 # encoding=utf-8
 
+import reversion
 from django.db import models
-from django.utils.translation import ugettext_lazy as _, ugettext
-from django.db.models.signals import pre_save, post_save, post_delete
+from django.utils.translation import ugettext_lazy as _
 
+from nutrsc.constants import MODERATE, SEVERE, SEVERE_COMP
 from bolibana.models import Entity
 
 
@@ -19,3 +20,11 @@ class NUTEntity(Entity):
     is_sam = models.BooleanField(verbose_name=_(u"is SAM?"))
     is_samp = models.BooleanField(verbose_name=_(u"is SAM+?"))
 
+    def caps(self):
+        caps = []
+        for cap in [SEVERE_COMP, SEVERE, MODERATE]:
+            if getattr(self, 'is_%s' % cap):
+                caps.append(cap)
+        return caps
+
+reversion.register(NUTEntity)
