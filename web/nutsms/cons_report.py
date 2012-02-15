@@ -72,7 +72,7 @@ def cons_sub_report(message, cons, infos, *args, **kwargs):
                 return resp_error('BAD_FORM_CONS',
                                   REPORT_ERRORS['BAD_FORM_CONS'])
 
-            # Associate ConsInput with CONSCAP
+            # Associate ConsInput with CONSCAPzz
             cons_cap.set('input_%s' % inpid, input_cons)
 
         # check that all expected inputs are present
@@ -127,7 +127,7 @@ def cons_sub_report(message, cons, infos, *args, **kwargs):
                 inp_report.nut_input = NUTInput.objects.get(slug=input_code.lower())
                 inp_report.cons_report = report
                 inp_report.initial = data_browser.get('input_%s' % input_code).get('initial')
-                inp_report.used = data_browser.get('input_%s' % input_code).get('consumed')
+                inp_report.used = data_browser.get('input_%s' % input_code).get('used')
                 inp_report.received = data_browser.get('input_%s' % input_code).get('received')
                 inp_report.lost = data_browser.get('input_%s' % input_code).get('lost')
                 reports[capid].append(inp_report)

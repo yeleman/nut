@@ -19,6 +19,7 @@ MIL = 'mil'
 NIEBE = 'niebe'
 UNIMIX = 'unimix'
 
+
 """
     Input consumption at centers by malnutrition level.
     Inputs represented by codes (see inputs fixtures)
@@ -65,29 +66,30 @@ PEC_FIELDS = {
     'muac_u120': 'c',
     'hw_u70_bmi_u16': 'd',
     'muac_u11_muac_u18': 'e',
-    'other': 'f',
+    'oedema': 'f',
+    'other': 'g',
 
     # ADM TYPE
-    'new_case': 'g',
-    'relapse': 'h',
-    'returned': 'i',
-    'nut_transfered_in': 'j',
-    'nut_referred_in': 'k',
-    'admitted': 'l',
+    'new_case': 'h',
+    'relapse': 'i',
+    'returned': 'j',
+    'nut_transfered_in': 'k',
+    'nut_referred_in': 'l',
+    'admitted': 'm',
 
     # OUT
-    'healed': 'm',
-    'referred_out': 'n',
-    'deceased': 'o',
-    'aborted': 'p',
-    'non_respondant': 'q',
-    'medic_transfered_out': 'r',
-    'nut_transfered_out': 's',
-    'total_out': 't',
+    'healed': 'n',
+    'referred_out': 'o',
+    'deceased': 'p',
+    'aborted': 'q',
+    'non_respondant': 'r',
+    'medic_transfered_out': 's',
+    'nut_transfered_out': 't',
+    'total_out': 'u',
 
-    'others_tb': 'u',
-    'others_hiv': 'v',
-    'others_lwb': 'w',
+    'others_tb': 'v',
+    'others_hiv': 'w',
+    'others_lwb': 'x',
 }
 
 CONS_FIELDS = {
@@ -100,7 +102,6 @@ CONS_FIELDS = {
     PPN: 'g',
     F75: 'h',
     F100: 'i',
-    PPN: 'j',
 
     'initial': '0',
     'received': '1',

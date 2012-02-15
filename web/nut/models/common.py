@@ -13,6 +13,7 @@ NUT_TYPES = (
 
 
 class InputsDependantReport(object):
+
     """ Consumption & Order checks on completeness """
     def set_complete(self):
         if self.nut_report._status < self.nut_report.STATUS_COMPLETE:
@@ -23,6 +24,13 @@ class InputsDependantReport(object):
         if self.nut_report._status >= self.nut_report.STATUS_COMPLETE:
             self.nut_report._status = self.nut_report.STATUS_INCOMPLETE
             self.nut_report.save()
+
+    @property
+    def tied_reports(self):
+        for t in ('cons', 'order'):
+            if hasattr(self, 'input_%s_reports' % t):
+                return list(getattr(self, 'input_%s_reports' % t).all())
+        return []
 
 
 def ensure_completeness(instance):
@@ -44,6 +52,14 @@ class OverLoadedReport(ValueError):
 
 
 class NutritionSubReport(object):
+
+    def delete_safe(self):
+        tied_reports = [] \
+                       + list(getattr(self, 'tied_reports', [])) \
+                       + list(getattr(self, 'tied_reports', []))
+        for report in tied_reports:
+            report.delete_safe()
+        return self.delete()
 
     def data_fields(self, only_data=True):
         fields = self._meta.get_all_field_names()

@@ -11,6 +11,7 @@ from django.conf import settings
 
 from .login import nut_login
 from .report import nut_report
+from .report_update import nut_report_update
 
 logger = logging.getLogger(__name__)
 locale.setlocale(locale.LC_ALL, settings.DEFAULT_LOCALE)
@@ -22,6 +23,7 @@ def nosms_handler(message):
         keyword = 'nut'
         commands = {
             'login': nut_login,
+            'update-report': nut_report_update,
             'report': nut_report,
             'test': nut_test,
             'echo': nut_echo}

@@ -52,7 +52,7 @@ class ConsumptionReport(models.Model, InputsDependantReport, NutritionSubReport)
                                default=DEFAULT_VERSION)
 
     nut_report = models.ForeignKey(NutritionReport,
-                                   related_name='cons_reports')
+                                   related_name='all_cons_reports')
 
     objects = models.Manager()
     mam = MAMManager()

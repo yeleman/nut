@@ -10,7 +10,7 @@ LOGIN_ERRORS = {
 
 REPORT_ERRORS = {
     'NO_ACC': u"Cet identifiant n'existe pas.",
-    'NO_PERM': u"Cet identifian n'est pas autorisé "
+    'NO_PERM': u"Cet identifiant n'est pas autorisé "
                u"à envoyer des rapports pour ce centre",
     'BAD_PASS': u"Le mot de passe est incorrect pour cet identifiant.",
     'ACC_DIS': u"Cet identifiant a été désactivé.",

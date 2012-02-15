@@ -14,6 +14,9 @@ class PECReport(NutritionSubReport):
 
     """ PEC Meta Report """
 
+    def delete_safe(self):
+        return self.delete()
+
     def cap_from_class(self):
         for cap in ('mam', 'samp', 'sam'):
             if cap in str(self.__class__).lower():

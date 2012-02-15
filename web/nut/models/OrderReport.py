@@ -55,7 +55,7 @@ class OrderReport(models.Model, InputsDependantReport, NutritionSubReport):
                                default=DEFAULT_VERSION)
 
     nut_report = models.ForeignKey(NutritionReport,
-                                   related_name='order_reports')
+                                   related_name='all_order_reports')
 
     objects = models.Manager()
     mam = MAMManager()

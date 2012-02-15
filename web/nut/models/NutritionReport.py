@@ -44,6 +44,17 @@ class NutritionReport(Report):
                 pass
         return report
 
+    def delete_safe(self):
+        for report in self.tied_reports():
+            report.delete_safe()
+        self.delete()
+
+    def tied_reports(self):
+        return self.pec_reports() \
+               + self.cons_reports() \
+               + self.order_reports() \
+               + [self.pec_other_report]
+
     @property
     def mperiod(self):
         """ casted period to MonthPeriod """
@@ -87,13 +98,13 @@ class NutritionReport(Report):
 
     def get_cons_report(self, cap):
         try:
-            return self.cons_reports.get(nut_type=cap)
+            return self.all_cons_reports.get(nut_type=cap)
         except:
             return None
 
     def get_order_report(self, cap):
         try:
-            return self.order_reports.get(nut_type=cap)
+            return self.all_order_reports.get(nut_type=cap)
         except:
             return None
 
@@ -142,6 +153,9 @@ class NutritionReport(Report):
     def is_complete(self):
         return True
 
+    @property
+    def sum_all_other(self):
+        return sum([r.all_other for r in self.pec_reports()])
 
 
 pre_save.connect(pre_save_report, sender=NutritionReport)

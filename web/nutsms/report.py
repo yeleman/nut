@@ -112,9 +112,8 @@ def nut_report(message, args, sub_cmd, **kwargs):
     @reversion.create_revision()
     @transaction.commit_manually
     def save_reports(reports, user=None):
-        reversion.set_user(user)
-        reversion.set_comment("SMS transmitted report")
-        
+        reversion.set_user(provider.user)
+        reversion.set_comment("SMS transmitted report")   
         # save main first
         reports['main'].save()
 
@@ -279,6 +278,28 @@ def nut_report(message, args, sub_cmd, **kwargs):
         logger.warning("Unable to save reports")
         return resp_error('SRV', REPORT_ERRORS['SRV'])
     logger.info("Reports saved")
+
+    def flatten(iterable):
+        values = []
+
+        def add(value):
+            if not isinstance(value, (list, dict)):
+                values.append(value)
+                return True
+            return False
+
+        if not add(iterable):
+            miterable = iterable.values() if isinstance(iterable, dict) \
+                                          else iterable
+            for item in miterable:
+                values += flatten(item)
+        return values
+
+    # for report in flatten(reports):
+    #     with reversion.create_revision():
+    #         reversion.set_user(provider.user)
+    #         reversion.set_comment("SMS transmitted report")
+    #         report.save()
 
     ## CONFIRM RESPONSE
     

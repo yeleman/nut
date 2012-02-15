@@ -49,6 +49,10 @@ class InputConsumptionReport(models.Model, NutritionSubReport):
     def left(self):
         return self.possessed - self.consumed
 
+    @property
+    def valid(self):
+        return self.consumed <= self.possessed
+
     def data_fields(self, only_data=True):
         fields = self._meta.get_all_field_names()
         if only_data:
@@ -60,8 +64,16 @@ def check_stock_integrity(sender, instance, **kwargs):
     print('check_stock_integrity %s' % sender)
     """ check that usage of stock is coherent """
     if instance.consumed > instance.possessed:
-        raise IncoherentValue(ugettext(u"Used + Lost quantities can't "\
-                                       u"exceed Initial + Received"))
+        raise IncoherentValue(u"%s: Quantités utilisés (%d) + perdus (%d) = %d"
+                              u"ne peut pas excéder initial (%d) + reçus "
+                              u"(%d) = %d" \
+                              % (instance.nut_input.slug,
+                                 instance.used,
+                                 instance.lost,
+                                 instance.consumed,
+                                 instance.initial,
+                                 instance.received,
+                                 instance.possessed))
 
 
 def post_save_update_parent(sender, instance, **kwargs):
