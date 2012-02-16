@@ -46,9 +46,6 @@ def main(args):
         window.showFullScreen()
     else:
         window.show()
-    #window.showMaximized()
-    #window.showNormal()
-    #window.showFullScreen()
     
     ret = app.exec_()
     if halt_on_quit:

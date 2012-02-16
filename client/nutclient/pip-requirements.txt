@@ -2,3 +2,4 @@ peewee
 nosmsd
 snakeMQ==0.5.10
 envoy
+xlwt

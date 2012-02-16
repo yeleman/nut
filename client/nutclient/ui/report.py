@@ -118,13 +118,21 @@ class ReportWidget(NUTWidget):
         return True
     
     def attempt_close(self):
+        # don't bother if there's not Report
+        if not self.report:
+            return True
+
         resp = QtGui.QMessageBox.question(self, u"Voulez-vous quitter ?",
                             u"Si vous quitter l'édition du rapport maintenant,"
                             u" vos modfications sur cette page seront perdues."
                             u"\n\nQuitter le rapport ?",
                             QtGui.QMessageBox.Ok|QtGui.QMessageBox.Cancel,
                             QtGui.QMessageBox.Cancel)
-        return resp == QtGui.QMessageBox.Ok
+        if resp == QtGui.QMessageBox.Ok:
+            self.report = None
+            return True
+        else:
+            return False
 
     def next(self):
         # can't go next if on last page
@@ -212,7 +220,9 @@ class ReportWidget(NUTWidget):
         return self.save_and_validate_current_page()
 
     def save_and_validate_current_page(self):
-        
+        # don't bother on read only
+        if self.readonly:
+            return True
         if self.current_page in (self.PEC_ADM_CRIT, 
                                  self.PEC_ADM_TYP,
                                  self.PEC_OUT, self.PEC_RECAP, self.CONS_ORDER):
@@ -257,17 +267,18 @@ class ReportWidget(NUTWidget):
         return True
 
     def transmit(self):
-        
+        # disable send button to prevent accidental double sending
+        self.transmit_button.disable()
+
         if not self.save_and_validate_current_page():
             QtGui.QMessageBox.warning(self, u"Impossible de transmettre.",
                               u"Impossible de transmettre "
                               u"le rapport. Les données ne sont pas correctes."
-                              u"\nVous devez les corriger pour re-essayer."),
+                              u"\nVous devez les corriger pour re-essayer.")
+            self.transmit_button.enable()
             return False
 
         if send_report(self.report, self.user):
-            self.report.status = self.report.STATUS_SENT
-            self.report.save()
             QtGui.QMessageBox.information(self, u"Transmission en cours...",
                                                 u"Le rapport est en cours de "
                                                 u"Transmission.\n\n"
@@ -306,29 +317,21 @@ class ReportWidget(NUTWidget):
 
         head_box = QtGui.QHBoxLayout()
         if page == self.PAGES[-1]:
-            transmit_button = TransmitButton()
-            transmit_button.clicked.connect(self.transmit)
+            self.transmit_button = TransmitButton()
+            self.transmit_button.clicked.connect(self.transmit)
+            if not self.report.can_send:
+                self.transmit_button.disable()
         else:
-            transmit_button = SaveButton()
-            transmit_button.clicked.connect(self.save)
+            self.transmit_button = SaveButton()
+            self.transmit_button.clicked.connect(self.save)
+            if self.readonly:
+                self.transmit_button.disable()
         head_line = QtGui.QWidget()
         head_box.addWidget(title)
         head_box.addStretch()
-        head_box.addWidget(transmit_button)
+        head_box.addWidget(self.transmit_button)
         head_line.setLayout(head_box)
         vbox.addWidget(head_line)
-        # if page == self.PAGES[-1]:
-        #     head_box = QtGui.QHBoxLayout()
-        #     transmit_button = TransmitButton()
-        #     transmit_button.clicked.connect(self.transmit)
-        #     head_line = QtGui.QWidget()
-        #     head_box.addWidget(title)
-        #     head_box.addStretch()
-        #     head_box.addWidget(transmit_button)
-        #     head_line.setLayout(head_box)
-        #     vbox.addWidget(head_line)
-        # else:
-        #     vbox.addWidget(title)
 
         vbox.addWidget(widget.table)
 

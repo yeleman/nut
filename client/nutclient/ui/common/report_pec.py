@@ -27,6 +27,7 @@ class PECReportTable(ReportFlexibleTable):
         return [fd.get('n') for fd in self.report_field_dict]
 
     def load_data(self, readonly=False):
+        print('load data %s' % readonly)
         self.data = []
         cols = len(self.hheaders)
         def blank_line():
@@ -44,7 +45,8 @@ class PECReportTable(ReportFlexibleTable):
                 for fdata in self.report_field_dict:
                     fname = fdata.get('n')
                     field = fdata.get('f')
-                    readonly = fdata.get('ro')
+                    ro = fdata.get('ro', readonly)
+                    print('readonly: %s' % ro)
 
                     # auto-column, always displayed
                     if not fname:
@@ -57,6 +59,12 @@ class PECReportTable(ReportFlexibleTable):
                         else:
                             if not field:
                                 field = ReportValueEditItem
+                            if (ro
+                                and field == ReportValueEditItem):
+                                field = ReportAutoValueRO
+                                print('READONLYYYYYY')
+                            else:
+                                print('NOOOOOZZEE %s' % field)
                             cells.append(field(self, cap_report, afname, age))
                 self.data.append(cells)
         # add total line
@@ -306,6 +314,7 @@ class PECRECAPReportTable(PECReportTable):
         # we'll save the Others fields (not on table though)
         for other_field in ('hiv', 'tb', 'lwb'):
             field = getattr(self.parentWidget(), 'others_%s_field' % other_field)
+            print("SETTING %s on %s with value: %d" % ('others_%s' % other_field, self.report, field.value))
             setattr(self.report, 'others_%s' % other_field, field.value)
         self.report.save()
         return True

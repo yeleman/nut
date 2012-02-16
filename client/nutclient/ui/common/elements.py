@@ -190,11 +190,24 @@ class IconLabel(QtGui.QLabel):
 class TransmitButton(QtGui.QPushButton):
 
     def __init__(self, parent=None):
-        super(TransmitButton, self).__init__(QtGui.QIcon('images/phone.png'), u"&Transmettre le rapport", parent)
+        super(TransmitButton, self).__init__(QtGui.QIcon('images/phone.png'),
+                                             u"&Transmettre le rapport", parent)
+
+    def disable(self):
+        self.setEnabled(False)
+
+    def enable(self):
+        self.setEnabled(True)
 
 
 class SaveButton(QtGui.QPushButton):
 
     def __init__(self, parent=None):
         super(SaveButton, self).__init__(QtGui.QIcon('images/table_save.png'), 
-                                             u"&Enregistrer", parent)
+                                                     u"&Enregistrer", parent)
+
+    def disable(self):
+        self.setEnabled(False)
+
+    def enable(self):
+        self.setEnabled(True)

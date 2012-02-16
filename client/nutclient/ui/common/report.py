@@ -529,7 +529,6 @@ class ReportValueEditItem(ReportField):
 
     def __init__(self, parent, report, field, age):
         super(ReportValueEditItem, self).__init__("?", 0)
-        #QtGui.QTableWidgetItem.__init__(self, "?", 0)
         
         self._parent = parent
         self._report = report
@@ -538,16 +537,9 @@ class ReportValueEditItem(ReportField):
         self._must_valid = True
 
         self.setTextAlignment(Qt.AlignCenter | Qt.AlignVCenter)
-        #self.setToolTip(self._field)
-        #self.setWhatsThis(self._field)
-        #self.setStatusTip(self._field)
 
         self.live_refresh()
 
-    '''def live_refresh(self):
-        self.setData(QtCore.Qt.EditRole, str(self.value))
-        self.setData(QtCore.Qt.DisplayRole, str(self.value))
-    '''
 
     @property
     def value(self):

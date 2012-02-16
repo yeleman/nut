@@ -10,19 +10,36 @@ from . import BaseModel, User, Period
 
 class Report(BaseModel):
 
+    """ Workflow:
+        1. CREATED (internal)
+        2. DRAFT (anytime before it reachs end of forms)
+        3. COMPLETE (end of form if data is valid) | can send
+        4. SENT | can send (resend) 
+        5. RECEIVED (server ack reception) | can NOT send
+        6. REMOTE_MODIFIED (received edits from server) | can NOT send
+        7. LOCAL_MODIFIED (updated after received) | can send
+        8. MODIFIED_SENT | can send
+        9. MODIFIED_RECEIVED | can NOT send
+        10. VALIDATED | can NOT send """
     STATUS_CREATED = 0 # blank created
     STATUS_DRAFT = 1 # started edition
     STATUS_COMPLETE = 2 # ready for transmission
     STATUS_SENT = 3 # SMS sent
-    STATUS_REMOTE_MODIFIED = 4 # modified by server users
-    STATUS_LOCAL_MODIFIED = 5 # modified locally after remote. next is SENT
-    STATUS_VALIDATED = 6 # has been validated online.
+    STATUS_RECEIVED = 4 # SMS sent and received by server
+    STATUS_REMOTE_MODIFIED = 5 # modified by server users
+    STATUS_LOCAL_MODIFIED = 6 # modified locally after remote.
+    STATUS_MODIFIED_SENT = 7 # update sent
+    STATUS_MODIFIED_RECEIVED = 8 # SMS update sent and received by server
+    STATUS_VALIDATED = 9 # has been validated online.
     STATUSES = ((STATUS_CREATED, u"Commencé"),
                 (STATUS_DRAFT, u"Commencé"),
                 (STATUS_COMPLETE, u"Terminé (non envoyé)"),
                 (STATUS_SENT, u"Envoyé"),
+                (STATUS_RECEIVED, u"envoyé (reçu)"),
                 (STATUS_REMOTE_MODIFIED, u"Attente corrections"),
                 (STATUS_LOCAL_MODIFIED, u"Corrigé (non envoyé)"),
+                (STATUS_MODIFIED_SENT, u"Envoyé (corrigé)"),
+                (STATUS_MODIFIED_RECEIVED, u"envoyé (corrigé reçu)"),
                 (STATUS_VALIDATED, u"Validé"))
     
     created_by = peewee.ForeignKeyField(User, related_name='reports')
@@ -131,18 +148,33 @@ class Report(BaseModel):
         for report in self.tied_reports():
             report.delete_safe()
 
-        self.create_instance()
+        self.delete_instance()
 
     def can_edit(self):
         """ Only if report has not been sent or has been modified remotely """
-        return self.status in (self.STATUS_DRAFT,
+
+        return self.status in (self.STATUS_CREATED,
+                               self.STATUS_DRAFT,
+                               self.STATUS_COMPLETE,
                                self.STATUS_REMOTE_MODIFIED,
                                self.STATUS_LOCAL_MODIFIED)
 
+
+    def can_send(self):
+        return self.status in (self.STATUS_COMPLETE,
+                               self.STATUS_SENT,
+                               self.STATUS_LOCAL_MODIFIED,
+                               self.STATUS_MODIFIED_SENT)
+
     def touch(self):
         """ mark report as changed (change status according to previous one) """
+
         # can't touch such a report
-        if self.status in (self.STATUS_SENT, self.STATUS_VALIDATED):
+        if self.status in (self.STATUS_SENT,
+                           self.STATUS_RECEIVED,
+                           self.STATUS_MODIFIED_SENT,
+                           self.STATUS_MODIFIED_RECEIVED,
+                           self.STATUS_VALIDATED):
             return False
         
         if self.status <= self.STATUS_COMPLETE:

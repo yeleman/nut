@@ -134,13 +134,16 @@ class CONSORDERReportTable(ReportFlexibleTable):
         if not self.validate():
             return False
 
+        reports = []
         for rowid in xrange(0, self.rowCount()):
             for colid in xrange(0, self.columnCount()):
                 item = self.item(rowid, colid)
                 if not hasattr(item, '_report') or not hasattr(item, '_field'):
                     continue
                 setattr(item._report, item._field, item.value)
-                item._report.save()
+                reports.append(item._report)
+        for r in list(set(reports)):
+            r.save()
 
         return True
 

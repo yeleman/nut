@@ -177,6 +177,11 @@ class Period(BaseModel):
         d = date(self.year, self.month, 1)
         return unicode(d.strftime('%B %Y').decode('utf-8'))
 
+    def __str__(self):
+        return ('%(month)s-%(year)s'
+                % {'month': str(self.month).zfill(2),
+                   'year': str(self.year).zfill(2)})
+
     @classmethod
     def from_date(cls, date_obj):
         datestr = date_obj.strftime('%m%Y')

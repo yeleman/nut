@@ -9,7 +9,7 @@ from nutclient.exceptions import *
 
 from nosmsd.utils import send_sms
 
-from sms.outgoing import report_sms
+from sms.outgoing import report_sms, report_update_sms
 
 
 def offline_login(username, password):
@@ -48,15 +48,38 @@ def formatted_number(number):
 
 def send_report(report, user):
     # can only send complete reports (or re-send)
-    if not report.status in (report.STATUS_COMPLETE,
-                             report.STATUS_LOCAL_MODIFIED,
-                             report.STATUS_SENT):
+    if not report.can_send():
         return False
-    
-    sms = (u"nut report %(user)s %(pwhash)s %(report)s-EOM-"
-           % {'user': user.username,
-              'pwhash': user.pwhash,
-              'report': report_sms(report)})
 
+    # create revision if it's not a resend
+    create_revision =  report.status not in (report.STATUS_SENT, 
+                                             report.STATUS_MODIFIED_SENT)
+
+    # change status
+    if report.status in (report.STATUS_LOCAL_MODIFIED,
+                         report.STATUS_MODIFIED_SENT):
+        report.status = report.STATUS_MODIFIED_SENT
+        sms_report = report_update_sms(report)
+        kw = 'update-report'
+    else:
+        report.status = report.STATUS_SENT
+        sms_report = report_sms(report)
+        kw = 'report'
+    
+    sms = (u"nut %(kw)s %(user)s %(pwhash)s %(report)s-EOM-"
+           % {'kw': kw,
+              'user': user.username,
+              'pwhash': user.pwhash,
+              'report': sms_report})
+
+    print(sms)
     send_sms(config.SRV_NUM, sms)
+
+    # save status change
+    report.save()
+
+    # commit revision
+    if create_revision:
+        report.create_revision_safe()
+
     return True

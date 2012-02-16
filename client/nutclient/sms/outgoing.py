@@ -179,12 +179,13 @@ def report_update_sms(report):
 
                 # only add if there's something
                 if len(df):
-                    cap_sms.append(u"|%(code)s "
-                               % {'code': input_report.nut_input.slug})
+                    #cap_sms.append(u"|%(code)s "
+                    #           % {'code': input_report.nut_input.slug})
 
                     for field, value in df.items():
                         cap_sms.append((u"%(code)s:%(val)d"
-                                    % {'code': compress_pec_field(field),
+                                    % {'code': compress_cons_field(input_report.nut_input.slug,
+                                                                   field),
                                        'val': value}))
             if len(cap_sms):
                 sec_sms.append(u"&%(cap)s" % {'cap': cap.upper()})
