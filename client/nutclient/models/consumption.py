@@ -111,6 +111,9 @@ class ConsumptionReport(BaseModel):
         # make sure all of them exist
         return self.is_complete()
 
+    def icr(self, code):
+        return self.nutinput_reports.filter(nut_input__slug=code).get()
+
 class InputConsumptionReport(BaseModel):
 
     """ Consumption Quantities for a NUTInput and a ConsumptionReport """
