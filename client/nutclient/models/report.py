@@ -383,7 +383,7 @@ class Report(BaseModel):
 
     @property
     def sum_all_total_admitted(self):
-        return self.sum_pec_fields('all_admitted')
+        return self.sum_pec_fields('all_total_admitted')
 
     @property
     def sum_all_hw_b7080_bmi_u18(self):
@@ -426,6 +426,10 @@ class Report(BaseModel):
         return self.sum_pec_fields('all_nut_referred_in')
 
     @property
+    def sum_all_total_admitted(self):
+        return self.sum_pec_fields('all_admitted')
+
+    @property
     def sum_all_total_admitted_m(self):
         return self.sum_pec_fields('all_admitted_m')
 
@@ -434,7 +438,23 @@ class Report(BaseModel):
         return self.sum_pec_fields('all_admitted_f')
 
     @property
+    def sum_all_admitted(self):
+        return self.sum_pec_fields('all_admitted')
+
+    @property
+    def sum_all_admitted_m(self):
+        return self.sum_pec_fields('all_admitted_m')
+
+    @property
+    def sum_all_admitted_f(self):
+        return self.sum_pec_fields('all_admitted_f')
+
+    @property
     def sum_all_refered_out(self):
+        return self.sum_pec_fields('all_refered_out')
+
+    @property
+    def sum_all_referred_out(self):
         return self.sum_pec_fields('all_refered_out')
 
     @property
