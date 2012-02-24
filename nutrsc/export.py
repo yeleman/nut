@@ -7,7 +7,11 @@ import xlwt
 
 from nutrsc.mali import HC_CAPS, CONSUMPTION_TABLE, DEFAULT_VERSION, CAPS
 from nutrsc.constants import MODERATE, SEVERE, SEVERE_COMP
-from database import Report, InputOrderReport
+
+try:
+    from database import InputOrderReport
+except ImportError:
+    from nut.models import InputOrderReport
 
 font_gras = xlwt.Font()
 font_gras.bold = True
@@ -405,6 +409,7 @@ def export_report(report, filepath=None):
 def main(argv=[]):
     if len(argv):
         try:
+            from database import Report
             report = Report.select().get(id=int(argv[0]))
         except:
             report = None
