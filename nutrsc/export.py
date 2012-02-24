@@ -3,15 +3,16 @@
 # vim: ai ts=4 sts=4 et sw=4 nu
 
 import sys
+import StringIO
+
 import xlwt
 
 from nutrsc.mali import HC_CAPS, CONSUMPTION_TABLE, DEFAULT_VERSION, CAPS
 from nutrsc.constants import MODERATE, SEVERE, SEVERE_COMP
-
 try:
     from database import InputOrderReport
 except ImportError:
-    from nut.models import InputOrderReport
+    pass
 
 font_gras = xlwt.Font()
 font_gras.bold = True
@@ -72,15 +73,15 @@ styleheader_left_g.alignment = left_al
 
 
 def val(report, field):
-    return getattr(report, field, u"")
+    return getattr(report, field, None)
 
 
-def empty(nb=10, var=""):
+def empty(nb=10, var=None):
     l = []; [l.append(var) for x in range(0, nb + 1)]
     return l
 
 
-def export_report(report, filepath=None):
+def export_report_stream(report):
 
     book = xlwt.Workbook(encoding='utf-8')
 
@@ -89,16 +90,42 @@ def export_report(report, filepath=None):
     sheet.row(8).height = 790
     sheet.row(26).height = 400
 
+    # define if django report or peewee (client)
+    is_django = report.__class__.__name__ == 'NutritionReport'
+
+    # setup some variables
+    if is_django:
+        hc_name = report.entity.name
+        issamp = report.is_samp
+        issam = report.is_sam
+        ismam = report.is_mam
+        others_hiv = report.pec_other_report.other_hiv
+        others_tb = report.pec_other_report.other_tb
+        others_lwb = report.pec_other_report.other_lwb
+        # retrieve InputOrderReport.objects.filter without importing
+        ior_class = list(report.order_reports()[0].input_order_reports.all())[0].__class__.objects.filter
+    else:
+        hc_name = report.hc_name
+        issamp = report.hc_issamp
+        issam = report.hc_issam
+        ismam = report.hc_ismam
+        others_hiv = report.others_hiv
+        others_tb = report.others_tb
+        others_lwb = report.others_lwb
+        ior_class = InputOrderReport.filter
+
     def write_merge_p(liste, style):
+        
         for index in liste:
             label = index.keys()[0]
             row, row1, col, col1 = index.values()[0]
             sheet.write_merge(row, row1, col, col1, label, style)
 
     def write_p(liste, on_row, i_row, on_col, i_col, style=style_value):
+
         for index in liste:
             style_ = style
-            if index == u"":
+            if index == None:
                 style_ = styleblack
             if on_row < 40 and on_row > 26 and on_col == 1:
                 sheet.write_merge(on_row, on_row, on_col, on_col + 2,
@@ -115,11 +142,11 @@ def export_report(report, filepath=None):
 
     def type_center():
         type_ = []
-        if report.hc_issam:
+        if issam:
             type_.append(HC_CAPS[SEVERE])
-        if report.hc_issamp:
+        if issamp:
             type_.append(HC_CAPS[SEVERE_COMP])
-        if report.hc_ismam:
+        if ismam:
             type_.append(HC_CAPS[MODERATE])
         return " + ".join(type_)
 
@@ -133,7 +160,7 @@ def export_report(report, filepath=None):
     sheet.write(2, 0, u"District")
     sheet.write(2, 1, u"")
     sheet.write(3, 0, u"CSCom")
-    sheet.write(3, 1, u"%s" % report.hc_name)
+    sheet.write(3, 1, u"%s" % hc_name)
 
     sheet.write_merge(4, 4, 0, 1, u"TYPE DE CENTRE")
     sheet.write_merge(4, 4, 2, 3, u"%s" % type_center())
@@ -309,9 +336,9 @@ def export_report(report, filepath=None):
                {u"PPN": [42, 42, 9, 9]},]
     write_merge_p(footers, style_without_border)
 
-    footers_values = [{u"%s" % report.others_hiv: [42, 42, 2, 2]},
-                      {u"%s" % report.others_tb: [42, 42, 7, 7]},
-                      {u"%s" % report.others_lwb: [42, 42, 10, 10]}]
+    footers_values = [{u"%s" % others_hiv: [42, 42, 2, 2]},
+                      {u"%s" % others_tb: [42, 42, 7, 7]},
+                      {u"%s" % others_lwb: [42, 42, 10, 10]}]
     write_merge_p(footers_values, style_value)
 
     #--------------------------------------------------------------------------#
@@ -328,7 +355,7 @@ def export_report(report, filepath=None):
 
     liste_title = [u"REGION", u"District", u"CSCom", u"TYPE DE CENTRE", u"Mois"]
     write_p(liste_title, 2, 1, 0, 0, styleheader_left)
-    val_title = [u"Gao", u" ", u"%s" % report.hc_name, u"%s" % type_center(),
+    val_title = [u"Gao", u" ", u"%s" % hc_name, u"%s" % type_center(),
                  u"%s" % report.period]
     write_p(val_title, 2, 1, 1, 0, styleheader_left)
     sheet.write(7,0, u"Les champs ci-dessus sont à remplir dans la feuille PEC.")
@@ -369,7 +396,7 @@ def export_report(report, filepath=None):
                 n += 1
                 continue
 
-            ior = InputOrderReport.filter(order_report=cap_order_report,
+            ior = ior_class(order_report=cap_order_report,
                                           nut_input=icr.nut_input).get()
 
             data = ["%s" % icr.initial, "%s" % icr.received, "%s" % icr.used,
@@ -399,25 +426,48 @@ def export_report(report, filepath=None):
     sheet.write_merge(30, 30, 0, 6, "OBSERVATIONS", styleheader)
     sheet.write_merge(31, 44, 0, 6, "", style_value)
 
+    stream = StringIO.StringIO()
+    book.save(stream)
+
+    return stream
+
+
+def export_report(report, filepath=None):
+
     if not filepath:
         filepath = 'report-%s.xls' % str(report.period)
     print('exporting %s to %s' % (report, filepath))
-    book.save(filepath)
-    return filepath
+
+    stream = export_report_stream(report)
+
+    f = file.open(filepath, 'w')
+    f.write(stream.getvalue())
+    f.close()
 
 
-def main(argv=[]):
-    if len(argv):
-        try:
-            from database import Report
-            report = Report.select().get(id=int(argv[0]))
-        except:
-            report = None
-    if not report:
-        report = Report.all()[-1]
-    if not report:
-        print("No report to export")
-    export_report(report)
+# def main(argv=[]):
+#     if len(argv):
+#         try:
+#             from database import Report
+#             report = Report.select().get(id=int(argv[0]))
+#         except:
+#             report = None
 
-if __name__ == '__main__':
-    main(sys.argv)
+#         if not report:
+#             try:
+#                 from ylmnut.nut.models import NutritionReport
+#                 report = NutritionReport.objects.get(id=int(argv[0]))
+#             except:
+#                 report = None
+
+#     if not report:
+#         try:
+#             report = Report.all()[-1]
+#         except:
+#             report = list(NutritionReport.objects.all())[-1]
+#     if not report:
+#         print("No report to export")
+#     export_report(report)
+
+# if __name__ == '__main__':
+#     main(sys.argv)

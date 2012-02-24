@@ -7,15 +7,15 @@ from django.shortcuts import render, get_object_or_404
 from django.utils.translation import ugettext as _
 from django.http import HttpResponse
 
+from bolibana.models import Entity, MonthPeriod
+from bolibana.web.decorators import provider_required, provider_permission
+
 from nut.data import (raw_data_periods_for,
                       entities_path,
                       provider_can_or_403,
                       current_reporting_period)
-
-from bolibana.models import Entity, MonthPeriod
-from bolibana.web.decorators import provider_required, provider_permission
 from nut.models import NutritionReport
-from nut.exports import report_as_excel
+from nutrsc.export import export_report_stream
 
 
 @provider_permission('can_view_raw_data')
@@ -106,12 +106,12 @@ def excel_export(request, report_receipt):
     # check permission or raise 403
     provider_can_or_403('can_view_raw_data', web_provider, report.entity)
 
-    file_name = 'PNLP_%(entity)s.%(month)s.%(year)s.xls' \
+    file_name = 'NUT_%(entity)s.%(month)s.%(year)s.xls' \
                 % {'entity': report.entity.slug, \
                    'month': report.period.middle().month, \
                    'year': report.period.middle().year}
 
-    file_content = report_as_excel(report).getvalue()
+    file_content = export_report_stream(report).getvalue()
 
     response = HttpResponse(file_content, \
                             content_type='application/vnd.ms-excel')

@@ -222,90 +222,90 @@ class PECMAMReport(models.Model, PECReport):
     # MISSING FIELDS FOR GENERAL TOTALS
     @property
     def pw_total_beginning_m(self):
-        return 0
+        return None
 
     @property
     def u59_hw_u70_bmi_u16(self):
-        return 0
+        return None
 
     @property
     def pw_hw_u70_bmi_u16(self):
-        return 0
+        return None
 
     @property
     def fu12_hw_u70_bmi_u16(self):
-        return 0
+        return None
 
     @property
     def u59_muac_u11_muac_u18(self):
-        return 0
+        return None
 
     @property
     def pw_muac_u11_muac_u18(self):
-        return 0
+        return None
 
     @property
     def fu12_muac_u11_muac_u18(self):
-        return 0
+        return None
 
     @property
     def u59_oedema(self):
-        return 0
+        return None
 
     @property
     def pw_oedema(self):
-        return 0
+        return None
 
     @property
     def fu12_oedema(self):
-        return 0
+        return None
 
     @property
     def fu12_new_case(self):
-        return 0
+        return None
 
     @property
     def fu12_relapse(self):
-        return 0
+        return None
 
     @property
     def fu12_returned(self):
-        return 0
+        return None
 
     @property
     def u59_nut_transfered_in(self):
-        return 0
+        return None
 
     @property
     def pw_nut_transfered_in(self):
-        return 0
+        return None
 
     @property
     def fu12_nut_transfered_in(self):
-        return 0
+        return None
 
     @property
     def pw_total_admitted_m(self):
-        return 0
+        return None
 
     @property
     def u59_nut_transfered_out(self):
-        return 0
+        return None
 
     @property
     def pw_nut_transfered_out(self):
-        return 0
+        return None
 
     @property
     def fu12_nut_transfered_out(self):
-        return 0
+        return None
 
     @property
     def pw_total_out_m(self):
-        return 0
+        return None
 
     @property
     def pw_total_end_m(self):
-        return 0
+        return None
 
 reversion.register(PECMAMReport)

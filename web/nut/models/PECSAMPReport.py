@@ -254,50 +254,50 @@ class PECSAMPReport(models.Model, PECReport):
     # MISSING FIELDS FOR GENERAL TOTALS
     @property
     def u6_hw_b7080_bmi_u18(self):
-        return 0
+        return None
 
     @property
     def u59_hw_b7080_bmi_u18(self):
-        return 0
+        return None
 
     @property
     def o59_hw_b7080_bmi_u18(self):
-        return 0
+        return None
 
     @property
     def u6_muac_u120(self):
-        return 0
+        return None
 
     @property
     def u59_muac_u120(self):
-        return 0
+        return None
 
     @property
     def o59_muac_u120(self):
-        return 0
+        return None
 
     @property
     def u6_nut_referred_in(self):
-        return 0
+        return None
 
     @property
     def u59_nut_referred_in(self):
-        return 0
+        return None
 
     @property
     def o59_nut_referred_in(self):
-        return 0
+        return None
 
     @property
     def u6_referred_out(self):
-        return 0
+        return None
 
     @property
     def u59_referred_out(self):
-        return 0
+        return None
 
     @property
     def o59_referred_out(self):
-        return 0
+        return None
 
 reversion.register(PECSAMPReport)
