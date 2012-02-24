@@ -270,7 +270,23 @@ class NutritionReport(Report):
         return self.sum_pec_fields('all_total_admitted_f')
 
     @property
+    def sum_all_admitted(self):
+        return self.sum_pec_fields('all_total_admitted')
+
+    @property
+    def sum_all_admitted_m(self):
+        return self.sum_pec_fields('all_total_admitted_m')
+
+    @property
+    def sum_all_admitted_f(self):
+        return self.sum_pec_fields('all_total_admitted_f')
+
+    @property
     def sum_all_refered_out(self):
+        return self.sum_pec_fields('all_refered_out')
+
+    @property
+    def sum_all_referred_out(self):
         return self.sum_pec_fields('all_refered_out')
 
     @property

@@ -10,7 +10,7 @@ import xlwt
 from nutrsc.mali import HC_CAPS, CONSUMPTION_TABLE, DEFAULT_VERSION, CAPS
 from nutrsc.constants import MODERATE, SEVERE, SEVERE_COMP
 try:
-    from database import InputOrderReport
+    from nutclient.database import InputOrderReport
 except ImportError:
     pass
 
@@ -151,7 +151,7 @@ def export_report_stream(report):
         return " + ".join(type_)
 
     # Titres
-    sheet.write_merge(0, 0, 0, 12,
+    sheet.write_merge(0, 0, 0, 17,
                       u"RAPPORT STATISTIQUE MENSUEL - TRAITEMENT DE "
                       u"LA MALNUTRITION AIGUE", style_title)
     # En-tête gauche
@@ -437,37 +437,37 @@ def export_report(report, filepath=None):
     if not filepath:
         filepath = 'report-%s.xls' % str(report.period)
     print('exporting %s to %s' % (report, filepath))
-
+ 
     stream = export_report_stream(report)
 
-    f = file.open(filepath, 'w')
+    f = file(filepath, 'w')
     f.write(stream.getvalue())
     f.close()
 
 
-# def main(argv=[]):
-#     if len(argv):
-#         try:
-#             from database import Report
-#             report = Report.select().get(id=int(argv[0]))
-#         except:
-#             report = None
+def main(argv=[]):
+    if len(argv):
+        try:
+            from nutclient.database import Report
+            report = Report.select().get(id=int(argv[1]))
+        except:
+            report = None
 
-#         if not report:
-#             try:
-#                 from ylmnut.nut.models import NutritionReport
-#                 report = NutritionReport.objects.get(id=int(argv[0]))
-#             except:
-#                 report = None
+        if not report:
+            try:
+                from ylmnut.nut.models import NutritionReport
+                report = NutritionReport.objects.get(id=int(argv[1]))
+            except:
+                report = None
 
-#     if not report:
-#         try:
-#             report = Report.all()[-1]
-#         except:
-#             report = list(NutritionReport.objects.all())[-1]
-#     if not report:
-#         print("No report to export")
-#     export_report(report)
+    if not report:
+        try:
+            report = Report.all()[-1]
+        except:
+            report = list(NutritionReport.objects.all())[-1]
+    if not report:
+        print("No report to export")
+    export_report(report)
 
-# if __name__ == '__main__':
-#     main(sys.argv)
+if __name__ == '__main__':
+    main(sys.argv)
